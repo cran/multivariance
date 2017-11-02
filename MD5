@@ -1,0 +1,15 @@
+40f613bb8863349a77d524531362d9b6 *DESCRIPTION
+4353e40dffdd66383c1546c693694e56 *NAMESPACE
+fb176320b3c77adf313c0095da70fa2c *R/multivariance-functions.R
+0fd2beb6a00a0d8a899c561d51e20adf *man/cdm.Rd
+254b7a7e944027a8ad4a812c91f064db *man/cdm.product.Rd
+a55bc03828429bd7ca4e54cc29e29d89 *man/cdms.Rd
+ac05f63a98eefbf662399e7453319589 *man/coins.Rd
+38b686f0990bfde83e59ff0deb97b9e9 *man/independence.test.Rd
+0841656420468a0199d0f11b59685f1e *man/multicorrelation.Rd
+d69d87a4d181df118fbb46b748db545a *man/multivariance-package.Rd
+518e9acc92d6f52a0ba002e99aece0e7 *man/multivariance.Rd
+63109f6eb207b4858a6fe5055e00b871 *man/multivariance.pvalue.Rd
+3b9fe63406d0489516870ba279398eea *man/rejection.level.Rd
+c8caa3f18459efadc65a02964cccc041 *man/tetrahedron.Rd
+01496e5cec144390ddabd5e29eccfe78 *man/total.multivariance.Rd
