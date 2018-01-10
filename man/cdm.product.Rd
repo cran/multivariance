@@ -10,7 +10,7 @@ cdm.product(x, vec = if (length(dim(x)) == 2) {     1:ncol(x) } else {     NA
 \arguments{
 \item{x}{either a data matrix or an array of centered distance matrices}
 
-\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is an array, these are the indexes for which the multivariance is calculated. The default is all columns and all indicies, respectively.}
+\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is an array, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
 }
 \description{
 Computes the product of the distance matrices with the given indexes

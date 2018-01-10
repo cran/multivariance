@@ -4,25 +4,39 @@
 \alias{cdm}
 \title{centered distance matrix}
 \usage{
-cdm(x, normalize = TRUE, psi = NULL)
+cdm(x, normalize = TRUE, psi = NULL, p = NULL)
 }
 \arguments{
 \item{x}{matrix, each row of the matrix is treated as one sample}
 
-\item{normalize}{logical - indicates if the matrix should be normalized}
+\item{normalize}{logical, indicates if the matrix should be normalized}
 
-\item{psi}{the continuous negative definite function to be used. If it is \code{NULL}, the euclidean distance will be used}
+\item{psi}{a real valued function of two variables, to compute the distance of two samples based on a continuous negative definite function. If it is \code{NULL}, the euclidean distance will be used}
+
+\item{p}{numeric, if it is a value between 1 and 2 then the Minkowski distance with parameter p is used.}
 }
 \description{
-calculates the centered distance matrix
+computes the centered distance matrix
 }
 \details{
-Short: If \code{normalize = TRUE} then value of multivariance is comparable and meaningful. It can be compared to the \code{\link{rejection.level}} or its p-value \code{\link{multivariance.pvalue}} can be computed.
+The centered distance matrices are required for the computation of (total / m-) multivariance.
 
-If \code{normalize = TRUE} the matrix is scaled such that the multivariance based on it, times the sample size, has in the limit - in the case of independence - the distribution of an L^2 norm of a Gaussian process with known expectation.
+If \code{normalize = TRUE} then the value of multivariance is comparable and meaningful. It can be compared to the \code{\link{rejection.level}} or its p-value \code{\link{multivariance.pvalue}} can be computed.
+
+More details: If \code{normalize = TRUE} the matrix is scaled such that the multivariance based on it, times the sample size, has in the limit - in the case of independence - the distribution of an L^2 norm of a Gaussian process with known expectation.
 }
 \examples{
 x = coins(100)
 cdm(x) # fast euclidean distances
 cdm(x,psi = function(x,y) sqrt(sum((x-y)^2))) # this is identical to the previous (but slower)
+
+# the function cdm does the following three lines in a faster way
+N = nrow(x)
+C = diag(N) - matrix(1/N,nrow = N,ncol = N)
+A = - C \%*\% as.matrix(stats::dist(x,method="euclidean")) \%*\% C #'
+all(abs(A- cdm(x,normalize = FALSE)) < 10^(-12))
+
+}
+\references{
+For the theoretic background see the references given on the main help page of this package: \link{multivariance-package}.
 }

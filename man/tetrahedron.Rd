@@ -2,7 +2,7 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{tetrahedron}
 \alias{tetrahedron}
-\title{tetrahedron sampling}
+\title{dependence example: tetrahedron sampling}
 \usage{
 tetrahedron(N = 1000)
 }
@@ -18,4 +18,7 @@ This function creates samples of a tetrahedron-dice colored r, g, b and rgb. Eac
 \examples{
 tetrahedron(10)
 
+}
+\references{
+For the theoretic background see the reference [3] given on the main help page of this package: \link{multivariance-package}.
 }

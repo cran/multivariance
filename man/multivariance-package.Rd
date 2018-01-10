@@ -3,14 +3,18 @@
 \docType{package}
 \name{multivariance-package}
 \alias{multivariance-package}
-\title{Multivariance: detecting and measuring multivariate dependence}
+\title{multivariance: Measuring Multivariate Dependence Using Distance Multivariance}
 \description{
 The multivariance package provides basic functions to calculate distance multivariance and related quantities.
 }
 \details{
-Distance multivariance is a measure of dependence which can be used to detect and quantify dependence structures. The necessary functions are implemented in this packages, and examples are given. For the theoretic background we refer to the forthcoming papers [1,2].
+Distance multivariance is a measure of dependence which can be used to detect and quantify dependence structures. The necessary functions are implemented in this packages, and examples are given. For the theoretic background we refer to the papers [1,2] and [3]. The latter includes a summary of the first two. It is the recommended starting point for users with an applied interest.
 
 The (current) code should be understood as \emph{proof of concept}, certainly there is room for improvement and development. Questions, comments and remarks are welcome: \email{bjoern.boettcher@tu-dresden.de}
+
+For infos on the latest changes and/or updates to the package use \code{news(package="multivariance")}.
+
+To cite this package use the standard citation for R packages, i.e., the output of \code{citation("multivariance")}.
 }
 \section{Multivariance}{
 
@@ -18,26 +22,44 @@ The (current) code should be understood as \emph{proof of concept}, certainly th
  \code{\link{multivariance}} computes the distance multivariance
 
  \code{\link{total.multivariance}} computes the total distance multivariance
+
+ \code{\link{m.multivariance}} computes the m-multivariance (introduced in [3])
+
+ It might be convenient to compute these simultaneously using \code{\link{multivariances.all}}.
 }
 
 \section{Functions to use and interpret multivariance}{
 
 
- \code{\link{rejection.level}} computes the rejection level for a given significance level. This can be used for a sensitive (conservative) interpretation of distance multivariance. The counterpart is \code{\link{multivariance.pvalue}}, which computes the pvalue for a given distance multivariance. Both use the hypothesis of independence.
+ \code{\link{rejection.level}} computes the rejection level for a given significance level. This can be used for a conservative interpretation of distance multivariance. The counterpart is \code{\link{multivariance.pvalue}}, which computes a conservative p-value for a given distance multivariance. Both methods are distribution-free.
 
- \code{\link{independence.test}} provides the corresponding test of independence.
+ \code{\link{resample.rejection.level}} and \code{\link{resample.pvalue}} are the distribution dependent versions of the above. They are approximately sharp, but computational more expensive. Any resampling is done by \code{\link{resample.multivariance}}.
 
-\code{\link{cdm}} and \code{\link{cdms}} compute the centered distance matrix and matrices, respectively. These can be used for faster computation of distance multivariance.
+ \code{\link{independence.test}} provides the corresponding tests of independence.
+
+\code{\link{cdm}} and \code{\link{cdms}} compute the centered distance matrix and matrices, respectively. These can be used to speed up repeated computations of distance multivariance.
+}
+
+\section{Dependence structures}{
+
+
+ \code{\link{dependence.structure}} performs the dependence structure detection algorithm as described in [3].
+
+ \code{\link{find.cluster}} is the basic building block of \code{\link{dependence.structure}}. It is recommended to use \code{\link{dependence.structure}}.
 }
 
 \section{Examples}{
 
 
 \code{\link{coins}} and \code{\link{tetrahedron}} generate samples of pairwise independent random variables, with dependence of higher order.
+
+\code{\link{dep_struct_iterated_13_100}}, \code{\link{dep_struct_ring_15_100}}, \code{\link{dep_struct_several_26_100}} and \code{\link{dep_struct_star_9_100}} are example data sets for the dependence structure detection. These might also serve as benchmark examples.
 }
 
 \references{
-[1] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors I. Generalized distance covariance and Gaussian covariance. Preprint 2017.
+[1] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors I. Generalized distance covariance and Gaussian covariance. Preprint 2017. \url{https://arxiv.org/abs/1711.07778}
 
-[2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors II. Distance multivariance and Gaussian multivariance. Preprint 2017.
+[2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors II. Distance multivariance and Gaussian multivariance. Preprint 2017. \url{https://arxiv.org/abs/1711.07775}
+
+[3] B. Böttcher, Dependence Structures - Estimation and Visualization Using Distance Multivariance. Preprint 2017. \url{https://arxiv.org/abs/1712.06532}
 }

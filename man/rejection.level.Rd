@@ -10,19 +10,25 @@ rejection.level(alpha)
 \item{alpha}{level of significance}
 }
 \description{
-Under independence the probability for the normalized and Nscaled multivariance to be above this level is less than alpha. The same holds for the normalized, Nscaled and Escaled total multivariance.
+Under independence the probability for the normalized and Nscaled multivariance to be above this level is less than \code{alpha}. The same holds for the normalized, Nscaled and Escaled total multivariance and m-multivariance.
 }
 \details{
-The value might be very conservative. This is the counterpart to \code{\link{multivariance.pvalue}}.
+This is based on a distribution-free approach. The value might be very conservative. This is the counterpart to \code{\link{multivariance.pvalue}}. For a less conservative approach see \code{\link{resample.rejection.level}}.
+
+The estimate is only valid for \code{alpha} smaller than 0.215.
 }
 \examples{
-\dontrun{ curve(rejection.level(x),xlim = c(0.001,0.2))}
-
 rejection.level(0.05) #the rejection level, for comparison with the following values
 total.multivariance(matrix(rnorm(100*3),ncol = 3)) #independent sample
 total.multivariance(coins(100)) #dependent sample which is 2-independent
 
+# and the p values are (to compare with alpha)
 multivariance.pvalue(total.multivariance(matrix(rnorm(100*3),ncol = 3))) #independent sample
 multivariance.pvalue(total.multivariance(coins(100))) #dependent sample which is 2-independent
+
+\dontrun{
+# visualization of the rejection level
+curve(rejection.level(x),xlim = c(0.001,0.215),xlab = "alpha")
+}
 
 }

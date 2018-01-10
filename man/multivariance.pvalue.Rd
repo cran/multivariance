@@ -2,7 +2,7 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{multivariance.pvalue}
 \alias{multivariance.pvalue}
-\title{transform multivariance to pvalue}
+\title{transform multivariance to p-value}
 \usage{
 multivariance.pvalue(x)
 }
@@ -10,8 +10,13 @@ multivariance.pvalue(x)
 \item{x}{value of a normalized and Nscaled \code{\link{multivariance}}}
 }
 \description{
-Computes the p-value (under the hypothesis of independence) for a given multivariance/total multivariance.
+Computes the p-value for the hypothesis of independence for a given multivariance/total multivariance.
 }
 \details{
-The p-value is conservative, i.e. it might be much smaller. This is the counterpart to \code{\link{rejection.level}}.
+This is based on a distribution-free approach. The p-value is conservative, i.e. it might be much smaller. This is the counterpart to \code{\link{rejection.level}}. For a less conservative approach see \code{\link{resample.pvalue}}.
+
+p-values larger than 0.215 might be incorrect, since the distribution-free estimate on which the computation is based only holds up to 0.215.
+}
+\references{
+For the theoretic background see the references given on the main help page of this package: \link{multivariance-package}.
 }

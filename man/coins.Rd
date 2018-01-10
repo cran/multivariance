@@ -2,7 +2,7 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{coins}
 \alias{coins}
-\title{k-independent coin sampling}
+\title{dependence example: k-independent coin sampling}
 \usage{
 coins(N = 1000, k = 2)
 }
@@ -15,9 +15,12 @@ coins(N = 1000, k = 2)
 It returns the samples as rows of an \code{N} by \code{k+1} matrix. The columns are dependent but k-independent.
 }
 \description{
-This function creates samples which are k-independent.
+This function creates samples which are dependent but k-independent.
 }
 \examples{
 coins(200,4)
 
+}
+\references{
+For the theoretic background see the reference [3] given on the main help page of this package: \link{multivariance-package}.
 }

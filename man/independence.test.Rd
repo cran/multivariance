@@ -4,29 +4,39 @@
 \alias{independence.test}
 \title{test for independence}
 \usage{
-independence.test(x, vec = NA, alpha = 0.05)
+independence.test(x, vec = 1:ncol(x), alpha = 0.05,
+  type = "distribution_free")
 }
 \arguments{
 \item{x}{either a data matrix or an array of centered distance matrices}
 
-\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is an array, these are the indexes for which the multivariance is calculated. The default is all columns and all indicies, respectively.}
+\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is an array, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
 
 \item{alpha}{significance level}
+
+\item{type}{one of \code{"distribution_free","resample"}}
 }
 \value{
 Returns \code{TRUE} if the hypothesis of independence is NOT rejected, otherwise \code{FALSE}.
 }
 \description{
-This computes a test of independence for given columns of a sample matrix or given centered distance matrices.
+This computes a test of independence for the columns of a sample matrix (required for the resampling test) or for given centered distance matrices (only possible for the distribution-free test).
 }
 \details{
-The test might be very conservative.
-
-The centered distance matrices can be prepared by \code{\link{cdms}}.
+The \code{"distribution_free"} test might be very conservative.
+The centered distance matrices can be prepared by \code{\link{cdms}}. But note that for the resample test, the data matrix has to be given.
 }
 \examples{
-independence.test(coins(100)) # dependent sample
-independence.test(coins(100)[,2:3]) # independent sample
 independence.test(coins(100)) #dependent sample which is 2-independent
+independence.test(coins(100),type = "resample") #dependent sample which is 2-independent
 
+independence.test(coins(100)[,2:3]) # independent sample
+independence.test(coins(100)[,2:3],type = "resample") # independent sample
+
+independence.test(coins(10),type = "resample") #dependent sample which is 2-independent
+independence.test(coins(10)[,2:3],type = "resample") #dependent sample which is 2-independent
+
+}
+\references{
+For the theoretic background see the references given on the main help page of this package: \link{multivariance-package}.
 }

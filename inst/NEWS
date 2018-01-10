@@ -1,0 +1,23 @@
+Changes in Version 1.1.0
+========================
+New Features
+  * 'm.multivariance' a function to calculate the m-multivariance
+  * 'multivariances.all' a function to calculate standard/total/m-multivariance simultaneously
+  * 'resample.multivariance' implements the resampling method which can be used to get less conservative tests than the distribution-free methods
+  * 'dependence.structure' a function to generate a graphical model of the dependence structure
+  * various examples of the use of 'dependence.structure'
+
+Changes
+  * The standard output of 'multivariance' is now (distance multivariance squared) scaled by the sample size. Use 'Nscale = FALSE' to get the value without this scaling. The reason for this was twofold: 1. it is now the same setting as for 'total.multivariance'. 2. This is the only value which can (roughly) be interpreted without further calculations.
+
+Updates
+  * improved documentation. In particular, it is now cleary stated that the squared values are the standard output of 'multivariance' and 'total.multivariance'
+  * some speed up
+
+
+Changes in Version 1.0.5 2017-11-01
+===================================
+Details
+  * Initial public release
+
+

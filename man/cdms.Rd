@@ -4,21 +4,20 @@
 \alias{cdms}
 \title{computes the centered distance matrices}
 \usage{
-cdms(x, membership = 1:ncol(x), ...)
+cdms(x, vec = 1:ncol(x), membership = NULL, ...)
 }
 \arguments{
 \item{x}{matrix, each row is a sample}
 
-\item{membership}{vector which indicates which columns are treated as one sample}
+\item{vec}{vector which indicates which columns are treated as one sample}
+
+\item{membership}{depreciated. Now use \code{vec}.}
 
 \item{...}{these are passed to \code{\link{cdm}}}
 }
 \value{
-It returns an 3 dimensional array of the distance matrices. The index of the first dimension names the component for which the matrix is computed, thus it ranges from 1 to max(membership).
+It returns an 3 dimensional array of the distance matrices. The index of the first dimension names the component for which the matrix is computed, thus it ranges from 1 to max(vec).
 }
 \description{
 computes the centered distance matrices
-}
-\details{
-\code{membership} has to be a vector of length \code{ncol(x)}. Furthermore it has to have values from 1 to the number of classes.
 }

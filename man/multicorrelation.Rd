@@ -4,12 +4,14 @@
 \alias{multicorrelation}
 \title{distance multicorrelation}
 \usage{
-multicorrelation(x, vec = NA, ...)
+multicorrelation(x, vec = NA, squared = FALSE, ...)
 }
 \arguments{
 \item{x}{either a data matrix or an array of centered distance matrices}
 
-\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is an array, these are the indexes for which the multivariance is calculated. The default is all columns and all indicies, respectively.}
+\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is an array, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
+
+\item{squared}{if \code{FALSE} it returns the actual multivariance, otherwise the squared multivariance (less computation)}
 
 \item{...}{these are passed to \code{\link{cdms}} (which is only invoked if \code{x} is a matrix)}
 }
@@ -17,5 +19,8 @@ multicorrelation(x, vec = NA, ...)
 computes the distance multicorrelation
 }
 \details{
-This is just a wrapper for \code{\link{multivariance}(x,vec,Nscale = FALSE,correlation = TRUE,...)}.
+This is just a wrapper for \code{\link{multivariance}(x,vec,Nscale = FALSE,correlation = TRUE,squared = squared,...)}.
+}
+\references{
+For the theoretic background see the references given on the main help page of this package: \link{multivariance-package}.
 }
