@@ -10,6 +10,8 @@ context("centered distance matrices")
 test_that("cdms",{
   expect_warning(cdm(matrix(1,nrow= N,ncol = n)),"constant")
   expect_equal(cdm(x),cdm(x,psi = function(x,y) sqrt(sum((x-y)^2))))
+  expect_equivalent(fastdist(as.matrix(x[,1])),as.matrix(dist(x[,1])))
+  expect_equivalent(fastdist(as.matrix(x)),as.matrix(dist(x)))
 })
 
 context("definition of multivariances")

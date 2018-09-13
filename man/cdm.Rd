@@ -4,16 +4,18 @@
 \alias{cdm}
 \title{centered distance matrix}
 \usage{
-cdm(x, normalize = TRUE, psi = NULL, p = NULL)
+cdm(x, normalize = TRUE, psi = NULL, p = NULL, isotropic = FALSE)
 }
 \arguments{
 \item{x}{matrix, each row of the matrix is treated as one sample}
 
 \item{normalize}{logical, indicates if the matrix should be normalized}
 
-\item{psi}{a real valued function of two variables, to compute the distance of two samples based on a continuous negative definite function. If it is \code{NULL}, the euclidean distance will be used}
+\item{psi}{a real valued function of two variables (in the case of \code{isotropic = FALSE}) or one variable (in the case of \code{isotropic = TRUE}), to compute the distance of two samples based on a continuous negative definite function. If it is \code{NULL}, the euclidean distance will be used}
 
 \item{p}{numeric, if it is a value between 1 and 2 then the Minkowski distance with parameter p is used.}
+
+\item{isotropic}{logical, indicates if psi of the Euclidean distance matrix should be computed, i.e., if an isotropic distance should be used.}
 }
 \description{
 computes the centered distance matrix

@@ -8,11 +8,11 @@ find.cluster(x, vec = 1:ncol(x), array.cdm = cdms(x, vec = vec),
   mem = as.numeric(1:max(vec)), cluster.to.vertex = 1:max(mem),
   vertex.to.cdm = 1:max(mem), previous.n.o.cdms = rep(0, max(mem)),
   all.multivariances = numeric(0),
-  g = igraph::add.vertices(igraph::graph.empty(, directed = FALSE), max(mem),
-  label = sapply(1:max(mem), function(r) paste(colnames(x, do.NULL = FALSE,
-  prefix = "")[vec == r], collapse = ",")), shape = "circle"),
-  fixed.rejection.level = NA, alpha = 0.05, p.adjust.method = "holm",
-  verbose = TRUE, kvec = 2:max(mem))
+  g = igraph::add.vertices(igraph::graph.empty(, directed = FALSE),
+  max(mem), label = sapply(1:max(mem), function(r) paste(colnames(x,
+  do.NULL = FALSE, prefix = "")[vec == r], collapse = ",")), shape =
+  "circle"), fixed.rejection.level = NA, alpha = 0.05,
+  p.adjust.method = "holm", verbose = TRUE, kvec = 2:max(mem))
 }
 \arguments{
 \item{x}{matrix with the samples}

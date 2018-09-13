@@ -12,7 +12,7 @@ resample.pvalue(value, ...)
 \item{...}{passed to \code{\link{resample.multivariance}}. Required is the data matrix \code{x}.}
 }
 \value{
-It returns 1 minus the value of the empirical distribution function of the resampling samples evaluated at the given value is returned.
+It returns 1 minus the value of the empirical distribution function of the resampling samples evaluated at the given value.
 }
 \description{
 Use a resampling method to generate samples of the test statistic under the hypothesis of independence. Based on these the p.value of a given value of a test statistic is computed.

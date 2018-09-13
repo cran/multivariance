@@ -4,8 +4,8 @@
 \alias{resample.multivariance}
 \title{resampling (total /m-) multivariance}
 \usage{
-resample.multivariance(x, vec = 1:ncol(x), times = 300, type = "multi",
-  resample.type = "permutation", ...)
+resample.multivariance(x, vec = 1:ncol(x), times = 300,
+  type = "multi", resample.type = "permutation", ...)
 }
 \arguments{
 \item{x}{matrix, the rows should be iid samples}
@@ -18,7 +18,7 @@ resample.multivariance(x, vec = 1:ncol(x), times = 300, type = "multi",
 
 \item{resample.type}{one of \code{"permutation", "bootstrap"}. The samples are generated without replacement (permutations) or with replacement (bootstrap).}
 
-\item{...}{is passed to \code{\link{multivariance}, \link{total.multivariance}, \link{m.multivariance}}, respectively.}
+\item{...}{is passed to \code{\link{cdms}, \link{multivariance}, \link{total.multivariance}, \link{m.multivariance}}, respectively.}
 }
 \value{
 A list with elements
@@ -38,7 +38,7 @@ For convenience also the actual (total /m-) multivariance is computed and its p-
 }
 \examples{
 re.m = resample.multivariance(matrix(rnorm(30*2),nrow = 30),
-                        Nscale = TRUE,type= "multi",times = 300)$resampled
+                        type= "multi",times = 300)$resampled
 curve(ecdf(re.m)(x), xlim = c(0,4),main = "empirical distribution of the test statistic under H_0")
 }
 \references{

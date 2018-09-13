@@ -16,7 +16,7 @@ m.multivariance(x, vec = NA, m = 2, Nscale = TRUE, Escale = TRUE,
 
 \item{Nscale}{if \code{TRUE} the multivariance is scaled up by the sample size (and thus it is exactly as required for the test of independence)}
 
-\item{Escale}{if \code{TRUE} then it is scaled by the number of multivariances which are theoretically summed up (this yields an expectation of 1 in the case of independence)}
+\item{Escale}{if \code{TRUE} then it is scaled by the number of multivariances which are theoretically summed up (in the case of independence this yields for normalized distance matrices an estimator with expectation 1)}
 
 \item{squared}{if \code{FALSE} it returns the actual multivariance, otherwise the squared multivariance (less computation)}
 

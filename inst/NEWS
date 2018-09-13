@@ -1,3 +1,17 @@
+
+New Features
+ * 'independence.test' is now also implemented with type "pearson_approx". Providing the fast p-value approximation developed in <arXiv:1808.07280>. For this also the functions 'pearson.qf' (a Gaussian quadratic form estimate based on mean, variance and skewness) and 'pearson.pvalue' (the corresponding p-value estimate based on new moment estimators) are introduced.
+ * In "cmd" one can now explicitly specify the use of "isotropic" continuous negative definite functions. This speeds up the calculation for this case by a factor of about 100.
+
+Fixed
+ * the option "squared" works now also for multivariance with option "correlation=TRUE".
+ * 'multivariances.all' returns NA for 3-multivariance if only two variables are given.
+
+Updates
+ * speed up of various functions
+ * various typos corrected
+
+
 Changes in Version 1.1.0
 ========================
 New Features

@@ -4,7 +4,7 @@
 \name{dep_struct_ring_15_100}
 \alias{dep_struct_ring_15_100}
 \title{example dataset for \code{\link{dependence.structure}}}
-\format{\code{matrix} 13 variables (columns), 100 independent samples (rows)}
+\format{\code{matrix} 15 variables (columns), 100 independent samples (rows)}
 \usage{
 dep_struct_ring_15_100
 }

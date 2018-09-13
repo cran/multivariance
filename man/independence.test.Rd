@@ -5,7 +5,7 @@
 \title{test for independence}
 \usage{
 independence.test(x, vec = 1:ncol(x), alpha = 0.05,
-  type = "distribution_free")
+  type = "distribution_free", verbose = TRUE, ...)
 }
 \arguments{
 \item{x}{either a data matrix or an array of centered distance matrices}
@@ -14,7 +14,11 @@ independence.test(x, vec = 1:ncol(x), alpha = 0.05,
 
 \item{alpha}{significance level}
 
-\item{type}{one of \code{"distribution_free","resample"}}
+\item{type}{one of \code{"pearson_approx","distribution_free","resample"}}
+
+\item{verbose}{logical, if TRUE meaningful text output is generated.}
+
+\item{...}{these are passed to \code{\link{cdms}} (which is only invoked if \code{x} is a matrix)}
 }
 \value{
 Returns \code{TRUE} if the hypothesis of independence is NOT rejected, otherwise \code{FALSE}.
@@ -23,8 +27,8 @@ Returns \code{TRUE} if the hypothesis of independence is NOT rejected, otherwise
 This computes a test of independence for the columns of a sample matrix (required for the resampling test) or for given centered distance matrices (only possible for the distribution-free test).
 }
 \details{
-The \code{"distribution_free"} test might be very conservative.
-The centered distance matrices can be prepared by \code{\link{cdms}}. But note that for the resample test, the data matrix has to be given.
+The \code{"pearson_approx"} and \code{"resample"} are approximately sharp. The latter is based on a resampling approach and thus much slower. The \code{"distribution_free"} test might be very conservative.
+The centered distance matrices can be prepared by \code{\link{cdms}}. But note that for the test based on Pearson's approximation and for the resample test, the data matrix has to be given.
 }
 \examples{
 independence.test(coins(100)) #dependent sample which is 2-independent

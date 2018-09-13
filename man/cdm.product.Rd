@@ -4,8 +4,8 @@
 \alias{cdm.product}
 \title{Product of distance matrices}
 \usage{
-cdm.product(x, vec = if (length(dim(x)) == 2) {     1:ncol(x) } else {     NA
-  })
+cdm.product(x, vec = if (length(dim(x)) == 2) {     1:ncol(x) } else {   
+   NA })
 }
 \arguments{
 \item{x}{either a data matrix or an array of centered distance matrices}

@@ -8,9 +8,11 @@
 The multivariance package provides basic functions to calculate distance multivariance and related quantities.
 }
 \details{
-Distance multivariance is a measure of dependence which can be used to detect and quantify dependence structures. The necessary functions are implemented in this packages, and examples are given. For the theoretic background we refer to the papers [1,2] and [3]. The latter includes a summary of the first two. It is the recommended starting point for users with an applied interest.
+Distance multivariance is a measure of dependence which can be used to detect and quantify dependence structures. The necessary functions are implemented in this packages, and examples are given. For the theoretic background we refer to the papers [1,2,3,4]. Paper [3] includes a summary of the first two. It is the recommended starting point for users with an applied interest. Paper [4] is concerned with new (faster) p-value estimates for the independence tests.
 
-The (current) code should be understood as \emph{proof of concept}, certainly there is room for improvement and development. Questions, comments and remarks are welcome: \email{bjoern.boettcher@tu-dresden.de}
+The (current) code is tested and speed improved in comparison to the former releases. Certainly there is still room for improvement and development. Questions, comments and remarks are welcome: \email{bjoern.boettcher@tu-dresden.de}
+
+Users on Windows machines might get a considerable speed up using MRO instead of the standard R release - since this is particularly faster for large matrix operations.
 
 For infos on the latest changes and/or updates to the package use \code{news(package="multivariance")}.
 
@@ -31,13 +33,17 @@ To cite this package use the standard citation for R packages, i.e., the output 
 \section{Functions to use and interpret multivariance}{
 
 
- \code{\link{rejection.level}} computes the rejection level for a given significance level. This can be used for a conservative interpretation of distance multivariance. The counterpart is \code{\link{multivariance.pvalue}}, which computes a conservative p-value for a given distance multivariance. Both methods are distribution-free.
+ \code{\link{rejection.level}} computes a (conservative) rejection level for a given significance level. This can be used for a conservative interpretation of distance multivariance. The counterpart is \code{\link{multivariance.pvalue}}, which computes a conservative p-value for a given distance multivariance. Both methods are distribution-free.
 
  \code{\link{resample.rejection.level}} and \code{\link{resample.pvalue}} are the distribution dependent versions of the above. They are approximately sharp, but computational more expensive. Any resampling is done by \code{\link{resample.multivariance}}.
+
+ Using the methods developed in [4] approximate p-value estimates are provided by \code{\link{pearson.pvalue}}. This method is much faster than the resampling method.
 
  \code{\link{independence.test}} provides the corresponding tests of independence.
 
 \code{\link{cdm}} and \code{\link{cdms}} compute the centered distance matrix and matrices, respectively. These can be used to speed up repeated computations of distance multivariance.
+
+In [4] various methods to estimate the moments of the test statistic under H0 were developed, these are (implicitly) implemented in this package only for the moments used in \code{\link{pearson.pvalue}}. Further and explicit functions can be added upon request. Please feel free to contact the author.
 }
 
 \section{Dependence structures}{
@@ -62,4 +68,6 @@ To cite this package use the standard citation for R packages, i.e., the output 
 [2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors II. Distance multivariance and Gaussian multivariance. Preprint 2017. \url{https://arxiv.org/abs/1711.07775}
 
 [3] B. Böttcher, Dependence Structures - Estimation and Visualization Using Distance Multivariance. Preprint 2017. \url{https://arxiv.org/abs/1712.06532}
+
+[4] G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint 2018. \url{https://arxiv.org/abs/1808.07280}
 }
