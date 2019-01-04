@@ -17,6 +17,9 @@ multivariances.all(x, vec = NA, Nscale = TRUE, squared = TRUE, ...)
 
 \item{...}{these are passed to \code{\link{cdms}} (which is only invoked if \code{x} is a matrix)}
 }
+\value{
+Returns a vector with multivariance, total.multivariance, 2-multivariance and 3-multivariance
+}
 \description{
 Computes simultaneously multivariance, total multivariance, 2-multivariance and 3-multivariance.
 }

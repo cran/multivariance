@@ -1,3 +1,17 @@
+(News above the first "Changes...." are not displayed properly in Rstudio, i.e., this line is invisible)
+
+kown problems: in "resampling" the argument lambda is not passed correctly for total.multivariance
+
+Changes in Version 1.2.1
+========================
+
+Updates
+ * updated references
+ * various typos corrected
+
+
+Changes in Version 1.2.0
+========================
 
 New Features
  * 'independence.test' is now also implemented with type "pearson_approx". Providing the fast p-value approximation developed in <arXiv:1808.07280>. For this also the functions 'pearson.qf' (a Gaussian quadratic form estimate based on mean, variance and skewness) and 'pearson.pvalue' (the corresponding p-value estimate based on new moment estimators) are introduced.

@@ -1,7 +1,7 @@
 Package: multivariance
 Title: Measuring Multivariate Dependence Using Distance Multivariance
-Version: 1.2.0
-Date: 2018-09-12
+Version: 1.2.1
+Date: 2019-01-04
 Authors@R: c(
     person("Björn", "Böttcher", email = "bjoern.boettcher@tu-dresden.de",role = c("aut", "cre")),
     person("Martin", "Keller-Ressel", email = "martin.keller-ressel@tu-dresden.de", role = "ctb")
@@ -9,22 +9,22 @@ Authors@R: c(
 Description: Distance multivariance is a measure of dependence which can be used to detect 
     and quantify dependence. The necessary functions are implemented in this packages, 
     and examples are given. For the theoretic background we refer to the papers:
-    B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors I. Generalized distance covariance and Gaussian covariance. Preprint 2017, <arXiv:1711.07778>.
-    B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors II. Distance multivariance and Gaussian multivariance. Preprint 2017, <arXiv:1711.07775>.
-    B. Böttcher, Dependence Structures - Estimation and Visualization Using Distance Multivariance. Preprint 2017, <arXiv:1712.06532>.
-    G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint 2018, <arXiv:1808.07280>.
+    B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors: generalized distance covariance and Gaussian covariance. VMSTA, 2018, Vol. 5, No. 3, 353-383. <arXiv:1711.07778>.
+    B. Böttcher, M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures for random vectors. <arXiv:1711.07775>.
+    B. Böttcher, Dependence Structures - Estimation and Visualization Using Distance Multivariance. <arXiv:1712.06532>.
+    G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. <arXiv:1808.07280>.
 Depends: R (>= 3.3.0)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: abind, igraph, graphics, stats, Rcpp
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Suggests: testthat
 LinkingTo: Rcpp
 NeedsCompilation: yes
-Packaged: 2018-09-13 14:34:34 UTC; BB
+Packaged: 2019-01-04 08:40:30 UTC; BB
 Author: Björn Böttcher [aut, cre],
   Martin Keller-Ressel [ctb]
 Maintainer: Björn Böttcher <bjoern.boettcher@tu-dresden.de>
 Repository: CRAN
-Date/Publication: 2018-09-13 15:20:06 UTC
+Date/Publication: 2019-01-05 00:20:03 UTC

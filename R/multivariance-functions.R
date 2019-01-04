@@ -7,7 +7,7 @@
 #'
 # It also includes a function to perform a dependence analysis.
 #'
-#' Distance multivariance is a measure of dependence which can be used to detect and quantify dependence structures. The necessary functions are implemented in this packages, and examples are given. For the theoretic background we refer to the papers [1,2,3,4]. Paper [3] includes a summary of the first two. It is the recommended starting point for users with an applied interest. Paper [4] is concerned with new (faster) p-value estimates for the independence tests.
+#' Distance multivariance is a measure of dependence which can be used to detect and quantify dependence structures. The necessary functions are implemented in this package, and examples are given. For the theoretic background we refer to the papers [1,2,3,4]. Paper [3] includes a summary of the first two. It is the recommended starting point for users with an applied interest. Paper [4] is concerned with new (faster) p-value estimates for the independence tests.
 #'
 #' The (current) code is tested and speed improved in comparison to the former releases. Certainly there is still room for improvement and development. Questions, comments and remarks are welcome: \email{bjoern.boettcher@@tu-dresden.de}
 #'
@@ -33,7 +33,7 @@
 #'
 #'  \code{\link{resample.rejection.level}} and \code{\link{resample.pvalue}} are the distribution dependent versions of the above. They are approximately sharp, but computational more expensive. Any resampling is done by \code{\link{resample.multivariance}}.
 #'
-#'  Using the methods developed in [4] approximate p-value estimates are provided by \code{\link{pearson.pvalue}}. This method is much faster than the resampling method.
+#'  Using the methods developed in [4] approximate p-value estimates are provided by \code{\link{pearson.pvalue}}. This method is much faster than the resampling method, but still experimental. Use the resampling method for reliable results.
 #'
 #'  \code{\link{independence.test}} provides the corresponding tests of independence.
 #'
@@ -54,13 +54,13 @@
 #' \code{\link{dep_struct_iterated_13_100}}, \code{\link{dep_struct_ring_15_100}}, \code{\link{dep_struct_several_26_100}} and \code{\link{dep_struct_star_9_100}} are example data sets for the dependence structure detection. These might also serve as benchmark examples.
 #'
 #' @references
-#' [1] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors I. Generalized distance covariance and Gaussian covariance. Preprint 2017. \url{https://arxiv.org/abs/1711.07778}
+#' [1] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors: generalized distance covariance and Gaussian covariance. Modern Stochastics: Theory and Applications 2018, Vol. 5, No. 3, 353-383. \url{https://www.vmsta.org/journal/VMSTA/article/127/info}
 #'
-#' [2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors II. Distance multivariance and Gaussian multivariance. Preprint 2017. \url{https://arxiv.org/abs/1711.07775}
+#' [2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures for random vectors. Accepted for publication in Annals of Statistics. \url{https://arxiv.org/abs/1711.07775}
 #'
-#' [3] B. Böttcher, Dependence Structures - Estimation and Visualization Using Distance Multivariance. Preprint 2017. \url{https://arxiv.org/abs/1712.06532}
+#' [3] B. Böttcher, Dependence Structures - Estimation and Visualization Using Distance Multivariance. Preprint. \url{https://arxiv.org/abs/1712.06532}
 #'
-#' [4] G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint 2018. \url{https://arxiv.org/abs/1808.07280}
+#' [4] G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint. \url{https://arxiv.org/abs/1808.07280}
 #'
 #' @docType package
 #' @name multivariance-package
@@ -106,7 +106,7 @@ rejection.level = function(alpha) {
 
 #' transform multivariance to p-value
 #'
-#' Computes the p-value for the hypothesis of independence for a given multivariance/total multivariance.
+#' Computes a conservative p-value for the hypothesis of independence for a given multivariance/total multivariance.
 #'
 #' @param x value of a normalized and Nscaled \code{\link{multivariance}}
 #'
@@ -504,6 +504,8 @@ m.multivariance = function(x, vec= NA, m = 2, Nscale = TRUE, Escale = TRUE, squa
 #' @details
 #' The computation is faster than the seperate computations.
 #'
+#' @return Returns a vector with multivariance, total.multivariance, 2-multivariance and 3-multivariance
+#'
 #' @examples
 #' x = coins(100,k = 3)
 #' multivariances.all(x)
@@ -769,7 +771,7 @@ resample.multivariance = function(x,vec = 1:ncol(x),times = 300,type = "multi",r
          bootstrap = {resample = function() sample.cols(x,vec)},
          permutation.orig = {resample = function() sample.cols(x,vec,replace =FALSE)}, # resampling of the original data
        permutation = {
-         cdm.array = cdms(x,vec,...)
+         cdm.array = cdms(x,vec,...) #!! TODO: note there is the argument lambda for total.multivariance this should be exclued here!
          vec = 1:max(vec) # all distance matrices shall be used.
          resample = function() sample.cdms(cdm.array)} # resampling of the centered distance matrices - this is faster than the above but yields the same values. The speed up is in particular
   )
@@ -1159,6 +1161,7 @@ pearson.qf = function(x,moment, lower.tail = TRUE) {
 #'
 #' @export
 pearson.pvalue = function(x,vec = 1:ncol(x), psi = NULL, p = NULL, isotropic = FALSE, type = "multi") {
+  cat("Note: The Pearson approximation is still experimental. Use the resampling method for reliable results.\n") #Pearson
   cmb = cdms.mu.bcd(x,vec, psi = psi, p = p, isotropic = isotropic)
   moms = moments.for.pearson(nrow(x),cmb$bcd, cmb$mu, cmb$mean, type = type)
 

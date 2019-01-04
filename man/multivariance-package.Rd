@@ -8,7 +8,7 @@
 The multivariance package provides basic functions to calculate distance multivariance and related quantities.
 }
 \details{
-Distance multivariance is a measure of dependence which can be used to detect and quantify dependence structures. The necessary functions are implemented in this packages, and examples are given. For the theoretic background we refer to the papers [1,2,3,4]. Paper [3] includes a summary of the first two. It is the recommended starting point for users with an applied interest. Paper [4] is concerned with new (faster) p-value estimates for the independence tests.
+Distance multivariance is a measure of dependence which can be used to detect and quantify dependence structures. The necessary functions are implemented in this package, and examples are given. For the theoretic background we refer to the papers [1,2,3,4]. Paper [3] includes a summary of the first two. It is the recommended starting point for users with an applied interest. Paper [4] is concerned with new (faster) p-value estimates for the independence tests.
 
 The (current) code is tested and speed improved in comparison to the former releases. Certainly there is still room for improvement and development. Questions, comments and remarks are welcome: \email{bjoern.boettcher@tu-dresden.de}
 
@@ -37,7 +37,7 @@ To cite this package use the standard citation for R packages, i.e., the output 
 
  \code{\link{resample.rejection.level}} and \code{\link{resample.pvalue}} are the distribution dependent versions of the above. They are approximately sharp, but computational more expensive. Any resampling is done by \code{\link{resample.multivariance}}.
 
- Using the methods developed in [4] approximate p-value estimates are provided by \code{\link{pearson.pvalue}}. This method is much faster than the resampling method.
+ Using the methods developed in [4] approximate p-value estimates are provided by \code{\link{pearson.pvalue}}. This method is much faster than the resampling method, but still experimental. Use the resampling method for reliable results.
 
  \code{\link{independence.test}} provides the corresponding tests of independence.
 
@@ -63,11 +63,11 @@ In [4] various methods to estimate the moments of the test statistic under H0 we
 }
 
 \references{
-[1] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors I. Generalized distance covariance and Gaussian covariance. Preprint 2017. \url{https://arxiv.org/abs/1711.07778}
+[1] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors: generalized distance covariance and Gaussian covariance. Modern Stochastics: Theory and Applications 2018, Vol. 5, No. 3, 353-383. \url{https://www.vmsta.org/journal/VMSTA/article/127/info}
 
-[2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors II. Distance multivariance and Gaussian multivariance. Preprint 2017. \url{https://arxiv.org/abs/1711.07775}
+[2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures for random vectors. Accepted for publication in Annals of Statistics. \url{https://arxiv.org/abs/1711.07775}
 
-[3] B. Böttcher, Dependence Structures - Estimation and Visualization Using Distance Multivariance. Preprint 2017. \url{https://arxiv.org/abs/1712.06532}
+[3] B. Böttcher, Dependence Structures - Estimation and Visualization Using Distance Multivariance. Preprint. \url{https://arxiv.org/abs/1712.06532}
 
-[4] G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint 2018. \url{https://arxiv.org/abs/1808.07280}
+[4] G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint. \url{https://arxiv.org/abs/1808.07280}
 }
