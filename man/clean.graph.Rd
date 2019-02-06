@@ -13,7 +13,7 @@ clean.graph(g)
 graph
 }
 \description{
-Given a dependence structure graph: vertices representing the multivariances of only two verticies become an edge labeled with the label of the vertex.
+Given a dependence structure graph: vertices representing the multivariances of only two vertices become an edge labeled with the label of the vertex.
 }
 \examples{
 

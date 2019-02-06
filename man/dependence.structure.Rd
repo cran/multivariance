@@ -38,9 +38,9 @@ If \code{fixed.rejection.level} is not provided, the significance level \code{al
 The resulting graph can be simplified (pairwise dependence can be represented by edges instead of vertices) using \code{\link{clean.graph}}.
 
 Advanced:
-The argument \code{detection.aim} can be used to check, if an expected dependence structure was detected. This might be useful for simulation studies to determine the empirical power of the detection algorithm. Hereto  \code{detection.aim} is set to a list of vectors which indicate the expected detected dependence structures (one for each run of \code{\link{find.cluster}}). The vector has as first element the \code{k} for which k-tuples are detected (for this aim the detection stops without success if no k-tuple is found), and the other elements, indicate to which clusters all present vertices belong after the detection, e.g. \code{c(3,2,2,1,2,1,1,2,1)} expects that 3-tuples are detected and in the graph are 8 vertices (including those representing the detected 3 dependences), the order of the 2's and 1's indicate which vertices belong to which cluster. If \code{detection.aim} is provided, the vector representing the actual detection is printed, thus one can use the output with copy-paste to fix successively the expected detection aims.
+The argument \code{detection.aim} can be used to check, if an expected dependence structure was detected. This might be useful for simulation studies to determine the empirical power of the detection algorithm. Hereto  \code{detection.aim} is set to a list of vectors which indicate the expected detected dependence structures (one for each run of \code{\link{find.cluster}}). The vector has as first element the \code{k} for which k-tuples are detected (for this aim the detection stops without success if no k-tuple is found), and the other elements, indicate to which clusters all present vertices belong after the detection, e.g. \code{c(3,2,2,1,2,1,1,2,1)} expects that 3-tuples are detected and in the graph are 8 vertices (including those representing the detected 3 dependencies), the order of the 2's and 1's indicate which vertices belong to which cluster. If \code{detection.aim} is provided, the vector representing the actual detection is printed, thus one can use the output with copy-paste to fix successively the expected detection aims.
 
-Note that a failed detection might invoce the warning:
+Note that a failed detection might invoice the warning:
 \preformatted{
 run$mem == detection.aim[[k]][-1] :
 longer object length is not a multiple of shorter object length
@@ -64,8 +64,8 @@ longer object length is not a multiple of shorter object length
   #1,2,3 are 3-dependent, 4,..,9 are 6-dependent
 
   # similar to the the previous example, but
-  # the pair 1,2 is treated as one sample,
-  # anagously the pair 3,4. In the resulting structure one does not
+  # the pair 1,3 is treated as one sample,
+  # anagously the pair 2,4. In the resulting structure one does not
   # see anymore that the dependence of 1,2,3,4 with the rest is due
   # to 4.
   dependence.structure(cbind(coins(200),coins(200,k=5)),

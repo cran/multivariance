@@ -8,9 +8,9 @@ independence.test(x, vec = 1:ncol(x), alpha = 0.05,
   type = "distribution_free", verbose = TRUE, ...)
 }
 \arguments{
-\item{x}{either a data matrix or an array of centered distance matrices}
+\item{x}{either a data matrix or a list of centered distance matrices}
 
-\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is an array, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
+\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is a list, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
 
 \item{alpha}{significance level}
 
@@ -27,8 +27,10 @@ Returns \code{TRUE} if the hypothesis of independence is NOT rejected, otherwise
 This computes a test of independence for the columns of a sample matrix (required for the resampling test) or for given centered distance matrices (only possible for the distribution-free test).
 }
 \details{
+For a test with p-value output (as standard for tests in R) see \code{\link{multivariance.test}}.
+
 The \code{"pearson_approx"} and \code{"resample"} are approximately sharp. The latter is based on a resampling approach and thus much slower. The \code{"distribution_free"} test might be very conservative.
-The centered distance matrices can be prepared by \code{\link{cdms}}. But note that for the test based on Pearson's approximation and for the resample test, the data matrix has to be given.
+The centered distance matrices can be prepared by \code{\link{cdms}}. But note that for the test based on Pearson's approximation and for the resampling test, the data matrix has to be given.
 }
 \examples{
 independence.test(coins(100)) #dependent sample which is 2-independent

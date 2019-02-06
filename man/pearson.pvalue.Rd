@@ -4,24 +4,19 @@
 \alias{pearson.pvalue}
 \title{fast p-value approximation}
 \usage{
-pearson.pvalue(x, vec = 1:ncol(x), psi = NULL, p = NULL,
-  isotropic = FALSE, type = "multi")
+pearson.pvalue(x, vec = 1:ncol(x), type = "multi", ...)
 }
 \arguments{
 \item{x}{matrix, the rows should be iid samples}
 
 \item{vec}{vector, which indicates which columns of \code{x} are treated together as one sample}
 
-\item{psi}{a real valued function of two variables (in the case of \code{isotropic = FALSE}) or one variable (in the case of \code{isotropic = TRUE}), to compute the distance of two samples based on a continuous negative definite function. If it is \code{NULL}, the euclidean distance will be used}
-
-\item{p}{numeric, if it is a value between 1 and 2 then the Minkowski distance with parameter p is used.}
-
-\item{isotropic}{logical, indicates if psi of the Euclidean distance matrix should be computed, i.e., if an isotropic distance should be used.}
-
 \item{type}{one of \code{"multi","total","m.multi.2","m.multi.3"}}
+
+\item{...}{these are passed to \code{\link{cdms}}}
 }
 \description{
-Computes the p-value of a sample using Pearsons approximation of Gaussian quadratic forms with the estimators developed by Berschneider and Böttcher in [4].
+Computes the p-value of a sample using Pearson's approximation of Gaussian quadratic forms with the estimators developed by Berschneider and Böttcher in [4].
 }
 \details{
 This is the method recommended in [4], i.e., using Pearson's quadratic form estimate with the unbiased finite sample estimators for the mean and variance of normalized multivariance together with the unbiased estimator for the limit skewness.

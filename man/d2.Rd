@@ -2,11 +2,11 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{d2}
 \alias{d2}
-\title{functions which are required for the calculation of the finite sample expactation and variance for m-multivariance and total multivariance}
+\title{functions which are required for the calculation of the finite sample expectation and variance for m-multivariance and total multivariance}
 \usage{
 d2(a, b)
 }
 \description{
-functions which are required for the calculation of the finite sample expactation and variance for m-multivariance and total multivariance
+functions which are required for the calculation of the finite sample expectation and variance for m-multivariance and total multivariance
 }
 \keyword{internal}

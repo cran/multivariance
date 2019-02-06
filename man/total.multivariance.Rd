@@ -8,9 +8,9 @@ total.multivariance(x, vec = NA, lambda = 1, Nscale = TRUE,
   Escale = TRUE, squared = TRUE, ...)
 }
 \arguments{
-\item{x}{either a data matrix or an array of centered distance matrices}
+\item{x}{either a data matrix or a list of centered distance matrices}
 
-\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is an array, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
+\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is a list, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
 
 \item{lambda}{a scaling parameter >0. Each k-tuple multivariance gets weight \code{lambda^(n-k)}.}
 

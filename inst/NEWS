@@ -1,6 +1,29 @@
 (News above the first "Changes...." are not displayed properly in Rstudio, i.e., this line is invisible)
 
-kown problems: in "resampling" the argument lambda is not passed correctly for total.multivariance
+
+Changes in Version 2.0.0
+========================
+
+New Features
+ * new function 'multivariance.test' which provides all multivariance related tests - providing a unified interface with return values as they are common for tests in R, in particular, the p.value und the value of the test statistic. The return value is of class "htest" (as it is standard for other hypothesis tests, e.g. ks.test, t.test).
+ * 'cdm' has now the argument "external.dm.fun" which can be used to pass an external function for the computation of the distance matrix (allowing major speed ups for non standard distances)
+ * 'multivariances.all' has now named return values
+ * 'resample.multivariance' works now also with 'type="all"', for simultaneous computation of p.values of multivariance, total-multivariance, 2-multivariance and 3-multivariance
+ * 'multicorrelation' computes now various types of multicorrelations.
+ * 'multivariance.timing' provides methods for detailed estimation of the computation time, which might be useful e.g. when planing simulation studies.
+
+Changes
+ * 'multicorrelation' has now different defaults and new arguments.
+ * the centered distance matrices are now stored in a list rather than a 3-dim array. Thus the return value of 'cdms' was changed, and correspondingly the arguments of all '*.multivariance' functions.
+
+Updated
+ * major speedup
+ * 'multivariance.pvalue' accepts and returns NA and NaN
+ * 'm.multivariance' returns NA when 3-multivariance is used for only 2 variables.
+
+Fixed
+ * 'pearson.pvalue' partially ignored the option "type". It always used the test statistic of multivariance, despite the fact the parameters were computed for the given "type".
+ * the option "verbose" in 'dependence.structure' now works as expected
 
 Changes in Version 1.2.1
 ========================
@@ -39,7 +62,7 @@ Changes
   * The standard output of 'multivariance' is now (distance multivariance squared) scaled by the sample size. Use 'Nscale = FALSE' to get the value without this scaling. The reason for this was twofold: 1. it is now the same setting as for 'total.multivariance'. 2. This is the only value which can (roughly) be interpreted without further calculations.
 
 Updates
-  * improved documentation. In particular, it is now cleary stated that the squared values are the standard output of 'multivariance' and 'total.multivariance'
+  * improved documentation. In particular, it is now clearly stated that the squared values are the standard output of 'multivariance' and 'total.multivariance'
   * some speed up
 
 

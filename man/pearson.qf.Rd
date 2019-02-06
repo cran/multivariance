@@ -14,7 +14,7 @@ pearson.qf(x, moment, lower.tail = TRUE)
 \item{lower.tail}{logical, indicating of the lower or upper tail of the distribution function should be calculated}
 }
 \description{
-Approximation of the of the value of the distribution function of a gaussian quadratic form based on its first three moments.
+Approximation of the of the value of the distribution function of a Gaussian quadratic form based on its first three moments.
 }
 \details{
 This is Pearson's approximation for Gaussian quadratic forms as stated in Equation (4.64) in [4]

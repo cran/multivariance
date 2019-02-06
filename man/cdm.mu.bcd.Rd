@@ -3,10 +3,10 @@
 \name{cdm.mu.bcd}
 \alias{cdm.mu.bcd}
 \title{given the sample of a single variable the centered distance matrix, mu and bcd are computed
-The normalization should be posponed to the moment calulation.}
+The normalization should be postponed to the moment calculation.}
 \usage{
 cdm.mu.bcd(x, normalize = FALSE, psi = NULL, p = NULL,
-  isotropic = FALSE, unbiased.moments = TRUE)
+  isotropic = FALSE, unbiased.moments = TRUE, external.dm.fun = NULL)
 }
 \description{
 NOTE: speedup might be possible by incorporating mu3 and some matrix-norm-identities

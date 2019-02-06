@@ -5,14 +5,12 @@
 \alias{multivariance-package}
 \title{multivariance: Measuring Multivariate Dependence Using Distance Multivariance}
 \description{
-The multivariance package provides basic functions to calculate distance multivariance and related quantities.
+The multivariance package provides basic functions to calculate distance multivariance and related quantities. To test independence use \code{\link{multivariance.test}}, it provides an interface (via its arguments) to all the tests based on distance (m-/total-)multivariance. The package offers also several other functions related to distance multivariance, e.g. a detection and visualization of dependence structures \code{\link{dependence.structure}}. See below for details on the full content of the package.
 }
 \details{
-Distance multivariance is a measure of dependence which can be used to detect and quantify dependence structures. The necessary functions are implemented in this package, and examples are given. For the theoretic background we refer to the papers [1,2,3,4]. Paper [3] includes a summary of the first two. It is the recommended starting point for users with an applied interest. Paper [4] is concerned with new (faster) p-value estimates for the independence tests.
+Distance multivariance is a multivariate dependence measure, which can be used to detect dependencies between an arbitrary number of random vectors each of which can have a distinct dimension. The necessary functions are implemented in this package, and examples are given. For the theoretic background we refer to the papers [1,2,3,4]. Paper [3] includes a summary of the first two. It is the recommended starting point for users with an applied interest. Paper [4] is concerned with new (faster) p-value estimates for the independence tests.
 
 The (current) code is tested and speed improved in comparison to the former releases. Certainly there is still room for improvement and development. Questions, comments and remarks are welcome: \email{bjoern.boettcher@tu-dresden.de}
-
-Users on Windows machines might get a considerable speed up using MRO instead of the standard R release - since this is particularly faster for large matrix operations.
 
 For infos on the latest changes and/or updates to the package use \code{news(package="multivariance")}.
 
@@ -39,11 +37,13 @@ To cite this package use the standard citation for R packages, i.e., the output 
 
  Using the methods developed in [4] approximate p-value estimates are provided by \code{\link{pearson.pvalue}}. This method is much faster than the resampling method, but still experimental. Use the resampling method for reliable results.
 
- \code{\link{independence.test}} provides the corresponding tests of independence.
+ \code{\link{multivariance.test}} and \code{\link{independence.test}} provide the corresponding tests of independence. The former provides output as common for tests in R, the latter is a simple significance test returning for a given significance level just \code{TRUE} or \code{FALSE}
 
 \code{\link{cdm}} and \code{\link{cdms}} compute the centered distance matrix and matrices, respectively. These can be used to speed up repeated computations of distance multivariance.
 
 In [4] various methods to estimate the moments of the test statistic under H0 were developed, these are (implicitly) implemented in this package only for the moments used in \code{\link{pearson.pvalue}}. Further and explicit functions can be added upon request. Please feel free to contact the author.
+
+For bigger projects it might be convenient to estimate the computation time of multivariance via \code{\link{multivariance.timing}}.
 }
 
 \section{Dependence structures}{
@@ -67,7 +67,7 @@ In [4] various methods to estimate the moments of the test statistic under H0 we
 
 [2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures for random vectors. Accepted for publication in Annals of Statistics. \url{https://arxiv.org/abs/1711.07775}
 
-[3] B. Böttcher, Dependence Structures - Estimation and Visualization Using Distance Multivariance. Preprint. \url{https://arxiv.org/abs/1712.06532}
+[3] B. Böttcher, Dependence and Dependence Structures: Estimation and Visualization Using Distance Multivariance. Preprint. \url{https://arxiv.org/abs/1712.06532}
 
 [4] G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint. \url{https://arxiv.org/abs/1808.07280}
 }

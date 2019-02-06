@@ -2,7 +2,7 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{dist.to.matrix}
 \alias{dist.to.matrix}
-\title{Transforms a distance matrix to a matrix}
+\title{transforms a distance matrix to a matrix}
 \usage{
 dist.to.matrix(ds)
 }

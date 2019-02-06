@@ -2,16 +2,18 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{sample.cdms}
 \alias{sample.cdms}
-\title{resamples centered distance matricies}
+\title{resamples centered distance matrices}
 \usage{
-sample.cdms(array.cdm)
+sample.cdms(list.cdm, replace = FALSE)
 }
 \arguments{
-\item{array.cdm}{an array of centered distance matricies}
+\item{list.cdm}{a list of centered distance matrices}
+
+\item{replace}{boolean, sampling with or without replacement}
 }
 \value{
-Returns an array of centered distance matricies, each matrix corresponds to the resampled columns of the corresponding sample, using resampling without replacement (permutations).
+Returns a list of centered distance matrices, each matrix corresponds to the resampled columns of the corresponding sample, using resampling with replacement (bootstrap) or without replacement (permutations).
 }
 \description{
-resamples centered distance matricies
+resamples centered distance matrices
 }

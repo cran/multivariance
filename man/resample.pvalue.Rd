@@ -17,9 +17,13 @@ It returns 1 minus the value of the empirical distribution function of the resam
 \description{
 Use a resampling method to generate samples of the test statistic under the hypothesis of independence. Based on these the p.value of a given value of a test statistic is computed.
 }
+\details{
+This function is useful if a p-value of a test statistic shall be computed based on the resampling values of the test statistic of a different sample. For the p-value based on the same sample \code{\link{resample.multivariance}(...)$p.value} is sufficient.
+}
 \examples{
 x = coins(100)
 resample.pvalue(multivariance(x),x=x,times = 300)
+resample.pvalue(multivariances.all(x),x=x,times = 300,type = "all")
 
 }
 \references{

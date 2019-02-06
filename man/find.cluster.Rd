@@ -4,7 +4,7 @@
 \alias{find.cluster}
 \title{cluster detection}
 \usage{
-find.cluster(x, vec = 1:ncol(x), array.cdm = cdms(x, vec = vec),
+find.cluster(x, vec = 1:ncol(x), list.cdm = cdms(x, vec = vec),
   mem = as.numeric(1:max(vec)), cluster.to.vertex = 1:max(mem),
   vertex.to.cdm = 1:max(mem), previous.n.o.cdms = rep(0, max(mem)),
   all.multivariances = numeric(0),
@@ -19,13 +19,13 @@ find.cluster(x, vec = 1:ncol(x), array.cdm = cdms(x, vec = vec),
 
 \item{vec}{vector, it indicates which columns are initially treated together as one sample}
 
-\item{array.cdm}{array of centered distance matrices}
+\item{list.cdm}{list of centered distance matrices}
 
 \item{mem}{numeric vector, its length is the number of vertices, its content is the number of the corresponding cluster for the current iteration, i.e., vertex \code{i} belongs to cluster \code{mem[i]}}
 
 \item{cluster.to.vertex}{vector, contains the cluster to vertex relations, i.e., \code{cluster.to.vertex[i]} is the index of the vertex which represents cluster \code{i}}
 
-\item{vertex.to.cdm}{vector, contains the vertex to centered distance matrix relations, i.e., \code{vertex.to.cdm[i]} is the index centered distance matrix in \code{array.cdm} which corresponds to vertex \code{i}}
+\item{vertex.to.cdm}{vector, contains the vertex to centered distance matrix relations, i.e., \code{vertex.to.cdm[i]} is the index centered distance matrix in \code{list.cdm} which corresponds to vertex \code{i}}
 
 \item{previous.n.o.cdms}{vector, number of centered distance matrices in the previous iteration (it is used to ensure that previously check tuples are not checked again)}
 

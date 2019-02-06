@@ -4,22 +4,46 @@
 \alias{multicorrelation}
 \title{distance multicorrelation}
 \usage{
-multicorrelation(x, vec = NA, squared = FALSE, ...)
+multicorrelation(x, vec = 1:ncol(x), type = "m.multi.2",
+  multicorrelation.type = "unnormalized", squared = TRUE, ...)
 }
 \arguments{
-\item{x}{either a data matrix or an array of centered distance matrices}
+\item{x}{either a data matrix or a list of centered distance matrices}
 
-\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is an array, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
+\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is a list, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
+
+\item{type}{one of \code{"m.multi.2","multi","m.multi.3","(lower bound) total"}}
+
+\item{multicorrelation.type}{one of \code{"normalized","unnormalized"}}
 
 \item{squared}{if \code{FALSE} it returns the actual multivariance, otherwise the squared multivariance (less computation)}
 
 \item{...}{these are passed to \code{\link{cdms}} (which is only invoked if \code{x} is a matrix)}
 }
+\value{
+Value of the multicorrelation.
+}
 \description{
-computes the distance multicorrelation
+Computes various types of sample distance multicorrelation as defined in [3].
 }
 \details{
-This is just a wrapper for \code{\link{multivariance}(x,vec,Nscale = FALSE,correlation = TRUE,squared = squared,...)}.
+The unnormalized and normalized versions coincide if an even number of variables is considered (in particular always for 2-multivariance). They usually differ if an odd number of variables is considered (always for 3-multivariance). If all variables are related by similarity transforms the unnormalized \code{"unnormalized"} multicorrelations are 1.
+
+For \code{"m.multi.2"} the empirical 2-multicorrelation is computed. Which is a dependence measure for pairwise dependence, i.e. the 3-multicorrelation is 0 if and only if all variables are pairwise independent.
+
+For total multicorrelation there is currently only a feasible empirical estimator for a lower bound (\code{"(lower bound) total"}). But it still characterizes dependence in the sense that the population version of this bound is 0 if and only if the variables are independent.
+
+A value of 0 of multicorrelation \code{"multi"} or 3-multicorrelation \code{"m.multi.3"} does not characterize independence.
+}
+\examples{
+y = rnorm(100)
+x = cbind(y,y*2,(y-2)/3,y+1,y*5)
+
+# compute all types of correlations for x:
+for (ty in c("(lower bound) total","m.multi.2","m.multi.3","multi"))
+ for (mty in c("normalized","unnormalized"))
+  print(paste(format(multicorrelation(x,type=ty,multicorrelation.type = mty)
+                     ,digits=3,nsmall = 3,width = 7),mty,ty,"correlation"))
 }
 \references{
 For the theoretic background see the references given on the main help page of this package: \link{multivariance-package}.

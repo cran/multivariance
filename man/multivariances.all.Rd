@@ -2,14 +2,14 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{multivariances.all}
 \alias{multivariances.all}
-\title{simultaneous computation of total/ 2-/ 3- /... multivariance}
+\title{simultaneous computation of multivariance and total/ 2-/ 3-multivariance}
 \usage{
 multivariances.all(x, vec = NA, Nscale = TRUE, squared = TRUE, ...)
 }
 \arguments{
-\item{x}{either a data matrix or an array of centered distance matrices}
+\item{x}{either a data matrix or a list of centered distance matrices}
 
-\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is an array, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
+\item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is a list, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
 
 \item{Nscale}{if \code{TRUE} the multivariance is scaled up by the sample size (and thus it is exactly as required for the test of independence)}
 
@@ -24,7 +24,7 @@ Returns a vector with multivariance, total.multivariance, 2-multivariance and 3-
 Computes simultaneously multivariance, total multivariance, 2-multivariance and 3-multivariance.
 }
 \details{
-The computation is faster than the seperate computations.
+The computation is faster than the separate computations.
 }
 \examples{
 x = coins(100,k = 3)

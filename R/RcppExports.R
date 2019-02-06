@@ -3,7 +3,7 @@
 
 #' fast euclidean distance matrix computation
 #'
-#' @param x the vector for which the distanc matrix is computed
+#' @param x matrix with sample rows which the distanc matrix is computed (to use with vectors, use \code{as.matrix(x)})
 #' @examples
 #' #require(microbenchmark)
 #' #x = rnorm(100)
@@ -11,5 +11,23 @@
 #' @export
 fastdist <- function(x) {
     .Call('_multivariance_fastdist', PACKAGE = 'multivariance', x)
+}
+
+#' double center a symmetric matrix
+#'
+#' @param x symmetric matrix
+#' @param normalize boolean. If \code{TRUE} the matrix will be normalized to mean 1.
+#' @keywords internal
+doubleCenterSymMat <- function(x, normalize) {
+    .Call('_multivariance_doubleCenterSymMat', PACKAGE = 'multivariance', x, normalize)
+}
+
+#' double centered Euclidean distance matrix
+#'
+#' @param x matrix with sample rows which the distanc matrix is computed (to use with vectors, use \code{as.matrix(x)})
+#' @param normalize boolean. If \code{TRUE} the matrix will be normalized to mean 1.
+#' @export
+fastEuclideanCdm <- function(x, normalize) {
+    .Call('_multivariance_fastEuclideanCdm', PACKAGE = 'multivariance', x, normalize)
 }
 

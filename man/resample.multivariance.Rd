@@ -14,7 +14,7 @@ resample.multivariance(x, vec = 1:ncol(x), times = 300,
 
 \item{times}{integer, number of samples to generate}
 
-\item{type}{one of \code{"multi","total","m.multi.2","m.multi.3"}}
+\item{type}{one of \code{"multi","total","m.multi.2","m.multi.3","all"}}
 
 \item{resample.type}{one of \code{"permutation", "bootstrap"}. The samples are generated without replacement (permutations) or with replacement (bootstrap).}
 

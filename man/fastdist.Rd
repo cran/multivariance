@@ -7,7 +7,7 @@
 fastdist(x)
 }
 \arguments{
-\item{x}{the vector for which the distanc matrix is computed}
+\item{x}{matrix with sample rows which the distanc matrix is computed (to use with vectors, use \code{as.matrix(x)})}
 }
 \description{
 fast euclidean distance matrix computation

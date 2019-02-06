@@ -15,8 +15,8 @@
   #1,2,3 are 3-dependent, 4,..,9 are 6-dependent
 
   # similar to the the previous example, but
-  # the pair 1,2 is treated as one sample,
-  # anagously the pair 3,4. In the resulting structure one does not
+  # the pair 1,3 is treated as one sample,
+  # anagously the pair 2,4. In the resulting structure one does not
   # see anymore that the dependence of 1,2,3,4 with the rest is due
   # to 4.
   dependence.structure(cbind(coins(200),coins(200,k=5)),

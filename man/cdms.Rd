@@ -16,7 +16,7 @@ cdms(x, vec = 1:ncol(x), membership = NULL, ...)
 \item{...}{these are passed to \code{\link{cdm}}}
 }
 \value{
-It returns an 3 dimensional array of the distance matrices. The index of the first dimension names the component for which the matrix is computed, thus it ranges from 1 to max(vec).
+It returns a list of distance matrices.
 }
 \description{
 computes the centered distance matrices

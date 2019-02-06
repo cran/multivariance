@@ -4,18 +4,21 @@
 \alias{cdm}
 \title{centered distance matrix}
 \usage{
-cdm(x, normalize = TRUE, psi = NULL, p = NULL, isotropic = FALSE)
+cdm(x, normalize = TRUE, psi = NULL, p = NULL, isotropic = FALSE,
+  external.dm.fun = NULL)
 }
 \arguments{
 \item{x}{matrix, each row of the matrix is treated as one sample}
 
 \item{normalize}{logical, indicates if the matrix should be normalized}
 
-\item{psi}{a real valued function of two variables (in the case of \code{isotropic = FALSE}) or one variable (in the case of \code{isotropic = TRUE}), to compute the distance of two samples based on a continuous negative definite function. If it is \code{NULL}, the euclidean distance will be used}
+\item{psi}{if it is \code{NULL}, the euclidean distance will be used. In the case of \code{isotropic = TRUE}: a real valued negative definite function of one variable (accepting vectors as arguments; returning a vector of the same length). In the case of \code{isotropic = FALSE}: a real valued function of two variables (or vectors) to compute the distance of two samples based on a continuous negative definite function.}
 
 \item{p}{numeric, if it is a value between 1 and 2 then the Minkowski distance with parameter p is used.}
 
 \item{isotropic}{logical, indicates if psi of the Euclidean distance matrix should be computed, i.e., if an isotropic distance should be used.}
+
+\item{external.dm.fun}{function, which computes the distance matrix.}
 }
 \description{
 computes the centered distance matrix
@@ -26,6 +29,8 @@ The centered distance matrices are required for the computation of (total / m-) 
 If \code{normalize = TRUE} then the value of multivariance is comparable and meaningful. It can be compared to the \code{\link{rejection.level}} or its p-value \code{\link{multivariance.pvalue}} can be computed.
 
 More details: If \code{normalize = TRUE} the matrix is scaled such that the multivariance based on it, times the sample size, has in the limit - in the case of independence - the distribution of an L^2 norm of a Gaussian process with known expectation.
+
+As default the Euclidean distance is used. The parameters \code{psi}, \code{p}, \code{isotropic} and \code{external.dm.fun} can be used to select a different distance. In particular, \code{external.dm.fun} can be used to provide any function which calculates a distance matrix for the rows of a given matrix.
 }
 \examples{
 x = coins(100)
