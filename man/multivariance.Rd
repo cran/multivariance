@@ -14,10 +14,16 @@ multivariance(x, vec = NA, Nscale = TRUE, correlation = FALSE,
 
 \item{Nscale}{if \code{TRUE} the multivariance is scaled up by the sample size (and thus it is exactly as required for the test of independence)}
 
-\item{correlation}{depreciated, please use the function \code{\link{multicorrelation}} instead.
+\item{correlation}{depreciated, please use the function \code{\link{multicorrelation}} instead.}
 
- @details
+\item{squared}{if \code{FALSE} it returns the actual multivariance, otherwise the squared multivariance (less computation)}
 
+\item{...}{these are passed to \code{\link{cdms}} (which is only invoked if \code{x} is a matrix)}
+}
+\description{
+Computes the distance multivariance, either for given data or a given list of centered distance matrices.
+}
+\details{
 If \code{x} is an matrix and \code{vec} is not given, then each column is treated as a separate sample. Otherwise \code{vec} has to have as many elements as \code{x} has columns and values starting from 1 up to the number of 'variables', e.g. if \code{x} is an \code{N} by 5 matrix and \code{vec = c(1,2,1,3,1)} then the multivariance of the 1-dimensional variables represented by column 2 and 4 and the 3-dimensional variable represented by the columns 1,3,5 is computed.
 
 As default it computes the normalized Nscaled squared multivariance, for a multivariance without normalization the argument \code{normalize = FALSE} has to be passed to \code{cdms}.
@@ -32,14 +38,7 @@ As a rough guide to interpret the value of distance multivariance note:
 \item If the random variables are (n-1)-independent and \code{Nscale = FALSE}, small values (close to 0) indicate independence, larger values indicate dependence.
 }
 
-Finally note, that due to numerical (in)precision the value of multivariance might become negative. In these cases it is set to 0. A warning is issued, if the value is negative and further than the usual (used by \code{\link[base]{all.equal}}) tolerance away from 0.}
-
-\item{squared}{if \code{FALSE} it returns the actual multivariance, otherwise the squared multivariance (less computation)}
-
-\item{...}{these are passed to \code{\link{cdms}} (which is only invoked if \code{x} is a matrix)}
-}
-\description{
-Computes the distance multivariance, either for given data or a given list of centered distance matrices.
+Finally note, that due to numerical (in)precision the value of multivariance might become negative. In these cases it is set to 0. A warning is issued, if the value is negative and further than the usual (used by \code{\link[base]{all.equal}}) tolerance away from 0.
 }
 \examples{
 multivariance(matrix(rnorm(100*3),ncol = 3)) #independent sample

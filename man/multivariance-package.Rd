@@ -35,15 +35,15 @@ To cite this package use the standard citation for R packages, i.e., the output 
 
  \code{\link{resample.rejection.level}} and \code{\link{resample.pvalue}} are the distribution dependent versions of the above. They are approximately sharp, but computational more expensive. Any resampling is done by \code{\link{resample.multivariance}}.
 
- Using the methods developed in [4] approximate p-value estimates are provided by \code{\link{pearson.pvalue}}. This method is much faster than the resampling method, but still experimental. Use the resampling method for reliable results.
+ Using the methods developed in [4] approximate p-value estimates are provided by \code{\link{pearson.pvalue}}. This method is much faster than the resampling method.
 
  \code{\link{multivariance.test}} and \code{\link{independence.test}} provide the corresponding tests of independence. The former provides output as common for tests in R, the latter is a simple significance test returning for a given significance level just \code{TRUE} or \code{FALSE}
 
-\code{\link{cdm}} and \code{\link{cdms}} compute the centered distance matrix and matrices, respectively. These can be used to speed up repeated computations of distance multivariance.
+\code{\link{cdm}} and \code{\link{cdms}} compute the (doubly) centered distance matrix and matrices, respectively. These can be used to speed up repeated computations of distance multivariance.
 
 In [4] various methods to estimate the moments of the test statistic under H0 were developed, these are (implicitly) implemented in this package only for the moments used in \code{\link{pearson.pvalue}}. Further and explicit functions can be added upon request. Please feel free to contact the author.
 
-For bigger projects it might be convenient to estimate the computation time of multivariance via \code{\link{multivariance.timing}}.
+For planing of large projects or studies it might be convenient to estimate the computation time of multivariance via \code{\link{multivariance.timing}}.
 }
 
 \section{Dependence structures}{

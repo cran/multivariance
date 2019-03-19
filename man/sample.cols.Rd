@@ -4,7 +4,7 @@
 \alias{sample.cols}
 \title{resample the columns of a matrix}
 \usage{
-sample.cols(x, vec = 1:ncol(x), replace = TRUE)
+sample.cols(x, vec = 1:ncol(x), replace = TRUE, incl.first = TRUE)
 }
 \arguments{
 \item{x}{matrix}
@@ -12,6 +12,8 @@ sample.cols(x, vec = 1:ncol(x), replace = TRUE)
 \item{vec}{vector, indicates which columns belong together}
 
 \item{replace}{boolean, sampling with or without replacement}
+
+\item{incl.first}{boolean, if \code{TRUE} also the first component is resampled}
 }
 \value{
 Returns a matrix with the same dimensions as \code{x}. The columns are resampled from the original columns. The resampling is done with replacement (\code{replace = TRUE}) or without (\code{replace = FALSE}). Columns which belong together (indicated by vec) are resampled identically, i.e., all values in rows of these are kept together.

@@ -35,15 +35,15 @@
 #'
 #'  \code{\link{resample.rejection.level}} and \code{\link{resample.pvalue}} are the distribution dependent versions of the above. They are approximately sharp, but computational more expensive. Any resampling is done by \code{\link{resample.multivariance}}.
 #'
-#'  Using the methods developed in [4] approximate p-value estimates are provided by \code{\link{pearson.pvalue}}. This method is much faster than the resampling method, but still experimental. Use the resampling method for reliable results.
+#'  Using the methods developed in [4] approximate p-value estimates are provided by \code{\link{pearson.pvalue}}. This method is much faster than the resampling method.
 #'
 #'  \code{\link{multivariance.test}} and \code{\link{independence.test}} provide the corresponding tests of independence. The former provides output as common for tests in R, the latter is a simple significance test returning for a given significance level just \code{TRUE} or \code{FALSE}
 #'
-#' \code{\link{cdm}} and \code{\link{cdms}} compute the centered distance matrix and matrices, respectively. These can be used to speed up repeated computations of distance multivariance.
+#' \code{\link{cdm}} and \code{\link{cdms}} compute the (doubly) centered distance matrix and matrices, respectively. These can be used to speed up repeated computations of distance multivariance.
 #'
 #' In [4] various methods to estimate the moments of the test statistic under H0 were developed, these are (implicitly) implemented in this package only for the moments used in \code{\link{pearson.pvalue}}. Further and explicit functions can be added upon request. Please feel free to contact the author.
 #'
-#' For bigger projects it might be convenient to estimate the computation time of multivariance via \code{\link{multivariance.timing}}.
+#' For planing of large projects or studies it might be convenient to estimate the computation time of multivariance via \code{\link{multivariance.timing}}.
 #'
 #' @section Dependence structures:
 #'
@@ -80,7 +80,7 @@ NULL
 
 #' rejection level for the test statistic
 #'
-#' Under independence the probability for the normalized and Nscaled multivariance to be above this level is less than \code{alpha}. The same holds for the normalized, Nscaled and Escaled total multivariance and m-multivariance.
+#' Under independence the probability for the normalized and Nscaled (squared) multivariance to be above this level is less than \code{alpha}. The same holds for the normalized, Nscaled and Escaled (squared) total multivariance and m-multivariance.
 #'
 #' @param alpha level of significance
 #' @details
@@ -104,7 +104,7 @@ NULL
 #'
 #' @export
 rejection.level = function(alpha) {
-  if (any(alpha > 0.215)) warning("alpha too large. Only valid for alpha smaller than 0.215!")
+  if (any(alpha > 0.215)) warning("alpha too large. Only valid for alpha smaller than 0.215! \n")
   return((stats::qnorm(1-alpha/2)^2))
   # identical with qchisq(1-alpha,1)
 }
@@ -113,10 +113,10 @@ rejection.level = function(alpha) {
 #'
 #' Computes a conservative p-value for the hypothesis of independence for a given multivariance/total multivariance.
 #'
-#' @param x value of a normalized and Nscaled \code{\link{multivariance}}
+#' @param x value of a normalized \code{\link{multivariance}} scaled by the sample size (i.e., computed with \code{Nscale = TRUE})
 #'
 #' @details
-#' This is based on a distribution-free approach. The p-value is conservative, i.e. it might be much smaller. This is the counterpart to \code{\link{rejection.level}}. For a less conservative approach see \code{\link{resample.pvalue}}.
+#' This is based on a distribution-free approach. The p-value is conservative, i.e. it might be much smaller. This is the counterpart to \code{\link{rejection.level}}. For a less conservative approach see \code{\link{resample.pvalue}} or \code{\link{pearson.pvalue}}.
 #'
 #' p-values larger than 0.215 might be incorrect, since the distribution-free estimate on which the computation is based only holds up to 0.215.
 #'
@@ -139,7 +139,7 @@ multivariance.pvalue = function(x) {
 #' @param psi if it is \code{NULL}, the euclidean distance will be used. In the case of \code{isotropic = TRUE}: a real valued negative definite function of one variable (accepting vectors as arguments; returning a vector of the same length). In the case of \code{isotropic = FALSE}: a real valued function of two variables (or vectors) to compute the distance of two samples based on a continuous negative definite function.
 #' @param isotropic logical, indicates if psi of the Euclidean distance matrix should be computed, i.e., if an isotropic distance should be used.
 #' @param p numeric, if it is a value between 1 and 2 then the Minkowski distance with parameter p is used.
-#' @param external.dm.fun function, which computes the distance matrix.
+#' @param external.dm.fun here one can supply an external function, which computes the distance matrix given \code{x}.
 #'
 #' @details
 #' The centered distance matrices are required for the computation of (total / m-) multivariance.
@@ -176,7 +176,7 @@ cdm = function(x, normalize = TRUE, psi = NULL, p = NULL, isotropic = FALSE, ext
 
   } else {
     if (!is.null(p)) {
-      if ((p<1) || (p>2)) warning("p is not in [1,2]")
+      if ((p<1) || (p>2)) warning("p is not in [1,2]. \n")
       dm = dist.to.matrix(stats::dist(x,method="minkowski", p = p))
     } else { # case: psi is given
       if (!is.null(external.dm.fun)) {
@@ -204,7 +204,7 @@ cdm = function(x, normalize = TRUE, psi = NULL, p = NULL, isotropic = FALSE, ext
   # colm = colMeans(dm)
   # m = mean(colm)  # equals mean(dm)
   #
-  # if (m == 0) warning("It seems that one variable is constant. Constants are always independent.\n")
+  # if (m == 0) warning("It seems that one variable is constant. Constants are always independent. \n")
   # if (normalize && (m != 0)) {
   #   return((-dm + outer(colm,colm, FUN ="+") - m)/ m)
   # } else {
@@ -230,7 +230,7 @@ cdm = function(x, normalize = TRUE, psi = NULL, p = NULL, isotropic = FALSE, ext
 cdms = function(x,vec = 1:ncol(x),membership = NULL,...) {
   if (!is.null(membership)) {
     vec = membership
-    warning("Use 'vec' instead of 'membership' as argument to 'cdms'. 'membership' is depreciated.")
+    warning("Use 'vec' instead of 'membership' as argument to 'cdms'. 'membership' is depreciated. \n")
   }
   if (anyNA(vec)) vec = 1:ncol(x)
   n = max(vec)
@@ -244,8 +244,9 @@ cdms = function(x,vec = 1:ncol(x),membership = NULL,...) {
 
 #' double centering of a matrix
 #'
+#' # changed default after 2.0.0
 #' @keywords internal
-double.center = function(dm,normalize = FALSE) {
+double.center = function(dm,normalize = TRUE) {
   if (is.list(dm)) { # double center a list of matrices
     return(lapply(dm, function(l) double.center(l,normalize) ))
     # n = lenght(tm)
@@ -256,7 +257,7 @@ double.center = function(dm,normalize = FALSE) {
     colm = colMeans(dm)
     m = mean(colm)  # equals mean(dm)
 
-    if (m == 0) warning("It seems that one variable is constant. Constants are always independent.\n")
+    if (m == 0) warning("It seems that one variable is constant. Constants are always independent. \n")
     if (normalize && (m != 0)) {
       return((-dm + outer(colm,colm, FUN ="+") - m)/ m)
     } else {
@@ -276,7 +277,7 @@ double.center = function(dm,normalize = FALSE) {
 #' @param ... these are passed to \code{\link{cdms}} (which is only invoked if \code{x} is a matrix)
 #' @param correlation depreciated, please use the function \code{\link{multicorrelation}} instead.
 #'
-#'  @details
+#' @details
 #'
 #' If \code{x} is an matrix and \code{vec} is not given, then each column is treated as a separate sample. Otherwise \code{vec} has to have as many elements as \code{x} has columns and values starting from 1 up to the number of 'variables', e.g. if \code{x} is an \code{N} by 5 matrix and \code{vec = c(1,2,1,3,1)} then the multivariance of the 1-dimensional variables represented by column 2 and 4 and the 3-dimensional variable represented by the columns 1,3,5 is computed.
 #'
@@ -312,9 +313,9 @@ double.center = function(dm,normalize = FALSE) {
 #' @export
 multivariance = function(x,vec = NA,Nscale = TRUE,correlation = FALSE, squared = TRUE, ...) {
 
-  if (correlation) warning("The option 'correlation' is depreciated. Please use the function 'multicorrelation' instead.")
+  if (correlation) warning("The option 'correlation' is depreciated. Please use the function 'multicorrelation' instead. \n")
   if (!is.list(x)) { # if the input is a matrix, the distance matrices are computed
-    if (is.array(x) & (length(dim(x))>2)) stop("Please provide a list instead of an array. Changed since version 2.0.0.")
+    if (is.array(x) & (length(dim(x))>2)) stop("Please provide a list instead of an array. Changed since version 2.0.0.\n")
 
     if (anyNA(vec)) vec = 1:ncol(x)
     x = cdms(x,vec,...)
@@ -322,7 +323,7 @@ multivariance = function(x,vec = NA,Nscale = TRUE,correlation = FALSE, squared =
   }
   if (anyNA(vec)) vec = 1:length(x)
 
-  if (anyNA(x)) stop("provided x contains NA")
+  if (anyNA(x)) stop("Provided x contains NA. \n")
 
   #if (length(vec) > dim(x)[2]) warning("More data columns than rows.")
   #Aprod = x[,,vec[1]]
@@ -353,7 +354,7 @@ multivariance = function(x,vec = NA,Nscale = TRUE,correlation = FALSE, squared =
   #}
   #erg = sum(diat,2*test)/ncol(x)^2
   if (result < 0) {
-    if (!isTRUE(all.equal(result,0))) warning(paste("Value of multivariance was negative (",result,"). This is usually due to numerical (in)precision. It was set to 0."))
+    if (!isTRUE(all.equal(result,0))) warning(paste("Value of multivariance was negative (",result,"). This is usually due to numerical (in)precision. It was set to 0. \n"))
     result = 0
   }
 
@@ -379,7 +380,7 @@ multivariance = function(x,vec = NA,Nscale = TRUE,correlation = FALSE, squared =
 #'  As a rough guide to interpret the value of total distance multivariance note:
 #' \itemize{
 #' \item Large values indicate dependence.
-#' \item For\code{Nscale = TRUE} values close to 1 and smaller indicate independence, larger values indicate dependence. In fact, in the case of independence the test statistic is a Gaussian quadratic form with expectation 1 and samples of it can be generated by \code{\link{resample.multivariance}}.
+#' \item For \code{Nscale = TRUE} values close to 1 and smaller indicate independence, larger values indicate dependence. In fact, in the case of independence the test statistic is a Gaussian quadratic form with expectation 1 and samples of it can be generated by \code{\link{resample.multivariance}}.
 #' \item For \code{Nscale = FALSE} small values (close to 0) indicate independence, larger values indicate dependence.
 #' }
 
@@ -420,7 +421,7 @@ total.multivariance = function(x,vec = NA,lambda = 1, Nscale = TRUE,Escale = TRU
   #result = mean(Aprod)-lambda^(length(vec))
 
   if (result < 0) {
-    if (!isTRUE(all.equal(result,0))) warning(paste("Value of total multivariance was negative (",result,"). This is usually due to numerical (in)precision. It was set to 0."))
+    if (!isTRUE(all.equal(result,0))) warning(paste("Value of total multivariance was negative (",result,"). This is usually due to numerical (in)precision. It was set to 0. \n"))
     result = 0
   }
 
@@ -540,7 +541,7 @@ m.multivariance = function(x, vec= NA, m = 2, Nscale = TRUE, Escale = TRUE, squa
   }
 
   if (m > 3) {
-    warning("m > 3, not implemented.")
+    warning("m > 3, not implemented. \n")
     result = NA
   }
 
@@ -548,7 +549,7 @@ m.multivariance = function(x, vec= NA, m = 2, Nscale = TRUE, Escale = TRUE, squa
     return(result)
   } else {
     if (result < 0) {
-      if (!isTRUE(all.equal(result,0))) warning(paste("Value of m-multivariance was negative (",result,"). This is usually due to numerical (in)precision. It was set to 0."))
+      if (!isTRUE(all.equal(result,0))) warning(paste("Value of m-multivariance was negative (",result,"). This is usually due to numerical (in)precision. It was set to 0. \n"))
       result = 0
     }
 
@@ -593,7 +594,7 @@ multivariances.all = function(x, vec= NA, Nscale = TRUE, squared = TRUE,...) {
     x = cdms(x,vec,...)
     vec = 1:max(vec)
   }
-  if (anyNA(vec)) vec = 1:dim(x)[3]
+  if (anyNA(vec)) vec = 1:length(x)
 
   if (anyNA(x)) stop("provided x contains NA")
 
@@ -639,7 +640,7 @@ multivariances.all = function(x, vec= NA, Nscale = TRUE, squared = TRUE,...) {
   neg.res = result<0
   if (any(neg.res,na.rm = TRUE)) {
     if (!isTRUE(all.equal(result[neg.res],0,check.names = FALSE))) {
-      warning(paste0("Value of ",c("","total-","2-","3-")[neg.res],"multivariance was negative (",result[neg.res],"). This is usually due to numerical (in)precision. It was set to 0."))
+      warning(paste0("Value of ",c("","total-","2-","3-")[neg.res],"multivariance was negative (",result[neg.res],"). This is usually due to numerical (in)precision. It was set to 0. \n"))
     }
     result[neg.res] = 0
   }
@@ -795,9 +796,9 @@ independence.test = function(x,vec = 1:ncol(x),alpha = 0.05,type = "distribution
 #'
 #' This performs the (specified by \code{type} and \code{p.value.type}) independence test for the columns of a sample matrix.
 #'
-#' @inheritParams multivariance
-#' @param type one of \code{"independence","pairwise independence","multi","total","m.multi.2","m.multi.3"}
-#' @param p.value.type one of \code{"pearson_approx","distribution_free","resample"}
+#' @inheritParams cdms
+#' @param type one of \code{"independence"}, \code{"pairwise independence"}, \code{"multi"}, \code{"total"}, \code{"m.multi.2"}, \code{"m.multi.3"}
+#' @param p.value.type one of \code{"pearson_approx"}, \code{"distribution_free"}, \code{"resample"}
 #' @param verbose logical, if TRUE meaningful text output is generated.
 #'
 #' @return  A list with class "\code{htest}" containing the following components:
@@ -807,7 +808,10 @@ independence.test = function(x,vec = 1:ncol(x),alpha = 0.05,type = "distribution
 #'   \item{\code{method}}{a character string indicating the type of test performed,}
 #'   \item{\code{data.name}}{a character string giving the name(s) of the data.}
 #' }
-#' @details The types \code{"independence"} and \code{"total"} are identical: an independence test is performed.
+#' @details
+#' For the use of \code{vec} see the examples below and the more detailed explanation of this argument for \code{\link{multivariance}}.
+#'
+#' The types \code{"independence"} and \code{"total"} are identical: an independence test is performed.
 #'
 #' Also the types \code{"pairwise independence"} and \code{"m.multi.2"} are identical:  a test of pairwise independence is performed.
 #'
@@ -832,6 +836,16 @@ independence.test = function(x,vec = 1:ncol(x),alpha = 0.05,type = "distribution
 #'  for (pvt in c("distribution_free","resample","pearson_approx"))
 #'   print(multivariance.test(coins100,type=ty,p.value.type = pvt))
 #'
+#' # using the vec argument:
+#' x = matrix(rnorm(50*6),ncol = 10) # a 50x6 data matrix
+#' vec = c(1,2,3,4,5,6) # each column is treated as one variable
+#' multivariance.test(x,vec) # is the same as the default
+#'
+#' vec = c(1,2,2,1,3,1)
+#' # column 1,4,6 are treated as one variable
+#' # column 2,3 are treated as one variable
+#' # column 5 is treated as one variable
+#' multivariance.test(x,vec)
 #'
 #' @export
 multivariance.test = function(x,vec = 1:ncol(x),type = "total",p.value.type = "distribution_free",verbose = TRUE,...) {
@@ -956,6 +970,7 @@ coins = function(N = 1000, k = 2) {
 #' @param x matrix
 #' @param vec vector, indicates which columns belong together
 #' @param replace boolean, sampling with or without replacement
+#' @param incl.first boolean, if \code{TRUE} also the first component is resampled
 #'
 #' @return Returns a matrix with the same dimensions as \code{x}. The columns are resampled from the original columns. The resampling is done with replacement (\code{replace = TRUE}) or without (\code{replace = FALSE}). Columns which belong together (indicated by vec) are resampled identically, i.e., all values in rows of these are kept together.
 #'
@@ -963,24 +978,26 @@ coins = function(N = 1000, k = 2) {
 #' sample.cols(matrix(1:15,nrow = 5),vec = c(1,1,2))
 #'
 #' @export
-sample.cols = function(x,vec = 1:ncol(x),replace = TRUE) {
+sample.cols = function(x,vec = 1:ncol(x),replace = TRUE,incl.first = TRUE) {
   if (anyNA(vec)) vec = 1:ncol(x)
   N = nrow(x)
   xnew = x
-  for (i in 1:max(vec)) {
-    xnew[,vec == i] = x[sample.int(N,replace = replace),vec == i]
+  for (i in (2-incl.first):max(vec)) {
+    neworder = sample.int(N,replace = replace)
+    xnew[,vec == i] = x[neworder,vec == i]
+    #print(neworder)
   }
   return(xnew)
 }
 
 #' resamples centered distance matrices
 #' @param list.cdm a list of centered distance matrices
-#' @param replace boolean, sampling with or without replacement
+#' @inheritParams sample.cols
 #'
 #' @return Returns a list of centered distance matrices, each matrix corresponds to the resampled columns of the corresponding sample, using resampling with replacement (bootstrap) or without replacement (permutations).
 #'
 #' @export
-sample.cdms = function(list.cdm, replace = FALSE) {
+sample.cdms = function(list.cdm,replace = FALSE, incl.first = FALSE) {
   N = nrow(list.cdm[[1]])
   # n = dim(array.cdm)[3]
   #
@@ -994,8 +1011,9 @@ sample.cdms = function(list.cdm, replace = FALSE) {
   return(
   lapply(1:length(list.cdm),
     function(i) {
-      if (i > 1) {
-        neworder = sample.int(N, replace = replace)
+      if (i > (!incl.first)) {
+        neworder = sample.int(N,replace = replace)
+        #print(neworder)
         return(list.cdm[[i]][neworder,neworder])
       } else { # no resampling for the first
         return(list.cdm[[i]])
@@ -1009,7 +1027,7 @@ sample.cdms = function(list.cdm, replace = FALSE) {
 #' The distribution of the test statistic under the hypothesis of independence is required for the independence tests. This function generates approximate samples of this distribution either by sampling without replacement (permutations) or by sampling with replacement (bootstrap).
 #'
 #' @details
-#' The resampling is done by sampling from the original data either without replacement (\code{"permutation"}) or with replacement (\code{"bootstrap"}).
+#' The resampling is done by sampling from the original data either without replacement (\code{"permutation"}) or with replacement (\code{"bootstrap"}). Using resampling without replacement is (much) faster (due to special identities which only hold in this case).
 #'
 #' For convenience also the actual (total /m-) multivariance is computed and its p-value.
 #'
@@ -1037,11 +1055,6 @@ sample.cdms = function(list.cdm, replace = FALSE) {
 #' @export
 resample.multivariance = function(x,vec = 1:ncol(x),times = 300,type = "multi",resample.type = "permutation",...) {
 
-  replace = FALSE
-  if (resample.type == "bootstrap") {
-    replace = TRUE
-    resample.type = "permutation"
-  }
   switch(resample.type,
          #distinct.permutation = {resample = function() matrix(x[derangements.without.fixpoint(N,n, distinctcols,vec)],ncol = n)},
        permutation = {
@@ -1052,11 +1065,11 @@ resample.multivariance = function(x,vec = 1:ncol(x),times = 300,type = "multi",r
 
          # list.cdm = cdms(x,vec,...) #!! TODO: note there is the argument lambda for total.multivariance this should be excluded here!
          vec = 1:max(vec) # all distance matrices shall be used.
-         resample = function() sample.cdms(list.cdm, replace = replace)}, # resampling of the centered distance matrices - this is faster than permutation.orig
-#    bootstrap = {
-#      list.cdm = cdms(x,vec,...)
-#      vec = 1:max(vec)
-#      resample = function() sample.cdms(list.cdm,replace = TRUE)},
+         resample = function() sample.cdms(list.cdm, replace = FALSE)}, # resampling of the centered distance matrices - this is faster than permutation.orig
+    bootstrap = {
+         warning("Note that bootstrap resampling is (for multivariance) much slower than permutation resampling. Because certain simplifying identities fail to hold. \n")
+         resample = function() cdms(sample.cols(x,vec,replace =TRUE))
+      },
     permutation.orig = {resample = function() sample.cols(x,vec,replace =FALSE)}, # resampling of the original data
     {stop(paste("unkown resample.type:",resample.type))}
   )
@@ -1175,7 +1188,7 @@ mu3.unbiased = function(B,b2ob = sum(tcrossprod(B)*B)) {
 }
 
 
-#' given the sample of a single variable the centered distance matrix, mu and bcd are computed
+#' given the sample of a single variable the centered distance matrix, mu (the limit moments) and bcd (the terms for the finite sample moments) are computed
 #' The normalization should be postponed to the moment calculation.
 #'
 #' NOTE: speedup might be possible by incorporating mu3 and some matrix-norm-identities
@@ -1191,7 +1204,7 @@ cdm.mu.bcd = function(x, normalize = FALSE, psi = NULL, p = NULL, isotropic = FA
     dm = fastdist(as.matrix(x))
   } else {
     if (!is.null(p)) {
-      if ((p<1) || (p>2)) warning("p is not in [1,2]")
+      if ((p<1) || (p>2)) warning("p is not in [1,2]. \n")
       dm = dist.to.matrix(stats::dist(x,method="minkowski", p = p))
     } else { # case: psi is given
       if (!is.null(external.dm.fun)) {
@@ -1220,7 +1233,7 @@ cdm.mu.bcd = function(x, normalize = FALSE, psi = NULL, p = NULL, isotropic = FA
 
   # if (unbiased & normalize) warning("Unbiased normalized cdm, m2, m3 not implemented. \n")
 
-  if (m == 0) warning("It seems that one variable is constant. Constants are always independent.\n")
+  if (m == 0) warning("It seems that one variable is constant. Constants are always independent. \n")
 
   cdm = (-dm + outer(colm,colm, FUN ="+") - m)
 
@@ -1271,13 +1284,19 @@ cdm.mu.bcd = function(x, normalize = FALSE, psi = NULL, p = NULL, isotropic = FA
 #' @param membership depreciated. Now use \code{vec}.
 #' @param ... these are passed to \code{\link{cdm}}
 #'
-#' @return It returns an 3 dimensional array of the distance matrices. The index of the third dimension names the component for which the matrix is computed, thus it ranges from 1 to max(vec).
+#' @return  A list containing the following components:
+#' \describe{
+#'   \item{\code{list.cdm}}{list of the centered distance matrices,}
+#'   \item{\code{mu}}{matrix with the limit moments in a column for each variable,}
+#'   \item{\code{bcd}}{matrix with b, c, d (which are required for the computation of the finite sample moments) in columns for each variable,}
+#'   \item{\code{mean}}{vector with the mean of each centered distance matrix.}
+#' }
 #'
 #' @keywords internal
 cdms.mu.bcd = function(x,vec = 1:ncol(x),membership = NULL,...) {
   if (!is.null(membership)) {
     vec = membership
-    warning("Use 'vec' instead of 'membership' as argument to 'cdms'. 'membership' is depreciated.")
+    warning("Use 'vec' instead of 'membership' as argument to 'cdms'. 'membership' is depreciated. \n")
   }
   if (anyNA(vec)) vec = 1:ncol(x)
   n = max(vec)
@@ -1364,7 +1383,13 @@ sums.of.products = function(a,b,c, type = "multi") {
   return(temp)
 }
 
-#' computes the moments as required by pearson
+#' computes the moments as required for Pearson's approximation
+#'
+#' @param N sample size
+#' @param bcd an array with b c d
+#' @param mu the limit moments
+#' @param mmean the means of the distance matrices
+#'
 #' @keywords internal
 moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
 
@@ -1376,8 +1401,18 @@ moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
          {stop(paste("unkown type:",type))}
   )
 
-  limit.variance = 2*fun(mu[2,]/mmean^2) # variance
-  limit.skewness = 8*fun(mu[3,]/mmean^3)/limit.variance^(3/2) #skewness
+  #limit.variance = 2*fun(mu[2,]/mmean^2) # variance
+  #limit.skewness = 8*fun(mu[3,]/mmean^3)/limit.variance^(3/2) #skewness
+
+  one.over.mmean = 1/mmean
+  one.over.mmean[mmean == 0] = 0 # convention 0/0 = 0 (since the corresponding mu[i,] below are 0)
+
+  limit.variance = 2*fun(mu[2,]*one.over.mmean^2) # variance
+  limit.skewness = 8*fun(mu[3,]*one.over.mmean^3)/limit.variance^(3/2) #skewness
+
+  if (is.nan(limit.skewness)) { # convention 0/0 = 0
+    limit.skewness = 0
+  }
 
   n = dim(mu)[2]
 
@@ -1398,9 +1433,18 @@ moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
 
   sumh2 = (res$freq.o.c[c(2,3,1)]/N^4)%*%bcd[1:3,] #(C(N,2)bi+C(N,3)ci+C(N,1)di)/N^4
 
-  bcdsums.normalized = t(apply(bcdsums,1,function(x) x/sumh2))
+  #bcdsums.normalized = t(apply(bcdsums,1,function(x) x/sumh2))
+
+  one.over.sumh2 = 1/sumh2
+  one.over.sumh2[sumh2 == 0] = 0
+
+
+  bcdsums.normalized = t(apply(bcdsums,1,function(x) x*one.over.sumh2))
+
 
   one = rep(1,n)
+
+  one[mmean == 0] = 0 # fixing 0/0
 
   E.no = (fun(one) + (N-1)*fun((-1/(N-1))*one))/sqrt(scalevec) # finite sample expectation
 
@@ -1431,7 +1475,7 @@ moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
 #' @param moment vector with the mean, variance and skewness of the quadratic form
 #' @param lower.tail logical, indicating of the lower or upper tail of the distribution function should be calculated
 #'
-#' @details This is Pearson's approximation for Gaussian quadratic forms as stated in Equation (4.64) in [4]
+#' @details This is Pearson's approximation for Gaussian quadratic forms as stated in [4] (equation (4.65) in arXiv:1808.07280v2)
 #'
 #' @references
 #' For the theoretic background see the reference [4] given on the main help page of this package: \link{multivariance-package}.
@@ -1439,7 +1483,7 @@ moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
 #' @export
 pearson.qf = function(x,moment, lower.tail = TRUE) {
   m = moment[1]
-  v = max(moment[2],0) #! since estimates of v might be negative.
+  v = max(moment[2],0) #! since estimates of v might be negative (usually only numerically, within the usual tolerance to 0).
   s = moment[3]
 
   a = sqrt(8)/s
@@ -1447,8 +1491,12 @@ pearson.qf = function(x,moment, lower.tail = TRUE) {
 
   if (is.na(v)) return(NA)
 
-  if (v == 0) {
-    return(x > m)
+  if ((v == 0) | (m == 0)) {
+    if (lower.tail) {
+      return(as.numeric(x <= m))
+    } else {
+      return(as.numeric(x >= m)) # for a discrete distribution the p.value (upper.tail) includes the value itself
+    }
   } else {
     stats::pchisq(sqrt(2)*a*(x-m)/sqrt(as.vector(v))+nu,df = nu, lower.tail= lower.tail)
   }
@@ -1475,6 +1523,10 @@ pearson.pvalue = function(x,vec = 1:ncol(x), type = "multi",...) {
   cmb = do.call('cdms.mu.bcd', c(list(x = x, vec = vec), dots[!(names(dots) %in% "lambda")]))
   # cmb = cdms.mu.bcd(x,vec, psi = psi, p = p, isotropic = isotropic,...)
   moms = moments.for.pearson(nrow(x),cmb$bcd, cmb$mu, cmb$mean, type = type)
+
+  if ((!any(is.na(cmb$mu[3,]))) & (any(cmb$mu[3,]<0,na.rm = TRUE))) {
+    warning(paste("Pearson's approximation: For the variable(s)",paste(which(cmb$mu[3,]<0),collapse = " and "),"the estimated limit skewness was negative. This usually indicates a (too) small sample size. It is recommended to use a resampling test (e.g. 'p.value.type='resample'') instead. \n"))
+  }
 
   # normalization already in cdms.mu.bcd
   # normalizing.factor = rep(cmb$mean, each = nrow(x)^2)
@@ -1595,7 +1647,7 @@ pearson.pvalue = function(x,vec = 1:ncol(x), type = "multi",...) {
 #' Advanced:
 #' The argument \code{detection.aim} can be used to check, if an expected dependence structure was detected. This might be useful for simulation studies to determine the empirical power of the detection algorithm. Hereto  \code{detection.aim} is set to a list of vectors which indicate the expected detected dependence structures (one for each run of \code{\link{find.cluster}}). The vector has as first element the \code{k} for which k-tuples are detected (for this aim the detection stops without success if no k-tuple is found), and the other elements, indicate to which clusters all present vertices belong after the detection, e.g. \code{c(3,2,2,1,2,1,1,2,1)} expects that 3-tuples are detected and in the graph are 8 vertices (including those representing the detected 3 dependencies), the order of the 2's and 1's indicate which vertices belong to which cluster. If \code{detection.aim} is provided, the vector representing the actual detection is printed, thus one can use the output with copy-paste to fix successively the expected detection aims.
 #'
-#' Note that a failed detection might invoice the warning:
+#' Note that a failed detection might invoke the warning:
 #' \preformatted{
 #' run$mem == detection.aim[[k]][-1] :
 #' longer object length is not a multiple of shorter object length
@@ -1861,7 +1913,7 @@ dist.to.matrix = function(ds) {
 
 #' estimate of the computation time
 #'
-#' Estimates of the computation time. This is relative rough. First run with \code{determine.parameters = TRUE} (which takes a while). Then use the computed parameters to determine the computation time/or sample size.
+#' Estimates the computation time. This is relative rough. First run with \code{determine.parameters = TRUE} (which takes a while). Then use the computed parameters to determine the computation time/or sample size.
 #'
 #' @param determine.parameters if \code{TRUE} then the parameters for the current computer are determined. This might take a while (3 loops to N=1000).
 #' @param N number of samples. If \code{NULL} and \code{sectime} is given, then \code{N} is computed.

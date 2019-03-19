@@ -32,7 +32,7 @@ A list with elements
 The distribution of the test statistic under the hypothesis of independence is required for the independence tests. This function generates approximate samples of this distribution either by sampling without replacement (permutations) or by sampling with replacement (bootstrap).
 }
 \details{
-The resampling is done by sampling from the original data either without replacement (\code{"permutation"}) or with replacement (\code{"bootstrap"}).
+The resampling is done by sampling from the original data either without replacement (\code{"permutation"}) or with replacement (\code{"bootstrap"}). Using resampling without replacement is (much) faster (due to special identities which only hold in this case).
 
 For convenience also the actual (total /m-) multivariance is computed and its p-value.
 }

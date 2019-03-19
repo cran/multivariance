@@ -2,15 +2,15 @@
 % Please edit documentation in R/RcppExports.R
 \name{fastEuclideanCdm}
 \alias{fastEuclideanCdm}
-\title{double centered Euclidean distance matrix}
+\title{fast centered Euclidean distance matrix}
 \usage{
 fastEuclideanCdm(x, normalize)
 }
 \arguments{
-\item{x}{matrix with sample rows which the distanc matrix is computed (to use with vectors, use \code{as.matrix(x)})}
+\item{x}{matrix with sample rows for which the distance matrix is computed (to use with vectors, use \code{as.matrix(x)})}
 
 \item{normalize}{boolean. If \code{TRUE} the matrix will be normalized to mean 1.}
 }
 \description{
-double centered Euclidean distance matrix
+fast centered Euclidean distance matrix
 }

@@ -2,15 +2,15 @@
 % Please edit documentation in R/RcppExports.R
 \name{fastdist}
 \alias{fastdist}
-\title{fast euclidean distance matrix computation}
+\title{fast Euclidean distance matrix}
 \usage{
 fastdist(x)
 }
 \arguments{
-\item{x}{matrix with sample rows which the distanc matrix is computed (to use with vectors, use \code{as.matrix(x)})}
+\item{x}{matrix with sample rows for which the distance matrix is computed (to use with vectors, use \code{as.matrix(x)})}
 }
 \description{
-fast euclidean distance matrix computation
+fast Euclidean distance matrix
 }
 \examples{
 #require(microbenchmark)

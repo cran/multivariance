@@ -2,11 +2,20 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{moments.for.pearson}
 \alias{moments.for.pearson}
-\title{computes the moments as required by pearson}
+\title{computes the moments as required for Pearson's approximation}
 \usage{
 moments.for.pearson(N, bcd, mu, mmean, type = "multi")
 }
+\arguments{
+\item{N}{sample size}
+
+\item{bcd}{an array with b c d}
+
+\item{mu}{the limit moments}
+
+\item{mmean}{the means of the distance matrices}
+}
 \description{
-computes the moments as required by pearson
+computes the moments as required for Pearson's approximation
 }
 \keyword{internal}

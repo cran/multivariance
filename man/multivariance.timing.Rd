@@ -23,7 +23,7 @@ multivariance.timing(N = NULL, n, sectime = NULL, coef.cdm = 15.2,
 \item{determine.parameters}{if \code{TRUE} then the parameters for the current computer are determined. This might take a while (3 loops to N=1000).}
 }
 \description{
-Estimates of the computation time. This is relative rough. First run with \code{determine.parameters = TRUE} (which takes a while). Then use the computed parameters to determine the computation time/or sample size.
+Estimates the computation time. This is relative rough. First run with \code{determine.parameters = TRUE} (which takes a while). Then use the computed parameters to determine the computation time/or sample size.
 }
 \details{
 When detecting the parameters, the median of the computation times is used.

@@ -1,6 +1,20 @@
 (News above the first "Changes...." are not displayed properly in Rstudio, i.e., this line is invisible)
 
 
+Changes in Version 2.1.0
+========================
+
+New Feature
+ * 'sample.cols' and 'sample.cdms' have now the option "incl.first" to select if the first component should also be resampled. The resampling of the first component is not necessary for the methods here, but it might be useful in other cases. Moreover, now using both methods (started with the same seed and parameter) yield the same results.
+ * When using Pearson's approximation (e.g. in 'test.multivariance') for samples with constant random variables, now (besides the warning that constants are always independent) also a proper p-value approximation is computed.
+
+Updated
+ * improved documentation
+
+Fixed
+ * 'multivariances.all' produced an error if x was a list and vec contained NA.
+
+
 Changes in Version 2.0.0
 ========================
 

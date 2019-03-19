@@ -4,12 +4,14 @@
 \alias{sample.cdms}
 \title{resamples centered distance matrices}
 \usage{
-sample.cdms(list.cdm, replace = FALSE)
+sample.cdms(list.cdm, replace = FALSE, incl.first = FALSE)
 }
 \arguments{
 \item{list.cdm}{a list of centered distance matrices}
 
 \item{replace}{boolean, sampling with or without replacement}
+
+\item{incl.first}{boolean, if \code{TRUE} also the first component is resampled}
 }
 \value{
 Returns a list of centered distance matrices, each matrix corresponds to the resampled columns of the corresponding sample, using resampling with replacement (bootstrap) or without replacement (permutations).

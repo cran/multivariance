@@ -10,7 +10,7 @@ rejection.level(alpha)
 \item{alpha}{level of significance}
 }
 \description{
-Under independence the probability for the normalized and Nscaled multivariance to be above this level is less than \code{alpha}. The same holds for the normalized, Nscaled and Escaled total multivariance and m-multivariance.
+Under independence the probability for the normalized and Nscaled (squared) multivariance to be above this level is less than \code{alpha}. The same holds for the normalized, Nscaled and Escaled (squared) total multivariance and m-multivariance.
 }
 \details{
 This is based on a distribution-free approach. The value might be very conservative. This is the counterpart to \code{\link{multivariance.pvalue}}. For a less conservative approach see \code{\link{resample.rejection.level}}.

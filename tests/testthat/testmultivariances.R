@@ -12,6 +12,18 @@ test_that("cdms",{
   expect_equal(cdm(x),cdm(x,psi = function(x,y) sqrt(sum((x-y)^2))))
   expect_equivalent(fastdist(as.matrix(x[,1])),as.matrix(dist(x[,1])))
   expect_equivalent(fastdist(as.matrix(x)),as.matrix(dist(x)))
+  x = rnorm(100)
+
+  expect_equal(
+    double.center(fastdist(as.matrix(x)),normalize = TRUE),
+    cdm(x)
+  )
+
+  expect_equal(
+    double.center(fastdist(as.matrix(x)),normalize = FALSE),
+    cdm(x,normalize = FALSE)
+  )
+
 })
 
 context("definition of multivariances")
@@ -39,6 +51,21 @@ test_that("resampling p-values and quantiles",{
   expect_equal(resample.rejection.level(0.05,x), quant)
   expect_equal(resample.pvalue(multivariance(x),x), pval)
 })
+
+set.seed(1)
+x = matrix(rnorm(10*10),10)
+vec = c(1:5,1:5)
+for (re in c(FALSE))
+  for (inc in c(TRUE,FALSE)) {
+    #print(paste("replace:",re,", include first:",inc))
+    set.seed(1234)
+    a = sample.cdms(cdms(x,vec),replace = re,incl.first = inc)
+    set.seed(1234)
+    b = cdms(sample.cols(x,vec ,replace = re,incl.first = inc),vec)
+    #print(all.equal(a,b))
+    expect_equal(a,b)
+  }
+
 
 for (n in c(2,5)) {
 

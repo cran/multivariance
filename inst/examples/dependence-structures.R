@@ -1,26 +1,26 @@
 \donttest{
-  # structures for the datasets included in the package
-  dependence.structure(dep_struct_several_26_100)
-  dependence.structure(dep_struct_star_9_100)
-  dependence.structure(dep_struct_iterated_13_100)
-  dependence.structure(dep_struct_ring_15_100)
+# structures for the datasets included in the package
+dependence.structure(dep_struct_several_26_100)
+dependence.structure(dep_struct_star_9_100)
+dependence.structure(dep_struct_iterated_13_100)
+dependence.structure(dep_struct_ring_15_100)
 
-  # basic examples:
+# basic examples:
 
-  dependence.structure(coins(100)) # 3-dependent
-  dependence.structure(coins(100),vec = c(1,1,2))
-  # 3-dependent rv of which the first two rv are used together as one rv, thus 2-dependence.
+dependence.structure(coins(100)) # 3-dependent
+dependence.structure(coins(100),vec = c(1,1,2))
+# 3-dependent rv of which the first two rv are used together as one rv, thus 2-dependence.
 
-  dependence.structure(cbind(coins(200),coins(200,k=5)),verbose = TRUE)
-  #1,2,3 are 3-dependent, 4,..,9 are 6-dependent
+dependence.structure(cbind(coins(200),coins(200,k=5)),verbose = TRUE)
+#1,2,3 are 3-dependent, 4,..,9 are 6-dependent
 
-  # similar to the the previous example, but
-  # the pair 1,3 is treated as one sample,
-  # anagously the pair 2,4. In the resulting structure one does not
-  # see anymore that the dependence of 1,2,3,4 with the rest is due
-  # to 4.
-  dependence.structure(cbind(coins(200),coins(200,k=5)),
-                             vec = c(1,2,1,2,3,4,5,6,7),verbose = TRUE)
+# similar to the the previous example, but
+# the pair 1,3 is treated as one sample,
+# anagously the pair 2,4. In the resulting structure one does not
+# see anymore that the dependence of 1,2,3,4 with the rest is due
+# to 4.
+dependence.structure(cbind(coins(200),coins(200,k=5)),
+                           vec = c(1,2,1,2,3,4,5,6,7),verbose = TRUE)
 
 
 ### Advanced:

@@ -1,7 +1,7 @@
 Package: multivariance
 Title: Measuring Multivariate Dependence Using Distance Multivariance
-Version: 2.0.0
-Date: 2019-02-04
+Version: 2.1.0
+Date: 2019-03-19
 Authors@R: c(
     person("Björn", "Böttcher", email = "bjoern.boettcher@tu-dresden.de",role = c("aut", "cre")),
     person("Martin", "Keller-Ressel", email = "martin.keller-ressel@tu-dresden.de", role = "ctb")
@@ -22,9 +22,9 @@ RoxygenNote: 6.1.1
 Suggests: testthat
 LinkingTo: Rcpp
 NeedsCompilation: yes
-Packaged: 2019-02-06 12:44:10 UTC; BB
+Packaged: 2019-03-19 11:28:48 UTC; BB
 Author: Björn Böttcher [aut, cre],
   Martin Keller-Ressel [ctb]
 Maintainer: Björn Böttcher <bjoern.boettcher@tu-dresden.de>
 Repository: CRAN
-Date/Publication: 2019-02-06 13:30:06 UTC
+Date/Publication: 2019-03-19 15:00:03 UTC

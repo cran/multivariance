@@ -4,9 +4,9 @@
 \alias{double.center}
 \title{double centering of a matrix}
 \usage{
-double.center(dm, normalize = FALSE)
+double.center(dm, normalize = TRUE)
 }
 \description{
-double centering of a matrix
+# changed default after 2.0.0
 }
 \keyword{internal}

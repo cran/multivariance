@@ -1,9 +1,9 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-//' fast euclidean distance matrix computation
+//' fast Euclidean distance matrix
 //'
-//' @param x matrix with sample rows which the distanc matrix is computed (to use with vectors, use \code{as.matrix(x)})
+//' @param x matrix with sample rows for which the distance matrix is computed (to use with vectors, use \code{as.matrix(x)})
 //' @examples
 //' #require(microbenchmark)
 //' #x = rnorm(100)
@@ -27,7 +27,7 @@ NumericMatrix fastdist (const NumericMatrix & x){
   return out;
 }
 
-//' double center a symmetric matrix
+//' doubly center a symmetric matrix
 //'
 //' @param x symmetric matrix
 //' @param normalize boolean. If \code{TRUE} the matrix will be normalized to mean 1.
@@ -47,7 +47,7 @@ NumericMatrix doubleCenterSymMat(const NumericMatrix & x, bool & normalize) {
   fullmean = sum(colmeans)/N;
 
   if ( (fullmean == 0) | !normalize) {
-    if (fullmean == 0) warning("It seems that one variable is constant. Constants are always independent.\n");
+    if (fullmean == 0) warning("It seems that one variable is constant. Constants are always independent. \n");
     for (i=0; i<N; i++)
       for (j=i; j<N; j++) {
         tmp = - x(i, j) + colmeans(i) + colmeans(j) - fullmean;
@@ -67,9 +67,9 @@ NumericMatrix doubleCenterSymMat(const NumericMatrix & x, bool & normalize) {
 }
 
 
-//' double centered Euclidean distance matrix
+//' fast centered Euclidean distance matrix
 //'
-//' @param x matrix with sample rows which the distanc matrix is computed (to use with vectors, use \code{as.matrix(x)})
+//' @param x matrix with sample rows for which the distance matrix is computed (to use with vectors, use \code{as.matrix(x)})
 //' @param normalize boolean. If \code{TRUE} the matrix will be normalized to mean 1.
 //' @export
 // [[Rcpp::export]]
@@ -95,7 +95,7 @@ NumericMatrix fastEuclideanCdm (const NumericMatrix & x, bool & normalize){
   m = sum(colmeans)/(double) N;
 
   if ( (m == 0) | !normalize) {
-    if (m == 0) warning("It seems that one variable is constant. Constants are always independent.\n");
+    if (m == 0) warning("It seems that one variable is constant. Constants are always independent. \n");
     for (i = 0; i < N-1; i++){ // row
       for (j = i+1 ; j < N ; j++){ // column
         tmp = -out(i,j) + colmeans(i) + colmeans(j) - m;

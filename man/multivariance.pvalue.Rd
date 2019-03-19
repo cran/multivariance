@@ -7,13 +7,13 @@
 multivariance.pvalue(x)
 }
 \arguments{
-\item{x}{value of a normalized and Nscaled \code{\link{multivariance}}}
+\item{x}{value of a normalized \code{\link{multivariance}} scaled by the sample size (i.e., computed with \code{Nscale = TRUE})}
 }
 \description{
 Computes a conservative p-value for the hypothesis of independence for a given multivariance/total multivariance.
 }
 \details{
-This is based on a distribution-free approach. The p-value is conservative, i.e. it might be much smaller. This is the counterpart to \code{\link{rejection.level}}. For a less conservative approach see \code{\link{resample.pvalue}}.
+This is based on a distribution-free approach. The p-value is conservative, i.e. it might be much smaller. This is the counterpart to \code{\link{rejection.level}}. For a less conservative approach see \code{\link{resample.pvalue}} or \code{\link{pearson.pvalue}}.
 
 p-values larger than 0.215 might be incorrect, since the distribution-free estimate on which the computation is based only holds up to 0.215.
 }

@@ -18,7 +18,7 @@ cdm(x, normalize = TRUE, psi = NULL, p = NULL, isotropic = FALSE,
 
 \item{isotropic}{logical, indicates if psi of the Euclidean distance matrix should be computed, i.e., if an isotropic distance should be used.}
 
-\item{external.dm.fun}{function, which computes the distance matrix.}
+\item{external.dm.fun}{here one can supply an external function, which computes the distance matrix given \code{x}.}
 }
 \description{
 computes the centered distance matrix

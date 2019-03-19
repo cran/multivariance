@@ -17,7 +17,7 @@ pearson.qf(x, moment, lower.tail = TRUE)
 Approximation of the of the value of the distribution function of a Gaussian quadratic form based on its first three moments.
 }
 \details{
-This is Pearson's approximation for Gaussian quadratic forms as stated in Equation (4.64) in [4]
+This is Pearson's approximation for Gaussian quadratic forms as stated in [4] (equation (4.65) in arXiv:1808.07280v2)
 }
 \references{
 For the theoretic background see the reference [4] given on the main help page of this package: \link{multivariance-package}.
