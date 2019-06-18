@@ -6,6 +6,7 @@ x = matrix(rnorm(N*n),nrow = N)
 y = matrix(rnorm(N*4),nrow = N)
 vec = c(1,1,2,3)
 
+# centered distance matrices ####
 context("centered distance matrices")
 test_that("cdms",{
   expect_warning(cdm(matrix(1,nrow= N,ncol = n)),"constant")
@@ -24,8 +25,16 @@ test_that("cdms",{
     cdm(x,normalize = FALSE)
   )
 
+# not public
+#  all.equal(cdms(x,normalize = FALSE),
+#    cdms.mu.bcd(x,normalize = FALSE)$list.cdm)
+
+# not implemented
+#  all.equal(cdms(x,normalize = TRUE),
+#    cdms.mu.bcd(x,normalize = TRUE)$list.cdm)
 })
 
+# definition of multivariances ####
 context("definition of multivariances")
 test_that("multivariance, total.multivariance, m.multivariance", {
   expect_warning(multivariance(matrix(1,nrow= N,ncol = n)),"constant")
@@ -41,7 +50,10 @@ test_that("multivariance, total.multivariance, m.multivariance", {
   expect_equivalent(multivariances.all(y,vec),c(multivariance(y,vec),total.multivariance(y,vec),m.multivariance(y,vec,m=2),m.multivariance(y,vec,m=3)))
 })
 
+# resampling ####
 context("resampling")
+
+
 set.seed(1)
 quant = quantile(resample.multivariance(x)$resampled,0.95)
 pval = sum(resample.multivariance(x)$resampled>=multivariance(x))/300
@@ -51,6 +63,29 @@ test_that("resampling p-values and quantiles",{
   expect_equal(resample.rejection.level(0.05,x), quant)
   expect_equal(resample.pvalue(multivariance(x),x), pval)
 })
+
+set.seed(1)
+
+mat = matrix( c(1,2,3,1,1,2,1,2,1,2,1,1),nrow = 4,byrow = TRUE)
+  for (i in 1:4) {
+
+    for (type in c("multi","total","m.multi.2","m.multi.3")) {
+     # print(paste(type,i)) for debugging
+    ma = multivariances.all(x,vec = mat[i,])
+
+    expect_equal(
+      unname(ma[type]),
+      as.numeric(resample.multivariance(x,vec = mat[i,],type = type,times = 2)$original) # here as.numeric is required since in the case of "NA" the return value would be of type logical
+    )
+    }
+
+    expect_equal(
+      ma,
+      resample.multivariance(x,vec = mat[i,],type = "all",times = 2)$original
+    )
+
+  }
+
 
 set.seed(1)
 x = matrix(rnorm(10*10),10)
@@ -67,8 +102,9 @@ for (re in c(FALSE))
   }
 
 
+# comparisons in dimensions ####
 for (n in c(2,5)) {
-
+# * function arguments ####
 context(paste0("function arguments, n = ",n))
 set.seed(123412)
 N = 5
@@ -106,6 +142,9 @@ for (ty in c("total","m.multi.2","m.multi.3","multi"))
   for (pvt in c("resample"))
     multivariance.test(x,type=ty,p.value.type = pvt, resample.type = "bootstrap")
 
+
+
+# * equality of distances ####
 context(paste0("equality of distances, n = ",n))
 
 set.seed(123412)
@@ -127,6 +166,52 @@ for (ty in c("total","m.multi.2","m.multi.3","multi"))
 
 }
 
+# pearson ####
+context("pearsons approximation")
+
+set.seed(123)
+x = coins(20)
+cmb = multivariance:::cdms.mu.bcd(x)
+
+# for cmb list or matrix
+expect_equal(
+pearson.pvalue(x),
+pearson.pvalue(cmb)
+)
+
+expect_equal(
+pearson.pvalue(x[,1:2]),
+pearson.pvalue(cmb,1:2)
+)
+
+expect_equal(
+  pearson.pvalue(x[,c(1,3)]),
+  pearson.pvalue(cmb,c(1,3))
+)
+
+expect_equal(
+  pearson.pvalue(x[,c(2,3)]),
+  pearson.pvalue(cmb,c(2,3))
+)
+
+set.seed(123)
+x = coins(20,3)
+cmb = multivariance:::cdms.mu.bcd(x)
+
+expect_equal(
+  pearson.pvalue(cmb,type = "all"),
+  pearson.pvalue(x,type = "all")
+)
+
+expect_equal(
+  pearson.pvalue(x,type = "all"),
+c(multi=pearson.pvalue(x,type = "multi"),
+  total=pearson.pvalue(x,type = "total"),
+  m.multi.2=pearson.pvalue(x,type = "m.multi.2"),
+  m.multi.3=pearson.pvalue(x,type = "m.multi.3"))
+)
+
+# multicorrelation ####
 context("multicorrelation")
 set.seed(1213)
 
@@ -146,6 +231,7 @@ expect_equivalent(multicorrelation(x,type = "total",multicorrelation.type = "unn
   multicorrelation(x,type = "total",multicorrelation.type = "normalized"))
 
 
+# identity with other measures ####
 context("identities with other measures")
 
 set.seed(1234)
@@ -205,3 +291,25 @@ expect_equal(
   multicorrelation(cbind(x,y),vec = c(rep(1,n),rep(2,n)), type = "multi",psi = function(x) x^2, isotropic = TRUE),
   multicorrelation(cbind(x,y),vec = c(rep(1,n),rep(2,n)), type = "multi",psi = function(x) x^2, isotropic = TRUE,multicorrelation.type = "normalized")
 )
+
+# dependence structures ####
+context("dependence structures")
+# just some code, to see if some errors are produced...
+
+set.seed(1023)
+x = coins(30,5)
+vec = 1:ncol(x)
+
+for (sty in c("clustered","full"))
+  for (ty in c("conservative","resample","pearson_approx","consistent"))
+    dependence.structure(x,vec,type = ty, structure.type = sty,list.cdm = NULL, alpha = 0.05,stop.too.many = 100000)
+
+for (sty in c("clustered"))
+  for (ty in c("conservative","resample","pearson_approx","consistent"))
+    dependence.structure(x,vec,type = ty, structure.type = sty,list.cdm = NULL, alpha = 0.05,stop.too.many = 100000)
+
+vec = c(1:3,1)
+for (sty in c("clustered","full"))
+  for (ty in c("conservative","resample","pearson_approx","consistent"))
+    dependence.structure(x,vec,type = ty, structure.type = sty,list.cdm = NULL, alpha = 0.05,stop.too.many = 100000)
+

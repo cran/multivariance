@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{doubleCenterSymMat}
 \alias{doubleCenterSymMat}
-\title{doubly center a symmetric matrix}
+\title{double center a symmetric matrix}
 \usage{
 doubleCenterSymMat(x, normalize)
 }
@@ -12,6 +12,6 @@ doubleCenterSymMat(x, normalize)
 \item{normalize}{boolean. If \code{TRUE} the matrix will be normalized to mean 1.}
 }
 \description{
-doubly center a symmetric matrix
+double center a symmetric matrix
 }
 \keyword{internal}

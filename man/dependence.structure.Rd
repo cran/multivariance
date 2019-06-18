@@ -5,7 +5,9 @@
 \title{determines the dependence structure}
 \usage{
 dependence.structure(x, vec = 1:ncol(x), verbose = TRUE,
-  detection.aim = NULL, ...)
+  detection.aim = NULL, type = "conservative",
+  structure.type = "clustered", c.factor = 2, list.cdm = NULL,
+  alpha = 0.05, p.adjust.method = "holm", stop.too.many = NULL, ...)
 }
 \arguments{
 \item{x}{matrix, each row of the matrix is treated as one sample}
@@ -16,6 +18,20 @@ dependence.structure(x, vec = 1:ncol(x), verbose = TRUE,
 
 \item{detection.aim}{\code{=NULL} or a list of vectors which indicate the expected detection, see below for more details}
 
+\item{type}{the method used for the detection, one of '\code{conservative}','\code{resample}','\code{pearson_approx}' or '\code{consistent}'}
+
+\item{structure.type}{either the '\code{clustered}' or the '\code{full}' structure is detected}
+
+\item{c.factor}{numeric, larger than 0, a constant factor used in the case of '\code{type = "consistent"}'}
+
+\item{list.cdm}{not required, the list of centered distance matrices corresponding to \code{x} speeds up the computation if given}
+
+\item{alpha}{numeric between 0 and 1, the significance level used for the tests}
+
+\item{p.adjust.method}{a string indicating the p-value adjustment for multiple testing, see \code{\link{p.adjust.methods}}}
+
+\item{stop.too.many}{numeric, upper limit for the number of tested tuples. A warning is issued if it is used. Use \code{stop.too.many = NULL} for no limit.}
+
 \item{...}{these are passed to \code{\link{find.cluster}}}
 }
 \value{
@@ -23,22 +39,30 @@ returns a list with elements:
 \describe{
   \item{\code{multivariances}}{calculated multivariances,}
   \item{\code{cdms}}{calculated centered distance matrices,}
-  \item{\code{graph}}{graph representing the dependence structure.}
-  \item{\code{detected}}{boolean, this is only included if a \code{detection.aim} is given.}
+  \item{\code{graph}}{graph representing the dependence structure,}
+  \item{\code{detected}}{boolean, this is only included if a \code{detection.aim} is given,}
+  \item{\code{number.of.dep.tuples}}{vector, with the number of dependent tuples for each tested order. For the full dependence structure a value of -1 indicates that all tuples of this order are already lower order dependent, a value of -2 indicates that there were more than \code{stop.too.many} tuples,}
+  \item{\code{structure.type}}{either \code{clustered} or \code{full},}
+  \item{\code{type}}{the type of p-value estimation or consistent estimation used,}
+  \item{\code{total.number.of.tests}}{numeric vector, with the number of tests for each group of tests,}
+  \item{\code{typeI.error.prob}}{estimated probability of a type I error,}
+  \item{\code{alpha}}{significance level used if a p-value estimation procedure is used,}
+  \item{\code{c.factor}}{factor used if a consistent estimation procedure is used,}
+  \item{\code{parameter.range}}{significance levels (or 'c.factor' values) which yield the same detection result.}
 }
 }
 \description{
 Determines the dependence structure as described in [3].
 }
 \details{
-Performs the detection of the dependence structure as described in [3].
+Performs the detection of the dependence structure as described in [3] (the options '\code{structure.type = "full"}' and '\code{type = "consistent"}' are part of a revised version of the paper). In the \code{clustered} structure variables are clustered and treated as one variable as soon as a dependence is detected, the \code{full} structure treats always each variable separately. The detection is either based on tests with significance level \code{alpha} or a \code{consistent} estimator is used. The latter yields (in the limit for increasing sample size) under very mild conditions always the correct dependence structure (but the convergence might be very slow).
 
 If \code{fixed.rejection.level} is not provided, the significance level \code{alpha} is used to determine which multivariances are significant using the distribution-free rejection level. As default the Holm method is used for p-value correction corresponding to multiple testing.
 
 The resulting graph can be simplified (pairwise dependence can be represented by edges instead of vertices) using \code{\link{clean.graph}}.
 
 Advanced:
-The argument \code{detection.aim} can be used to check, if an expected dependence structure was detected. This might be useful for simulation studies to determine the empirical power of the detection algorithm. Hereto  \code{detection.aim} is set to a list of vectors which indicate the expected detected dependence structures (one for each run of \code{\link{find.cluster}}). The vector has as first element the \code{k} for which k-tuples are detected (for this aim the detection stops without success if no k-tuple is found), and the other elements, indicate to which clusters all present vertices belong after the detection, e.g. \code{c(3,2,2,1,2,1,1,2,1)} expects that 3-tuples are detected and in the graph are 8 vertices (including those representing the detected 3 dependencies), the order of the 2's and 1's indicate which vertices belong to which cluster. If \code{detection.aim} is provided, the vector representing the actual detection is printed, thus one can use the output with copy-paste to fix successively the expected detection aims.
+The argument \code{detection.aim} is currently only implemented for \code{structure.type = clustered}. It can be used to check, if an expected dependence structure was detected. This might be useful for simulation studies to determine the empirical power of the detection algorithm. Hereto  \code{detection.aim} is set to a list of vectors which indicate the expected detected dependence structures (one for each run of \code{\link{find.cluster}}). The vector has as first element the \code{k} for which k-tuples are detected (for this aim the detection stops without success if no k-tuple is found), and the other elements, indicate to which clusters all present vertices belong after the detection, e.g. \code{c(3,2,2,1,2,1,1,2,1)} expects that 3-tuples are detected and in the graph are 8 vertices (including those representing the detected 3 dependencies), the order of the 2's and 1's indicate which vertices belong to which cluster. If \code{detection.aim} is provided, the vector representing the actual detection is printed, thus one can use the output with copy-paste to fix successively the expected detection aims.
 
 Note that a failed detection might invoke the warning:
 \preformatted{

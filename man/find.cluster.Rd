@@ -12,7 +12,9 @@ find.cluster(x, vec = 1:ncol(x), list.cdm = cdms(x, vec = vec),
   max(mem), label = sapply(1:max(mem), function(r) paste(colnames(x,
   do.NULL = FALSE, prefix = "")[vec == r], collapse = ",")), shape =
   "circle"), fixed.rejection.level = NA, alpha = 0.05,
-  p.adjust.method = "holm", verbose = TRUE, kvec = 2:max(mem))
+  p.adjust.method = "holm", verbose = TRUE, kvec = 2:max(mem),
+  parameter.range = NULL, type = "conservative",
+  stop.too.many = NULL, ...)
 }
 \arguments{
 \item{x}{matrix with the samples}
@@ -31,8 +33,7 @@ find.cluster(x, vec = 1:ncol(x), list.cdm = cdms(x, vec = vec),
 
 \item{all.multivariances}{vector, which contains all distance multivariances which have been calculated so far. Only used to finally return all distance multivariances which have been calculated.}
 
-\item{g}{dependence structure graph
-fixed.rejection.level = NA, alpha=0.05,method = "holm",explore = FALSE, verbose = TRUE, kvec = 2:max(mem)}
+\item{g}{dependence structure graph}
 
 \item{fixed.rejection.level}{vector, if not \code{NA} the \code{fixed.rejection.level[k]} is used for the k-tuples, instead of a level derived from the significance level \code{alpha}}
 
@@ -43,6 +44,14 @@ fixed.rejection.level = NA, alpha=0.05,method = "holm",explore = FALSE, verbose 
 \item{verbose}{boolean, if \code{TRUE} details during the detection are printed and whenever a cluster is newly detected the (so far) detected dependence structure is plotted.}
 
 \item{kvec}{vector, k-tuples are only checked for each k in \code{kvec}, i.e., for \code{kvec = 2:4} only 2,3 and 4-tuples would be check and then the algorithm stops.}
+
+\item{parameter.range}{numeric matrix, which hosts the range of significance levels or '\code{c.factor}' which yield the same detected structure}
+
+\item{type}{the method for the detection, one of '\code{conservative}','\code{resample}','\code{pearson_approx}' or '\code{consistent}'.}
+
+\item{stop.too.many}{numeric, upper limit for the number of tested tuples. A warning is issued if it is used. Use \code{stop.too.many = NULL} for no limit.}
+
+\item{...}{are passed to \code{\link{resample.multivariance}} in the case of '\code{type = resample}'}
 }
 \description{
 Performs the detection of dependence structures algorithm until a cluster is found. This function is the basic building block \code{\link{dependence.structure}}. Advanced users, might use it directly.

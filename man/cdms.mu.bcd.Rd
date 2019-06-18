@@ -21,7 +21,7 @@ A list containing the following components:
   \item{\code{list.cdm}}{list of the centered distance matrices,}
   \item{\code{mu}}{matrix with the limit moments in a column for each variable,}
   \item{\code{bcd}}{matrix with b, c, d (which are required for the computation of the finite sample moments) in columns for each variable,}
-  \item{\code{mean}}{vector with the mean of each centered distance matrix.}
+  \item{\code{mean}}{vector with the mean of each distance matrix.}
 }
 }
 \description{

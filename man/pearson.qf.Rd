@@ -4,7 +4,7 @@
 \alias{pearson.qf}
 \title{approximate distribution of Gaussian quadratic form}
 \usage{
-pearson.qf(x, moment, lower.tail = TRUE)
+pearson.qf(x, moment, lower.tail = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{x}{value at which the distribution function is to be evaluated}
@@ -12,6 +12,8 @@ pearson.qf(x, moment, lower.tail = TRUE)
 \item{moment}{vector with the mean, variance and skewness of the quadratic form}
 
 \item{lower.tail}{logical, indicating of the lower or upper tail of the distribution function should be calculated}
+
+\item{verbose}{logical, if \code{TRUE} a warning is issued if negative moments are sanitized to 0.}
 }
 \description{
 Approximation of the of the value of the distribution function of a Gaussian quadratic form based on its first three moments.

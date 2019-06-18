@@ -69,14 +69,13 @@
 #' @docType package
 #' @name multivariance-package
 NULL
-
-# speed up things with Rcpp - fastdist is a fast euclidean distance matrix computation
 #' @useDynLib multivariance
 NULL
 #' @importFrom Rcpp sourceCpp
 NULL
 
 ################# Multivariance ###########
+
 
 #' rejection level for the test statistic
 #'
@@ -111,7 +110,7 @@ rejection.level = function(alpha) {
 
 #' transform multivariance to p-value
 #'
-#' Computes a conservative p-value for the hypothesis of independence for a given multivariance/total multivariance.
+#' Computes a conservative p-value for the hypothesis of independence for a given multivariance / m-multivariance / total multivariance.
 #'
 #' @param x value of a normalized \code{\link{multivariance}} scaled by the sample size (i.e., computed with \code{Nscale = TRUE})
 #'
@@ -622,24 +621,36 @@ multivariances.all = function(x, vec= NA, Nscale = TRUE, squared = TRUE,...) {
   Aplusprod = (Reduce("*", lapply(xvec,function(y) 1 + y)))
   Asum = Reduce("+", xvec)
   A2sum = Reduce("+", lapply(xvec,function(y) y^2))
-  A3sum = Reduce("+", lapply(xvec,function(y) y^2*y))
-
-
 
   m = mean(Aprod)
-  mt = (mean(Aplusprod)-1)/(2^n - n - 1)
-  m2 = mean(Asum^2 - A2sum)/(n *(n-1))
+  if (n==2) {
+    # this and the following formular are different
+    # within numerical tolerance, to avoid confusing
+    # differences we use the same formular in this case
+    mt = m
+    m2 = m
+  } else {
+    mt = (mean(Aplusprod)-1)/(2^n - n - 1)
+    m2 = mean(Asum^2 - A2sum)/(n *(n-1))
+  }
   if (n > 2) {
-    m3 = mean(Asum^2*Asum - 3* Asum *A2sum + 2 * A3sum)/ (n *(n-1)*(n-2))
+    if (n == 3) {
+      # this and the following formular are different
+      # within numerical tolerance, to avoid confusing
+      # differences we use the same formular in this case
+      m3 = m
+    } else {
+      A3sum = Reduce("+", lapply(xvec,function(y) y^2*y))
+      m3 = mean(Asum^2*Asum - 3* Asum *A2sum + 2 * A3sum)/ (n *(n-1)*(n-2))
+    }
   } else {
     m3 = NA
   }
   result = c(multi = m,total = mt, m.multi.2 = m2,m.multi.3 = m3)
 
-
   neg.res = result<0
   if (any(neg.res,na.rm = TRUE)) {
-    if (!isTRUE(all.equal(result[neg.res],0,check.names = FALSE))) {
+    if (!isTRUE(all.equal(result[neg.res],rep(0,sum(neg.res)),check.names = FALSE))) {
       warning(paste0("Value of ",c("","total-","2-","3-")[neg.res],"multivariance was negative (",result[neg.res],"). This is usually due to numerical (in)precision. It was set to 0. \n"))
     }
     result[neg.res] = 0
@@ -676,7 +687,7 @@ multivariances.all = function(x, vec= NA, Nscale = TRUE, squared = TRUE,...) {
 
 #' @examples
 #' y = rnorm(100)
-#' x = cbind(y,y*2,(y-2)/3,y+1,y*5)
+#' x = cbind(y,y*2,(y-2)/3,y+1,y*5) # all variables are related by similarity transforms
 #'
 #' # compute all types of correlations for x:
 #' for (ty in c("(lower bound) total","m.multi.2","m.multi.3","multi"))
@@ -850,7 +861,18 @@ independence.test = function(x,vec = 1:ncol(x),alpha = 0.05,type = "distribution
 #' @export
 multivariance.test = function(x,vec = 1:ncol(x),type = "total",p.value.type = "distribution_free",verbose = TRUE,...) {
 
+  if (p.value.type == "conservative") p.value.type = "distribution_free" #undocumented
+
   data.name = deparse(substitute(x))
+
+  if ((p.value.type == "pearson_approx") & (is.list(x))) {
+    if (is.null(x$list.cdm)) {
+      stop("'pearson_approx' requires the data. A list of centered distance matrices is not sufficient.")
+    } else {
+      x.cdms.mu.bcd = x
+      x = x$list.cdm
+    }
+  }
 
   if (type == "independence") type = "total"
   if (type == "pairwise independence") type = "m.multi.2"
@@ -905,7 +927,11 @@ multivariance.test = function(x,vec = 1:ncol(x),type = "total",p.value.type = "d
     pearson_approx = {
       method = paste0(method, "; p-value via Pearson's approximation (approx. sharp)")
       statistic[1] = fun()
+      if (is.matrix(x)) {
       p.value = pearson.pvalue(x=x,vec=vec,type=type,...)
+      } else {
+        p.value = pearson.pvalue(x=x.cdms.mu.bcd,vec=vec,type=type,...)
+      }
     },
     {stop(paste("unkown p.value.type:",p.value.type))}
   )
@@ -1055,19 +1081,26 @@ sample.cdms = function(list.cdm,replace = FALSE, incl.first = FALSE) {
 #' @export
 resample.multivariance = function(x,vec = 1:ncol(x),times = 300,type = "multi",resample.type = "permutation",...) {
 
+  res.vec = vec # the vec argument used for the resampling methods; some methods use the centered distance matrices, and there vec has to be 1:max(vec)
   switch(resample.type,
          #distinct.permutation = {resample = function() matrix(x[derangements.without.fixpoint(N,n, distinctcols,vec)],ncol = n)},
        permutation = {
-         dots <- list(...) # we filter the argument lambda which might be used for total.multivariance, we keep everything else to preserve other error messages.
-         #argnames <- names(formals(cdm))
-         #list.cdm = do.call('cdms', c(list(x = x, vec = vec), dots[names(dots) %in% argnames]))
-         list.cdm = do.call('cdms', c(list(x = x, vec = vec), dots[!(names(dots) %in% "lambda")]))
+         if (is.list(x)) {
+           list.cdm = x[vec]
+           res.vec = 1:length(vec)
+         } else {
+           dots <- list(...) # we filter the argument lambda which might be used for total.multivariance, we keep everything else to preserve other error messages.
+           #argnames <- names(formals(cdm))
+           #list.cdm = do.call('cdms', c(list(x = x, vec = vec), dots[names(dots) %in% argnames]))
+           list.cdm = do.call('cdms', c(list(x = x, vec = vec), dots[!(names(dots) %in% "lambda")]))
 
-         # list.cdm = cdms(x,vec,...) #!! TODO: note there is the argument lambda for total.multivariance this should be excluded here!
-         vec = 1:max(vec) # all distance matrices shall be used.
+           # list.cdm = cdms(x,vec,...) #!! TODO: note there is the argument lambda for total.multivariance this should be excluded here!
+           res.vec = 1:max(vec) # all distance matrices shall be used.
+         }
          resample = function() sample.cdms(list.cdm, replace = FALSE)}, # resampling of the centered distance matrices - this is faster than permutation.orig
     bootstrap = {
          warning("Note that bootstrap resampling is (for multivariance) much slower than permutation resampling. Because certain simplifying identities fail to hold. \n")
+         res.vec = 1:max(vec) # all distance matrices shall be used.
          resample = function() cdms(sample.cols(x,vec,replace =TRUE))
       },
     permutation.orig = {resample = function() sample.cols(x,vec,replace =FALSE)}, # resampling of the original data
@@ -1075,21 +1108,21 @@ resample.multivariance = function(x,vec = 1:ncol(x),times = 300,type = "multi",r
   )
 
   switch(type,
-         multi = {fun = function (x) multivariance(x,vec = vec,...)},
-         total = {fun = function (x) total.multivariance(x,vec = vec,...)},
-         m.multi.2 = {fun = function (x) m.multivariance(x,vec = vec,...)},
-         m.multi.3 = {fun = function (x) m.multivariance(x,vec = vec,m = 3,...)},
-         all = {fun = function (x) multivariances.all(x,vec = vec,...)}#doAll = TRUE}
+         multi = {fun = function (x,v) multivariance(x,vec = v,...)},
+         total = {fun = function (x,v) total.multivariance(x,vec = v,...)},
+         m.multi.2 = {fun = function (x,v) m.multivariance(x,vec = v,...)},
+         m.multi.3 = {fun = function (x,v) m.multivariance(x,vec = v,m = 3,...)},
+         all = {fun = function (x,v) multivariances.all(x,vec = v,...)}#doAll = TRUE}
     ,
     {stop(paste("unkown type:",type))}
   )
 
   results = matrix(,nrow = times, ncol = 1 + (type == "all")*3)
   for (i in 1:times) {# we use a for loop instead of replicate to prevent trouble with '...'
-    results[i,] = fun(resample())
+    results[i,] = fun(resample(),res.vec)
   }
 
-  multi = fun(x)
+  multi = fun(x,vec)
   p.value = rowSums(t(results) >= multi)/times
   names(p.value) = names(multi)
 
@@ -1191,7 +1224,7 @@ mu3.unbiased = function(B,b2ob = sum(tcrossprod(B)*B)) {
 #' given the sample of a single variable the centered distance matrix, mu (the limit moments) and bcd (the terms for the finite sample moments) are computed
 #' The normalization should be postponed to the moment calculation.
 #'
-#' NOTE: speedup might be possible by incorporating mu3 and some matrix-norm-identities
+# NOTE: speedup might be possible by incorporating mu3 and some matrix-norm-identities
 #' @keywords internal
 cdm.mu.bcd = function(x, normalize = FALSE, psi = NULL, p = NULL, isotropic = FALSE, unbiased.moments = TRUE, external.dm.fun = NULL) {
   if (normalize) stop("normalized not implemented")
@@ -1235,8 +1268,8 @@ cdm.mu.bcd = function(x, normalize = FALSE, psi = NULL, p = NULL, isotropic = FA
 
   if (m == 0) warning("It seems that one variable is constant. Constants are always independent. \n")
 
-  cdm = (-dm + outer(colm,colm, FUN ="+") - m)
-
+  #cdm = (-dm + outer(colm,colm, FUN ="+") - m)
+  cdm = doubleCenterSymMat(dm,normalize)
 
   ###### for mu (biased)
   B = dm
@@ -1289,7 +1322,7 @@ cdm.mu.bcd = function(x, normalize = FALSE, psi = NULL, p = NULL, isotropic = FA
 #'   \item{\code{list.cdm}}{list of the centered distance matrices,}
 #'   \item{\code{mu}}{matrix with the limit moments in a column for each variable,}
 #'   \item{\code{bcd}}{matrix with b, c, d (which are required for the computation of the finite sample moments) in columns for each variable,}
-#'   \item{\code{mean}}{vector with the mean of each centered distance matrix.}
+#'   \item{\code{mean}}{vector with the mean of each distance matrix.}
 #' }
 #'
 #' @keywords internal
@@ -1312,7 +1345,7 @@ cdms.mu.bcd = function(x,vec = 1:ncol(x),membership = NULL,...) {
     if(res$mean ==0) {
       list.cdm[[i]] = res$cdm
     } else {
-      list.cdm[[i]] = res$cdm/res$mean
+      list.cdm[[i]] = res$cdm/res$mean # returns always the normalized matrices!
     }
     mu[,i] = res$mu
     bcd[,i] = res$bcd
@@ -1474,6 +1507,7 @@ moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
 #' @param x value at which the distribution function is to be evaluated
 #' @param moment vector with the mean, variance and skewness of the quadratic form
 #' @param lower.tail logical, indicating of the lower or upper tail of the distribution function should be calculated
+#' @param verbose logical, if \code{TRUE} a warning is issued if negative moments are sanitized to 0.
 #'
 #' @details This is Pearson's approximation for Gaussian quadratic forms as stated in [4] (equation (4.65) in arXiv:1808.07280v2)
 #'
@@ -1481,34 +1515,36 @@ moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
 #' For the theoretic background see the reference [4] given on the main help page of this package: \link{multivariance-package}.
 #'
 #' @export
-pearson.qf = function(x,moment, lower.tail = TRUE) {
-  m = moment[1]
-  v = max(moment[2],0) #! since estimates of v might be negative (usually only numerically, within the usual tolerance to 0).
-  s = moment[3]
+pearson.qf = function(x,moment,lower.tail = TRUE,verbose = FALSE) {
+  if (any(is.na(moment))) return(NA) # e.g. in the case where 3-multivariance is tested but only two variables are available
 
-  a = sqrt(8)/s
-  nu = a^2
-
-  if (is.na(v)) return(NA)
-
-  if ((v == 0) | (m == 0)) {
+  if (any(moment[1:2] <= 0)) {
+    if (verbose) warning("The mean or variance was negative, using 0 instead.")
     if (lower.tail) {
-      return(as.numeric(x <= m))
+      return(as.numeric(x <= max(moment[1],0)))
     } else {
-      return(as.numeric(x >= m)) # for a discrete distribution the p.value (upper.tail) includes the value itself
+      return(as.numeric(x >= max(moment[1],0))) # for a discrete distribution the p.value (upper.tail) includes the value itself
     }
   } else {
-    stats::pchisq(sqrt(2)*a*(x-m)/sqrt(as.vector(v))+nu,df = nu, lower.tail= lower.tail)
+    if (moment[3] <= 0) {
+      if (verbose) warning("The skewness was negative, using 0 instead.")
+      stats::pnorm((x-moment[1])/sqrt(moment[2]),lower.tail = FALSE)
+    } else {
+      a = 2/moment[3]
+      a2 = a*a
+      return(stats::pgamma((x-moment[1])/sqrt(moment[2])*a+a2, shape = a2, scale = 1, lower.tail = lower.tail))
+    }
   }
 }
+
 
 #' fast p-value approximation
 #'
 #' Computes the p-value of a sample using Pearson's approximation of Gaussian quadratic forms with the estimators developed by Berschneider and Böttcher in [4].
 #'
 #' @param x matrix, the rows should be iid samples
-#' @param vec vector, which indicates which columns of \code{x} are treated together as one sample
-#' @param type one of \code{"multi","total","m.multi.2","m.multi.3"}
+#' @param vec vector, which indicates which columns of \code{x} are treated together as one sample. The default case treats each column as a separate sample.
+#' @param type one of \code{"multi","total","m.multi.2","m.multi.3","all"}
 #' @param ... these are passed to \code{\link{cdms}}
 #'
 #' @details This is the method recommended in [4], i.e., using Pearson's quadratic form estimate with the unbiased finite sample estimators for the mean and variance of normalized multivariance together with the unbiased estimator for the limit skewness.
@@ -1517,12 +1553,36 @@ pearson.qf = function(x,moment, lower.tail = TRUE) {
 #' For the theoretic background see the reference [4] given on the main help page of this package: \link{multivariance-package}.
 #'
 #' @export
-pearson.pvalue = function(x,vec = 1:ncol(x), type = "multi",...) {
+pearson.pvalue = function(x,vec = NA, type = "multi",...) {
+  # undocumented: x can also be a list computed via multivariance:::cdms.mu.bcd()
 
-  dots <- list(...) # we filter the argument lambda which might be used for total.multivariance, we keep everything else to preserve other error messages.
-  cmb = do.call('cdms.mu.bcd', c(list(x = x, vec = vec), dots[!(names(dots) %in% "lambda")]))
-  # cmb = cdms.mu.bcd(x,vec, psi = psi, p = p, isotropic = isotropic,...)
-  moms = moments.for.pearson(nrow(x),cmb$bcd, cmb$mu, cmb$mean, type = type)
+  if (is.list(x)) { # assuming it is of type cdms.mu.bcd
+    cmb = x
+
+    if (any(is.na(vec))) {
+      vec = 1:length(x$list.cdm)
+    } else {
+      cmb$list.cdm = cmb$list.cdm[vec]
+      cmb$mu = cmb$mu[,vec]
+      cmb$bcd = cmb$bcd[,vec]
+      cmb$mean = cmb$mean[vec]
+    }
+    N = nrow(cmb$list.cdm[[1]])
+  } else {
+    if (any(is.na(vec))) vec = 1:ncol(x)
+
+    dots <- list(...) # we filter the argument lambda which might be used for total.multivariance, we keep everything else to preserve other error messages.
+    cmb = do.call('cdms.mu.bcd', c(list(x = x, vec = vec), dots[!(names(dots) %in% "lambda")]))
+    # cmb = cdms.mu.bcd(x,vec, psi = psi, p = p, isotropic = isotropic,...)
+    N = nrow(x)
+  }
+
+  # calculate the moments
+  if (type == "all") {
+    moms = sapply(c("multi","total","m.multi.2","m.multi.3"),function(ty) moments.for.pearson(N,cmb$bcd, cmb$mu, cmb$mean, type = ty))
+  } else {
+    moms = moments.for.pearson(N,cmb$bcd, cmb$mu, cmb$mean, type = type)
+  }
 
   if ((!any(is.na(cmb$mu[3,]))) & (any(cmb$mu[3,]<0,na.rm = TRUE))) {
     warning(paste("Pearson's approximation: For the variable(s)",paste(which(cmb$mu[3,]<0),collapse = " and "),"the estimated limit skewness was negative. This usually indicates a (too) small sample size. It is recommended to use a resampling test (e.g. 'p.value.type='resample'') instead. \n"))
@@ -1534,15 +1594,22 @@ pearson.pvalue = function(x,vec = 1:ncol(x), type = "multi",...) {
 
   ## list.cdm = alply(cmb$array.cdm/normalizing.factor,3)
 
-  switch( type,
-          multi = {m = multivariance(cmb$list.cdm)},
-          total = {m = total.multivariance(cmb$list.cdm)},
-          m.multi.2 = {m = m.multivariance(cmb$list.cdm)},
-          m.multi.3 = {m = m.multivariance(cmb$list.cdm,m = 3)},
-          {stop(paste("unkown type:",type))}
-  )
+  if (type == "all") {
+    m = multivariances.all(cmb$list.cdm)
 
-  return(pearson.qf(m,moms,lower.tail = FALSE))
+    return(sapply(c("multi","total","m.multi.2","m.multi.3"),function(ty) pearson.qf(unname(m[ty]),moms[,ty],lower.tail = FALSE)))
+  } else {
+
+    switch( type,
+            multi = {m = multivariance(cmb$list.cdm)},
+            total = {m = total.multivariance(cmb$list.cdm)},
+            m.multi.2 = {m = m.multivariance(cmb$list.cdm)},
+            m.multi.3 = {m = m.multivariance(cmb$list.cdm,m = 3)},
+            {stop(paste("unkown type:",type))}
+    )
+
+    return(pearson.qf(m,moms,lower.tail = FALSE))
+  }
 }
 
 ##### Dependence structure ####
@@ -1633,19 +1700,26 @@ pearson.pvalue = function(x,vec = 1:ncol(x), type = "multi",...) {
 #'
 #' @param x matrix, each row of the matrix is treated as one sample
 #' @param vec vector, it indicates which columns are initially treated together as one sample
+#' @param type the method used for the detection, one of '\code{conservative}','\code{resample}','\code{pearson_approx}' or '\code{consistent}'
+#' @param structure.type either the '\code{clustered}' or the '\code{full}' structure is detected
 #' @param verbose boolean, if \code{TRUE} details are printed during the detection and whenever a cluster is newly detected the (so far) detected dependence structure is plotted.
 #' @param detection.aim \code{=NULL} or a list of vectors which indicate the expected detection, see below for more details
+#' @param alpha numeric between 0 and 1, the significance level used for the tests
+#' @param p.adjust.method a string indicating the p-value adjustment for multiple testing, see \code{\link{p.adjust.methods}}
+#' @param c.factor numeric, larger than 0, a constant factor used in the case of '\code{type = "consistent"}'
+#' @param stop.too.many numeric, upper limit for the number of tested tuples. A warning is issued if it is used. Use \code{stop.too.many = NULL} for no limit.
+#' @param list.cdm not required, the list of centered distance matrices corresponding to \code{x} speeds up the computation if given
 #' @param ... these are passed to \code{\link{find.cluster}}
 #'
 #' @details
-#' Performs the detection of the dependence structure as described in [3].
+#' Performs the detection of the dependence structure as described in [3] (the options '\code{structure.type = "full"}' and '\code{type = "consistent"}' are part of a revised version of the paper). In the \code{clustered} structure variables are clustered and treated as one variable as soon as a dependence is detected, the \code{full} structure treats always each variable separately. The detection is either based on tests with significance level \code{alpha} or a \code{consistent} estimator is used. The latter yields (in the limit for increasing sample size) under very mild conditions always the correct dependence structure (but the convergence might be very slow).
 #'
 #' If \code{fixed.rejection.level} is not provided, the significance level \code{alpha} is used to determine which multivariances are significant using the distribution-free rejection level. As default the Holm method is used for p-value correction corresponding to multiple testing.
 #'
 #' The resulting graph can be simplified (pairwise dependence can be represented by edges instead of vertices) using \code{\link{clean.graph}}.
 #'
 #' Advanced:
-#' The argument \code{detection.aim} can be used to check, if an expected dependence structure was detected. This might be useful for simulation studies to determine the empirical power of the detection algorithm. Hereto  \code{detection.aim} is set to a list of vectors which indicate the expected detected dependence structures (one for each run of \code{\link{find.cluster}}). The vector has as first element the \code{k} for which k-tuples are detected (for this aim the detection stops without success if no k-tuple is found), and the other elements, indicate to which clusters all present vertices belong after the detection, e.g. \code{c(3,2,2,1,2,1,1,2,1)} expects that 3-tuples are detected and in the graph are 8 vertices (including those representing the detected 3 dependencies), the order of the 2's and 1's indicate which vertices belong to which cluster. If \code{detection.aim} is provided, the vector representing the actual detection is printed, thus one can use the output with copy-paste to fix successively the expected detection aims.
+#' The argument \code{detection.aim} is currently only implemented for \code{structure.type = clustered}. It can be used to check, if an expected dependence structure was detected. This might be useful for simulation studies to determine the empirical power of the detection algorithm. Hereto  \code{detection.aim} is set to a list of vectors which indicate the expected detected dependence structures (one for each run of \code{\link{find.cluster}}). The vector has as first element the \code{k} for which k-tuples are detected (for this aim the detection stops without success if no k-tuple is found), and the other elements, indicate to which clusters all present vertices belong after the detection, e.g. \code{c(3,2,2,1,2,1,1,2,1)} expects that 3-tuples are detected and in the graph are 8 vertices (including those representing the detected 3 dependencies), the order of the 2's and 1's indicate which vertices belong to which cluster. If \code{detection.aim} is provided, the vector representing the actual detection is printed, thus one can use the output with copy-paste to fix successively the expected detection aims.
 #'
 #' Note that a failed detection might invoke the warning:
 #' \preformatted{
@@ -1653,14 +1727,21 @@ pearson.pvalue = function(x,vec = 1:ncol(x), type = "multi",...) {
 #' longer object length is not a multiple of shorter object length
 #' }
 #'
-#'
-#'
 #' @return returns a list with elements:
 #' \describe{
 #'   \item{\code{multivariances}}{calculated multivariances,}
 #'   \item{\code{cdms}}{calculated centered distance matrices,}
-#'   \item{\code{graph}}{graph representing the dependence structure.}
-#'   \item{\code{detected}}{boolean, this is only included if a \code{detection.aim} is given.}
+#'   \item{\code{graph}}{graph representing the dependence structure,}
+#'   \item{\code{detected}}{boolean, this is only included if a \code{detection.aim} is given,}
+#'   \item{\code{number.of.dep.tuples}}{vector, with the number of dependent tuples for each tested order. For the full dependence structure a value of -1 indicates that all tuples of this order are already lower order dependent, a value of -2 indicates that there were more than \code{stop.too.many} tuples,}
+#'   \item{\code{structure.type}}{either \code{clustered} or \code{full},}
+#'   \item{\code{type}}{the type of p-value estimation or consistent estimation used,}
+#'   \item{\code{total.number.of.tests}}{numeric vector, with the number of tests for each group of tests,}
+#'   \item{\code{typeI.error.prob}}{estimated probability of a type I error,}
+#'   \item{\code{alpha}}{significance level used if a p-value estimation procedure is used,}
+#'   \item{\code{c.factor}}{factor used if a consistent estimation procedure is used,}
+#'   \item{\code{parameter.range}}{significance levels (or 'c.factor' values) which yield the same detection result.}
+#   \item{\code{}}{}
 #' }
 #'
 #' @references
@@ -1669,9 +1750,56 @@ pearson.pvalue = function(x,vec = 1:ncol(x), type = "multi",...) {
 #' @example inst/examples/dependence-structures.R
 #' @export
 #'
-dependence.structure = function(x, vec = 1:ncol(x), verbose = TRUE, detection.aim = NULL,  ...) {
+dependence.structure = function(x, vec = 1:ncol(x), verbose = TRUE, detection.aim = NULL, type = "conservative", structure.type = "clustered", c.factor = 2, list.cdm= NULL, alpha = 0.05, p.adjust.method = "holm",stop.too.many = NULL,...) {
 
-  list.cdm = cdms(x,vec = vec) # creates the distance matrices
+  dots <- list(...) # just to preserve backwards compatibility for "fixed.rejection.level".
+
+  fixed.rejection.level = dots[["fixed.rejection.level"]]
+  if (is.null(fixed.rejection.level)) {
+    #    if (!any(names(dots)=="fixed.rejection.level"))
+    fixed.rejection.level = NA
+  } else {
+    type = "fixed.rejection.level"
+    if (length(fixed.rejection.level) == 1)
+      fixed.rejection.level = rep(fixed.rejection.level,max(vec))
+  }
+
+
+  if (verbose){ cat(paste0("\n    Dependence structure detection\n\ndata: '",deparse(substitute(x)),"' with ",nrow(x)," samples of ",max(vec)," variables\nstructure: ",structure.type,"\ndetection method: "))
+    switch(type,
+           consistent = {
+             cat(paste0("consistent estimate -- using the factor: ",c.factor,"\n\n"))
+           },
+           conservative =, resample =, pearson_approx = {
+             cat(paste0("test -- method for p-values: ", type," -- significance level: ",alpha,"\n\n"))
+           },
+           fixed.rejection.level = {cat(paste0("using the given fixed rejection level\n\n"))},
+           {stop(paste0("unknown type: ",type))}
+    )
+  }
+
+  switch(structure.type,
+         full = return(dependence.structure.full(x,vec = vec,verbose = verbose,type = type, alpha = alpha,list.cdm = list.cdm,stop.too.many = stop.too.many,c.factor = c.factor,...)),
+         clustered = {},
+         {stop(paste0("unknown structure.type: ",structure.type))}
+  )
+
+  if (type == "consistent") {
+    fixed.rejection.level = rep(sqrt(nrow(x))*c.factor,max(vec))
+  }
+
+  if (is.null(list.cdm)) {
+    switch (type,
+            consistent =, conservative =, resample =, fixed.rejection.level= {
+              list.cdm = cdms(x,vec = vec) # creates the distance matrices
+            },
+            pearson_approx = {
+              list.cdm = cdms.mu.bcd(x,vec = vec)
+            },
+            {stop(paste0("unknown type: ",type))}
+    )
+
+  }
 
   all.multivariances = numeric(0) # vector which will contain all distance multivariances which are calculated
 
@@ -1687,6 +1815,7 @@ dependence.structure = function(x, vec = 1:ncol(x), verbose = TRUE, detection.ai
 
   previous.n.o.cdms = rep(0,max(mem)) # number of As in the previous iteration
 
+  sig.limits = NULL
 
   n = max(mem) # number of clusters
 
@@ -1696,17 +1825,43 @@ dependence.structure = function(x, vec = 1:ncol(x), verbose = TRUE, detection.ai
   # Loop through the tuples
   detected = TRUE
   k = 1
+  number.of.tests = NULL
+
   while (detected) {
     if (!is.null(detection.aim)) {
-      run = find.cluster(x,vec,list.cdm,mem,cluster.to.vertex,vertex.to.cdm,previous.n.o.cdms,all.multivariances,g,kvec = 2:detection.aim[[k]][1], verbose = verbose, ...)
+      #    run = find.cluster(x,vec,list.cdm,mem,cluster.to.vertex,vertex.to.cdm,previous.n.o.cdms,all.multivariances,g,kvec = 2:detection.aim[[k]][1], verbose = verbose, sig.limits = limits, type = type, ...)
+      run = do.call('find.cluster', c(list(
+        x = x, vec = vec,list.cdm = list.cdm,
+        mem = mem, cluster.to.vertex = cluster.to.vertex,
+        vertex.to.cdm = vertex.to.cdm,
+        previous.n.o.cdms = previous.n.o.cdms,
+        all.multivariances = all.multivariances,
+        g = g, kvec = 2:detection.aim[[k]][1],
+        verbose = verbose, parameter.range = sig.limits,
+        type = type, fixed.rejection.level = fixed.rejection.level),
+        alpha = alpha, p.adjust.method = p.adjust.method,
+        stop.too.many = stop.too.many,
+        dots[!(names(dots) == "fixed.rejection.level")]))
+
       if (verbose) {
         cat("last detected structure (in detection.aim format): ")
         dput(c(run$k,run$mem))
       }
       success = all(run$mem == detection.aim[[k]][-1])
-      k = k+1
     } else {
-      run = find.cluster(x,vec,list.cdm,mem,cluster.to.vertex,vertex.to.cdm,previous.n.o.cdms,all.multivariances,g,verbose = verbose,...)
+      #     run = find.cluster(x,vec,list.cdm,mem,cluster.to.vertex,vertex.to.cdm,previous.n.o.cdms,all.multivariances,g,verbose = verbose, sig.limits =sig.limits, type = type,...)
+      run = do.call('find.cluster', c(list(
+        x = x, vec = vec,list.cdm = list.cdm,
+        mem = mem, cluster.to.vertex = cluster.to.vertex,
+        vertex.to.cdm = vertex.to.cdm,
+        previous.n.o.cdms = previous.n.o.cdms,
+        all.multivariances = all.multivariances,
+        g = g,
+        verbose = verbose, parameter.range = sig.limits,
+        type = type, fixed.rejection.level = fixed.rejection.level),
+        alpha = alpha, p.adjust.method = p.adjust.method,
+        stop.too.many = stop.too.many,
+        dots[!(names(dots) == "fixed.rejection.level")]))
     }
 
     detected = run$detected
@@ -1717,14 +1872,76 @@ dependence.structure = function(x, vec = 1:ncol(x), verbose = TRUE, detection.ai
     previous.n.o.cdms = run$previous.n.o.cdms
     all.multivariances = run$all.multivariances
     g = run$g
+    sig.limits = run$parameter.range
+    number.of.tests = c(number.of.tests, run$number.of.tests)
 
+    k = k+1
     if (!is.null(detection.aim)) if (!success) break
+    if (run$stopped) break
+
   }
+
+  typeI.error.prob = NA
+
+  #number.of.tests = length(run$all.multivariances)
+  #groups.of.tests = nrow(sig.limits)
+
+  groups.of.tests = sum(number.of.tests > 0)
+
+  if (anyNA(fixed.rejection.level))
+    typeI.error.prob = 1-(1-alpha)^groups.of.tests
+
+  if (type %in% c("consistent","fixed.rejection.level")) {
+    typeI.error.prob = 1- (1- multivariance.pvalue(fixed.rejection.level[1]))^sum(number.of.tests)
+
+    sig.m = run$all.multivariances> sqrt(nrow(x))*c.factor
+
+    mult.factor = 1
+    if (type == "consistent") mult.factor = 1/sqrt(nrow(x))
+
+    low.c = ifelse(any(!sig.m),max(run$all.multivariances[!sig.m]*mult.factor),0)
+    high.c = ifelse(any(sig.m),min(run$all.multivariances[sig.m]*mult.factor),Inf)
+    parameter.range = c(low.c,high.c)
+  } else {
+    parameter.range = cbind(sig.limits[,1],sig.limits[,2])
+  }
+
+
+  if (verbose) {
+
+    cat(paste0("\ntotal number of tests: ",sum(number.of.tests),", groups of tests: ", groups.of.tests,"\n"))
+   # print(number.of.tests)
+
+    #print(sig.limits)
+
+    switch(type,
+           conservative =, resample =, pearson_approx = {
+             cat(paste0("\nSame structure for any significance level in (",signif(max(sig.limits[,1]),3),",",signif(min(sig.limits[,2]),3),")\n"))
+
+             # typeI.error.prob = 1-(1-alpha)^nrow(sig.limits)
+             #cat(paste0("\nThe total number of tests was ", length(run$all.multivariances), ", these were grouped into ",nrow(sig.limits)," tests of significance level ",alpha," (within each group the p-values were adjusted by ",p.adjust.method,"'s method).", "\nThis yields (assuming independence) an approximate ", if (type == "conservative") "conservative bound for the ", "global type I error probability of ",signif(typeI.error.prob,3),".\n"))
+           },
+           consistent = {
+             #typeI.error.prob = 1- (1- multivariance.pvalue(fixed.rejection.level[1]))^length(run$all.multivariances)
+             cat(paste0("\nSame structure for any 'c.factor' in (",signif(low.c,3),",",signif(high.c,3),")\n"))
+             #cat(paste0("\nApproximate upper bound for prob. of type I error: ", signif(typeI.error.prob,3),"\n"))
+           },
+           fixed.rejection.level = {
+             #      cat(paste0("\nSame structure for rejection level in (",signif(low.c,3),",",signif(high.c,3),")\n")) #problematic, since it can be a vector with different values
+           }
+    )
+
+    cat(paste0("\n",ifelse(type == "conservative","Conservative estimate","Estimate")," of the type I error probability: ",signif(typeI.error.prob,3),"\n"))
+
+  }
+
+  number.of.dep.tuples = c(NA,as.vector(table(factor(igraph::V(g)$level,2:max(vec)))))
+
 
   if (!is.null(detection.aim)) {
     return(invisible(list(cdms = run$list.cdm, multivariances = run$all.multivariances, graph = run$g,detected = success)))
   } else {
-    return(invisible(list(cdms = run$list.cdm, multivariances = run$all.multivariances, graph = run$g)))
+    return(invisible(list(cdms = run$list.cdm, multivariances = run$all.multivariances, graph = run$g,number.of.dep.tuples = number.of.dep.tuples,parameter.range = parameter.range,typeI.error.prob = typeI.error.prob,total.number.of.tests = number.of.tests,structure.type = structure.type, type = type,alpha = alpha, c.factor = c.factor)))
   }
 }
 
@@ -1742,41 +1959,59 @@ dependence.structure = function(x, vec = 1:ncol(x), verbose = TRUE, detection.ai
 #' @param previous.n.o.cdms vector, number of centered distance matrices in the previous iteration (it is used to ensure that previously check tuples are not checked again)
 #' @param all.multivariances vector, which contains all distance multivariances which have been calculated so far. Only used to finally return all distance multivariances which have been calculated.
 #' @param g dependence structure graph
-#'                         fixed.rejection.level = NA, alpha=0.05,method = "holm",explore = FALSE, verbose = TRUE, kvec = 2:max(mem)
 #' @param alpha numeric, significance level used for the (distribution-free) tests
 #' @param fixed.rejection.level vector, if not \code{NA} the \code{fixed.rejection.level[k]} is used for the k-tuples, instead of a level derived from the significance level \code{alpha}
 #' @param p.adjust.method name of the method used to adjust the p-values for multiple testing, see \code{\link[stats]{p.adjust}} for all possible options.
 #' @param verbose boolean, if \code{TRUE} details during the detection are printed and whenever a cluster is newly detected the (so far) detected dependence structure is plotted.
 #' @param kvec vector, k-tuples are only checked for each k in \code{kvec}, i.e., for \code{kvec = 2:4} only 2,3 and 4-tuples would be check and then the algorithm stops.
+#' @param parameter.range numeric matrix, which hosts the range of significance levels or '\code{c.factor}' which yield the same detected structure
+#' @param type the method for the detection, one of '\code{conservative}','\code{resample}','\code{pearson_approx}' or '\code{consistent}'.
+#' @param stop.too.many numeric, upper limit for the number of tested tuples. A warning is issued if it is used. Use \code{stop.too.many = NULL} for no limit.
+#' @param ... are passed to \code{\link{resample.multivariance}} in the case of '\code{type = resample}'
 #'
 #' @details
 #' For further details see \code{\link{dependence.structure}}.
 #'
 find.cluster = function(x,
-                        vec = 1:ncol(x), # which columns should be treated as one sample
-                        list.cdm = cdms(x,vec = vec), # creates the distance matrices
-                        mem = as.numeric(1:max(vec)),
-                        #its length is the number of vertices, its content is the number of the corresponding cluster for the current iteration!!!
-                        # has to be numeric, since otherwise 'identical' fails to end the loop (in the case of
-                        # no detected clusters in the first run)
-                        cluster.to.vertex = 1:max(mem), # cluster to vertex relation - gets renewed each iteration (since the names of the clusters change)
-                        vertex.to.cdm = 1:max(mem), # vertex to A (the centered distance matrices) relation - gets appended each iteration
-                        previous.n.o.cdms = rep(0,max(mem)), # number of As in the iteration before. it is used to speed up the detection.
-                        all.multivariances = numeric(0), # vector which will contain all distance multivariances which are calculated
-                        g = igraph::add.vertices(igraph::graph.empty(,directed=FALSE),max(mem),label = sapply(1:max(mem),function(r) paste(colnames(x,do.NULL = FALSE,prefix = "")[vec == r],collapse = ",")),shape = "circle"), #the graph
-                        fixed.rejection.level = NA, alpha=0.05,p.adjust.method = "holm", verbose = TRUE, kvec = 2:max(mem)) {
+  vec = 1:ncol(x), # which columns should be treated as one sample
+  list.cdm = cdms(x,vec = vec), # creates the distance matrices
+  mem = as.numeric(1:max(vec)),
+  #its length is the number of vertices, its content is the number of the corresponding cluster for the current iteration!!!
+  # has to be numeric, since otherwise 'identical' fails to end the loop (in the case of
+  # no detected clusters in the first run)
+  cluster.to.vertex = 1:max(mem), # cluster to vertex relation - gets renewed each iteration (since the names of the clusters change)
+  vertex.to.cdm = 1:max(mem), # vertex to A (the centered distance matrices) relation - gets appended each iteration
+  previous.n.o.cdms = rep(0,max(mem)), # number of As in the iteration before. it is used to speed up the detection.
+  all.multivariances = numeric(0), # vector which will contain all distance multivariances which are calculated
+  g = igraph::add.vertices(igraph::graph.empty(,directed=FALSE),max(mem),label = sapply(1:max(mem),function(r) paste(colnames(x,do.NULL = FALSE,prefix = "")[vec == r],collapse = ",")),shape = "circle"), #the graph
+  fixed.rejection.level = NA,
+  alpha=0.05,p.adjust.method = "holm",
+  verbose = TRUE,
+  kvec = 2:max(mem),
+  parameter.range = NULL,
+  type = "conservative",
+  stop.too.many = NULL,
+  ...) {
   explore = FALSE # undocumented option, which would provide some more graphs during the detection
   if (verbose) graphics::plot(g)
 
   n = max(mem) # number of clusters
   nV = length(igraph::V(g)) #length(mem) # number of vertices at the start of the iteration
-  n.o.cdm = length(list.cdm) # number of As at the start of the iteration
+
+  if (type == "pearson_approx") {
+    n.o.cdm = length(list.cdm$list.cdm) # number of As at the start of the iteration
+  } else {
+    n.o.cdm = length(list.cdm) # number of As at the start of the iteration
+  }
 
   cluster.to.cdm = vertex.to.cdm[cluster.to.vertex] #cluster to A relation - gets renewed each iteration
   # Each cluster is represented by its 'largest' vertex
 
   cdm.to.vertex = NA # A to vertex relation
   for (i in 1:n.o.cdm) cdm.to.vertex[i] = which(vertex.to.cdm == i)
+
+  number.of.tests = 0
+  stopped = FALSE
 
   for (k in 2:min(max(kvec),max(mem))) { # look at the k-tuples of the n variables.
 
@@ -1791,7 +2026,41 @@ find.cluster = function(x,
     if (length(tuples) == k) dim(tuples) = c(1,k)
     # make sure that it is a matrix
 
-    multivariances = apply(tuples,1,function(x) multivariance(list.cdm,x,Nscale = TRUE)) #calculates all distance multivariances
+    if (all(c(!is.null(stop.too.many),(nrow(tuples) > stop.too.many)))) {
+      warning(paste0("More than ",stop.too.many," tuples. Detection stopped. The above results represent only the performed tests.\n"))
+      stopped = TRUE
+      break
+    }
+
+    number.of.tests[k] = nrow(tuples)
+
+    if (verbose)
+      cat(paste0(k,"-tuples x ",nrow(tuples),":"))
+
+    switch(type,
+      consistent =,
+      conservative =,
+      fixed.rejection.level = {
+        multivariances = apply(tuples,1,function(x) multivariance(list.cdm,x,Nscale = TRUE)) #calculates all distance multivariances
+        multivariances.pvalues = multivariance.pvalue(multivariances)},
+
+      resample = {
+        res = apply(tuples,1,function(x) resample.multivariance(list.cdm,x,...))
+        multivariances = sapply(res,function(x) x$original)
+        multivariances.pvalues = sapply(res,function(x) x$p.value)
+      },
+
+      pearson_approx = {
+        multivariances = apply(tuples,1,function(x) multivariance(list.cdm$list.cdm,x,Nscale = TRUE))
+        multivariances.pvalues = apply(tuples,1,function(x) pearson.pvalue(list.cdm,x))
+      },
+
+      {#default
+        stop(paste("unkown type:",type))
+      }
+    )
+
+
 
     all.multivariances = c(all.multivariances,multivariances)
     # print(multivariances)
@@ -1801,20 +2070,60 @@ find.cluster = function(x,
       readline("continue with [enter]")
     }
 
-    for (i in which(((anyNA(fixed.rejection.level) & (stats::p.adjust(multivariance.pvalue(multivariances),method = p.adjust.method) < alpha))) | (multivariances > fixed.rejection.level[k]) )) {
+
+    adjusted.pvs = stats::p.adjust(multivariances.pvalues,method = p.adjust.method)
+
+    critical.tuples =  which(((anyNA(fixed.rejection.level) & (adjusted.pvs < alpha))) | (multivariances > fixed.rejection.level[k]) )
+    for (i in critical.tuples) {
       # for each tuple, with adjusted p value less than the significance level (or multivariance less than a prescribed fixed.rejection.level, if given) we add a vertex and the edges
 
       new = length(igraph::V(g))+1
       g = igraph::add.vertices(g,1,label = signif(multivariances[i],4), shape = "none", level=k)
 
-      g = igraph::add_edges(g, as.vector(t(cbind(new,cdm.to.vertex[tuples[i,]]))), weight= NA, color = k)
+      g = igraph::add_edges(g, as.vector(t(cbind(new,cdm.to.vertex[tuples[i,]]))), weight= NA, color = k, lty = k) # weight = adjusted.pvs[i]
       #  }
     }
-    if (verbose) cat(paste(k,"-tuples: max. multivariance: ",format(max(multivariances),digits=3,nsmall = 3,width = 7),"; min. p-value: ",multivariance.pvalue(max(multivariances)),"\n",sep =""))
+
+    #if (type != "consistent")
+    {
+      sorted.adjusted.pvs = sort(adjusted.pvs)
+
+      # print(sorted.adjusted.pvs)
+
+      first.non.critical = match(FALSE, sorted.adjusted.pvs < alpha)
+      if (is.na(first.non.critical)) {
+        lower.sig = sorted.adjusted.pvs[length(sorted.adjusted.pvs)]
+        upper.sig = 1
+      } else {
+        if (first.non.critical==1) {
+          lower.sig = 0
+          upper.sig = sorted.adjusted.pvs[1]
+
+        } else {
+          lower.sig = sorted.adjusted.pvs[first.non.critical-1]
+          upper.sig = sorted.adjusted.pvs[first.non.critical]
+        }
+      }
+
+      parameter.range = rbind(parameter.range,c(lower.sig,upper.sig))
+    }
+
+    if (verbose) {
+      cat(paste0(" max. multivariance: ",format(max(multivariances),digits=3,nsmall = 3,width = 7)))
+      if (anyNA(fixed.rejection.level)) {
+        cat(paste0("; min. p-value (unadjusted): ",min(multivariances.pvalues),"\n",sep =""))
+      } else {
+        cat("\n")
+      }
+
+      #    cat(paste0("Same result for any significance level in (",lower.sig,",",upper.sig,")\n"))
+    }
     #readline(paste("level",k,", press [Enter] for next level"))
 
     previous.n.o.cdms[k] = n.o.cdm
-    if ((anyNA(fixed.rejection.level) && (stats::p.adjust(multivariance.pvalue(max(multivariances)),method = p.adjust.method,n = length(multivariances)) < alpha)) || (!anyNA(fixed.rejection.level) && (max(multivariances) > fixed.rejection.level[k]))) {
+
+    #if ((anyNA(fixed.rejection.level) && (stats::p.adjust(multivariance.pvalue(max(multivariances)),method = p.adjust.method,n = length(multivariances)) < alpha)) || (!anyNA(fixed.rejection.level) && (max(multivariances) > fixed.rejection.level[k]))) {
+    if (length(critical.tuples)>0) {
       #if a cluster was found exit the loop
       break
     }
@@ -1853,7 +2162,24 @@ find.cluster = function(x,
     #      array.cdm = abind::abind(array.cdm, cdm(x[,which(mem[1:ncol(x)] == which(cluster.to.vertex== i))]),along=1)
     #array.cdm = abind::abind(array.cdm, cdm(x[,which(vec %in% which(mem[1:ncol(x)] == which(cluster.to.vertex== i)))]),along=3)
 
-    list.cdm[[length(list.cdm)+1]] = cdm(x[,which(vec %in% which(mem[1:ncol(x)] == which(cluster.to.vertex== i)))])
+    if (type == "pearson_approx") {
+      new.cmb = cdm.mu.bcd(x[,which(vec %in% which(mem[1:ncol(x)] == which(cluster.to.vertex== i)))])
+      new.ind = length(list.cdm$list.cdm)+1
+
+      if (new.cmb$mean == 0) { # note that cdm.mu.bcd returns unnormalized cdm
+        list.cdm$list.cdm[[new.ind]] = new.cmb$cdm
+      } else {
+        list.cdm$list.cdm[[new.ind]] = new.cmb$cdm/new.cmb$mean
+      }
+
+      list.cdm$mu = cbind(list.cdm$mu,new.cmb$mu)
+      list.cdm$bcd = cbind(list.cdm$bcd,new.cmb$bcd)
+      list.cdm$mean[new.ind] = new.cmb$mean
+
+    } else {
+      list.cdm[[length(list.cdm)+1]] = cdm(x[,which(vec %in% which(mem[1:ncol(x)] == which(cluster.to.vertex== i)))])
+    }
+
 
     # which(cluster.to.vertex== i) is the number of the cluster represented by vertex i
     # which(mem ...) gives the "original" vertices which belong to the same cluster as vertex i
@@ -1862,35 +2188,348 @@ find.cluster = function(x,
   } # at the end of this for loop, n.o.cdm contains the new number of As
 
 
-  invisible(list(detected = detected,list.cdm = list.cdm,mem = mem,cluster.to.vertex = cluster.to.vertex,vertex.to.cdm = vertex.to.cdm,previous.n.o.cdms = previous.n.o.cdms,all.multivariances = all.multivariances,g = g, k = k))
+  invisible(list(detected = detected,list.cdm = list.cdm,mem = mem,cluster.to.vertex = cluster.to.vertex,vertex.to.cdm = vertex.to.cdm,previous.n.o.cdms = previous.n.o.cdms,all.multivariances = all.multivariances,g = g, k = k, parameter.range = parameter.range,number.of.tests = number.of.tests[-1], stopped = stopped))
+  # the first element of number.of.tests is 0 for 1-tuples
+}
+
+
+
+
+
+#' functions to detect the full (without clustering) dependence structure
+#' @keywords internal
+#' @examples
+#' # multivariance:::dependence.structure.full(dep_struct_ring_15_100)
+#' # dependence.structure(dep_struct_ring_15_100,structure.type = "full")
+#'
+#' @keywords internal
+dependence.structure.full = function(x,vec = 1:ncol(x),verbose = TRUE,type = "conservative", alpha = 0.05,list.cdm = NULL,maxk = max(vec),stop.too.many = NULL, c.factor = 2,...) {
+
+  # compute the distance matrices
+  if (is.null(list.cdm)) {
+    switch( type,
+      conservative =, resample = , consistent = {
+        list.cdm = cdms(x,vec = vec)},
+      pearson_approx = {
+        list.cdm = cdms.mu.bcd(x,vec = vec)},
+      {stop(paste0("unknown type: ",type))}
+    )
+  }
+
+  n = max(vec)
+  N = nrow(x)
+
+  #R = rejection.level(0.005)
+  R = alpha
+  consistent.rejection.level = sqrt(N)*c.factor
+  ## generate the graph
+
+  g = igraph::graph.empty(,directed=FALSE)
+  g = igraph::add.vertices(g,n,label = sapply(1:max(vec),function(r) paste(colnames(x,do.NULL = FALSE,prefix = "")[vec == r],collapse = ",")),shape = "circle")
+
+  if (verbose) graphics::plot(g,layout = function(g) layout_on_circles(g,n))
+
+  number.of.dep.tuples = rep(NA,n)
+
+  number.of.tests = rep(NA,n)
+
+  m.values = list()
+  for (k in 2:min(maxk,n)) {
+    if (all(c(!is.null(stop.too.many),(choose(n,k) > stop.too.many)))) {
+      warning(paste0("More than ",stop.too.many," tuples. Detection stopped. Output contains only results of tests up to order ",k-1,".\n"))
+      number.of.dep.tuples[k] = -2 # as an indication that there can be no such tuple
+      k = k-1
+      break
+    }
+
+    if (verbose) {
+      cat(paste0(k,"-tuples x ",choose(n,k),""))
+    }
+    tuples = t(utils::combn(n,k))
+
+    # check which tuples are lower order dependent
+    lo = apply(tuples,1,function(tup) lower.order(tup,m.values))
+
+    number.of.tests[k] = sum(!lo)
+
+    if (verbose & (k>2)) cat(paste0(" of which ",sum(!lo)," are ",k-1,"-independent\n"))
+
+    if (verbose & (k == 2)) cat("\n")
+
+    if (all(lo)) {
+      if (verbose) cat(paste0("all ",k,"-tuples contain lower order dependent tuples\n"))
+      number.of.dep.tuples[k] = -1 # as an indication that there can be no such tuple
+      k = k-1
+      break
+    }
+
+    if (type == "consistent") {
+      # calculate the multivariances
+      if (sum(!lo) == 1) {
+        ms = multivariance(list.cdm,tuples[!lo,],...)
+      } else {
+        ms = apply(tuples[!lo,],1,function(tup) multivariance(list.cdm,tup,...))
+      }
+
+      sig.tuples = rep(TRUE,nrow(tuples))
+      sig.tuples[!lo] = ms > consistent.rejection.level
+      sig.tuples.values = rep(NA,nrow(tuples))
+      sig.tuples.values[!lo] = ms
+
+    } else {
+      # calculate the p values
+      if (sum(!lo) == 1) {
+        pvs = multivariance.test(list.cdm,tuples[!lo,],type = "multi",p.value.type = type,...)$p.value
+      } else {
+        pvs = apply(tuples[!lo,],1,function(tup) multivariance.test(list.cdm,tup,type = "multi",p.value.type = type,...)$p.value)
+      }
+
+      sig.tuples.values = rep(NA,nrow(tuples))
+      sig.tuples = rep(TRUE,nrow(tuples))
+      #sig.tuples.values[which(!lo)] = p.adjust(pvs)
+      #sig.tuples[which(!lo)] = sig.tuples.values[which(!lo)] < R
+      sig.tuples.values[!lo] = stats::p.adjust(pvs)
+      sig.tuples[!lo] = sig.tuples.values[!lo] < R
+
+    }
+
+    number.of.dep.tuples[k] = sum(sig.tuples[which(!lo)])
+
+    if (verbose) cat(paste0(number.of.dep.tuples[k]," dependencies found\n"))
+
+    m.values[[k]] = cbind(tuples,
+      # apply(tuples,1,function(tup) multivariance(list.cdm,tup,Nscale = TRUE)>R),
+      sig.tuples,
+      lo,
+      sig.tuples.values
+    )
+
+    for (i in 1:nrow(m.values[[k]]))
+    {
+      if (m.values[[k]][i,k+1] & !m.values[[k]][i,k+2]) {
+        new = length(igraph::V(g))+1
+        g = igraph::add.vertices(g,1,label = signif(k,4), shape = "none", level=k)
+        g = igraph::add_edges(g, as.vector(t(cbind(new,m.values[[k]][i,1:k]))), weight= NA, color = k, lty = k)
+      }
+    }
+
+    if (verbose) graphics::plot(g,layout = function(g) layout_on_circles(g,n))
+
+  }
+
+  number.of.tests = number.of.tests[!is.na(number.of.tests)] # the first is NA (for 1-tuples) and the last might be NA if it was stopped before (either because there is no independent tuple, or too.many
+
+  groups.of.tests = sum(number.of.tests >0) #,na.rm = TRUE
+
+  if (verbose) {
+    cat(paste0("\ntotal number of tests: ",sum(number.of.tests),", groups of tests: ", groups.of.tests,"\n"))
+
+    #print(number.of.tests)
+  }
+
+
+  if (type == "consistent") {
+    parameter.range = matrix(NA,nrow = length(m.values),ncol = 2)
+
+    for (k in 2:length(m.values)) {
+      #largest value of the independent tuples with lower order independence
+      parameter.range[k,1] = max(m.values[[k]][!m.values[[k]][,"lo"]&!m.values[[k]][,"sig.tuples"],"sig.tuples.values"],0)
+      #smallest value of the dependent tuples with lower order independence
+      parameter.range[k,2] = min(m.values[[k]][!m.values[[k]][,"lo"]&m.values[[k]][,"sig.tuples"],"sig.tuples.values"],Inf)
+    }
+
+    parameter.range = parameter.range/sqrt(N)
+
+    if (verbose) cat(paste0("\nSame structure for any 'c.factor' in (",signif(max(parameter.range[,1],na.rm = TRUE),3),",",signif(min(parameter.range[,2],na.rm = TRUE),3),").\n"))
+
+  } else {
+    parameter.range = matrix(NA,nrow = length(m.values),ncol = 2)
+
+    for (k in 2:length(m.values)) {
+      #largest (p-)value of the dependent tuples with lower order independence
+      parameter.range[k,1] = max(m.values[[k]][!m.values[[k]][,"lo"]&m.values[[k]][,"sig.tuples"],"sig.tuples.values"],0)
+      #smallest (p-)value of the dependent tuples with lower order independence
+      parameter.range[k,2]= min(m.values[[k]][!m.values[[k]][,"lo"]&!m.values[[k]][,"sig.tuples"],"sig.tuples.values"],1)
+    }
+
+    if (verbose) cat(paste0("\nSame structure for any significance level in (",signif(max(parameter.range[,1],na.rm = TRUE),3),",",signif(min(parameter.range[,2],na.rm = TRUE),3),").\n"))
+  }
+
+
+  if (type == "consistent") {
+    typeI.error.prob = 1- (1- multivariance.pvalue(consistent.rejection.level))^sum(number.of.tests,na.rm = TRUE)
+  } else {
+    typeI.error.prob = 1-(1-alpha)^groups.of.tests
+  }
+
+
+  if (verbose) cat(paste0("\n",ifelse(type == "conservative","Conservative estimate","Estimate")," of the type I error probability: ",signif(typeI.error.prob,3),"\n"))
+
+
+
+  g$layout = layout_on_circles(g)
+
+  return(invisible(list(cdms = list.cdm, values = m.values, graph = g,number.of.dep.tuples = number.of.dep.tuples,parameter.range = parameter.range,typeI.error.prob = typeI.error.prob,total.number.of.tests = number.of.tests,structure.type = "full", type = type,alpha = alpha, c.factor = c.factor)))
+
+}
+
+#' Returns the row indices of matrix A which match with B
+#' Use the fast cpp implementation 'match_rows' instead.
+#' Function here just for reference.
+#'
+#' @examples
+#' # A = t(utils::combn(10,3))
+#' # B = A[sort(sample.int(nrow(A),10)),]
+#' # match.rows(A,B)
+#'
+#' @keywords internal
+match.rows = function(A,B) {
+  # for ordered matrices
+  # rows of B have to be a subset of rows of A
+  i = 1
+  res = numeric(nrow(B))
+  for (k in 1:nrow(B))
+  {
+    while(any(A[i,] != B[k,])) {
+      i = i+1
+    }
+    res[k] = i
+  }
+  return(res)
+}
+
+
+
+#' check if lower order dependencies are present for the given tuple indices
+#' here 'm.values' is a list of boolean matrices. Matrix [[k]] corresponds to the k tuples. For each number of tuples, the first columns of the matrix always contain the indices of the tuples
+#'
+#' @keywords internal
+lower.order = function(tuple,m.values) {
+  k = length(tuple)
+  if( k >2) {
+    tuples = t(utils::combn(tuple,k-1))
+
+    #matched.rows = match.rows(m.values[[k-1]][,1:(k-1)],tuples)
+    matched.rows = match_rows(m.values[[k-1]][,1:(k-1)],tuples)
+
+    return(any(as.logical(m.values[[k-1]][matched.rows,c(k,k+1)]),na.rm = TRUE))
+  } else {
+    return(FALSE) # in the pairwise case all are 1 independent
+  }
 }
 
 #' cleanup dependence structure graph
 #'
-#' Given a dependence structure graph: vertices representing the multivariances of only two vertices become an edge labeled with the label of the vertex.
+#' Given a dependence structure graph: vertices representing the multivariances of only two vertices can be turned into an edge labeled with the label of the vertex. Moreover, only subsets of the graph can be selected.
 #'
 #' @param g graph, created by \code{\link{dependence.structure}}
+#' @param only.level integer vector, if provided all edges and dependency nodes corresponding to dependence orders not given in 'only.level' are removed
+#' @param simplify.pairs boolean, if true dependency nodes which are only connected to two variables are turned into edges
+#' @param drop.label.pairs boolean, if true the labels for edges indicating pairwise dependence are removed
 #' @return graph
 #'
-#' @examples
+#' @details
+#' Note: The option 'only.level' works only properly for a full dependence structure graph, in the case of a clustered dependence structure graph dependency nodes representing a cluster might be removed.
 #'
+#' @examples
 #' N = 200
 #' y = coins(N,2)
 #' x = cbind(y,y,y)
-#' ds = dependence.structure(x)
+#'
+#' ds = dependence.structure(x,structure.type = "clustered")
 #' plot(clean.graph(ds$graph))
+#' plot(clean.graph(ds$graph,only.level = 2))
+#' plot(clean.graph(ds$graph,only.level = 3)) # of limited use for a clustered graph,
+#' # i.e., here the three-dependence node without edges indicates that
+#' # all edges were connected to clusters
+#'
+#' ds = dependence.structure(x,structure.type = "full")
+#' plot(clean.graph(ds$graph))
+#' plot(clean.graph(ds$graph,drop.label.pairs = TRUE))
+#' plot(clean.graph(ds$graph,only.level = 2))
+#' plot(clean.graph(ds$graph,only.level = 2,drop.label.pairs = TRUE))
+#' plot(clean.graph(ds$graph,only.level = 3))
+#'
 #' @export
-clean.graph = function(g) {
+clean.graph = function(g,only.level = NULL,simplify.pairs = TRUE, drop.label.pairs = FALSE) {
+  enumerate = FALSE # option which would allow to numerate the labels of the dependency nodes - maybe useful for rearrangement of the graph
+
   #  g = ds$graph
-  vert = which(igraph::V(g)$level == 2) # might still have more neighbors!!!
-  only.two.neighbors = logical(igraph::vcount(g))
-  for (i in vert) {
-    only.two.neighbors[i] = length(igraph::neighbors(g,igraph::V(g)[i]))==2
-    if (only.two.neighbors[i]) g = igraph::add_edges(g, igraph::neighbors(g,i), weight= NA, label = igraph::V(g)[i]$label, color = 2)
+
+  if (!is.null(only.level)) {
+    to.delete = which(!(igraph::V(g)$level %in% c(only.level,NA)))
+    g = igraph::delete.vertices(g,to.delete)
+
+    if (enumerate) {
+      vn = length(igraph::V(g)) #total number of vertices
+      n = sum(is.na(igraph::V(g)$level)) # initial number of vertices
+      #igraph::V(g)$label = numeric(vn)
+      igraph::V(g)$label[!is.na(igraph::V(g)$level)] = paste0(1:(vn-n),".")
+    }
+
   }
 
-  return(igraph::delete.vertices(g,only.two.neighbors))
+  if (simplify.pairs) {
+    vert = which(igraph::V(g)$level == 2) # might still have more neighbors!!!
+    only.two.neighbors = logical(igraph::vcount(g)) # is initialized with FALSE
+    for (i in vert) {
+      only.two.neighbors[i] = length(igraph::neighbors(g,igraph::V(g)[i]))==2
+      if (only.two.neighbors[i]) {
+        if (drop.label.pairs) {
+          g = igraph::add_edges(g, igraph::neighbors(g,i), weight= NA, color = 2, lty=2)
+        } else {
+          g = igraph::add_edges(g, igraph::neighbors(g,i), weight= NA, color = 2, lty=2,label = igraph::V(g)[i]$label)
+        }
+      }
+    }
+    g = igraph::delete.vertices(g,only.two.neighbors)
+  }
+
+  if (!is.null(g$layout)) g$layout = layout_on_circles(g)
+
+  return(g)
 }
+
+
+#' calculates the coordinates of n points on a circle of radius r
+#' if only 1 inner point, then it is placed in the center
+#' @keywords internal
+circle.coordinates = function(n,r = 0.5,add.angle = 0) {
+  if (n == 0) {
+    return(NULL)
+  } else {
+    if (n == 1) r = 0
+    #   print(paste("on circle:",n))
+    angles = (1:n)*2*pi/n + add.angle
+    coords = matrix(c(r*sin(angles),r*cos(angles)),ncol = 2)
+    #   print(coords)
+    return(coords)
+  }
+}
+
+#' A special igraph layout for the dependence structure visualization
+#'
+#' It places the variable nodes on an outer circle and the dependency nodes on an inner circle
+#' @param g graph
+#' @param n number of vertices on outer circle
+#'
+#' @details
+#' This is the standard layout for the full dependence structure, since in this case there often too many nodes which make the other (usual) layout incomprehensible.
+#'
+#' @examples
+#' N = 200
+#' y = coins(N,2)
+#' x = cbind(y,y,y)
+#'
+#' g = dependence.structure(x,structure.type = "clustered",verbose = FALSE)$graph
+#' plot(g)
+#' plot(g,layout = layout_on_circles(g))
+#' @export
+layout_on_circles = function(g,n = sum(is.na(igraph::V(g)$level))) {
+  vn = length(igraph::V(g))
+  return(rbind(circle.coordinates(n,1),circle.coordinates(vn-n)))
+}
+
 
 # Utility functions ####
 

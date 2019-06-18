@@ -27,7 +27,7 @@ NumericMatrix fastdist (const NumericMatrix & x){
   return out;
 }
 
-//' doubly center a symmetric matrix
+//' double center a symmetric matrix
 //'
 //' @param x symmetric matrix
 //' @param normalize boolean. If \code{TRUE} the matrix will be normalized to mean 1.
@@ -123,9 +123,40 @@ NumericMatrix fastEuclideanCdm (const NumericMatrix & x, bool & normalize){
       out(i,i) =  (2*colmeans(i) - m)/m;
     }
   }
-  /**/
+  /* */
    return out;
-   }
+}
+
+
+//' for the fast detection of the full dependence structure
+//'
+//' Returns the row indicies of matrix A which match with B
+//'
+//' @param A matrix
+//' @param B matrix whose rows are subset of A
+//'
+//' @examples
+//' # A = t(utils::combn(10,3))
+//' # B = A[sort(sample.int(nrow(A),10)),]
+//' # match_rows(A,B)
+//'
+//' @keywords internal
+// [[Rcpp::export]]
+
+NumericVector match_rows(NumericMatrix & A,NumericMatrix &B){
+  int i = 0, k;
+  NumericVector res (B.nrow());
+
+  for (k = 0; k < B.nrow(); k++) {
+    while( is_true(any(A.row(i) != B.row(k)))) {
+      i++;
+    }
+    res(k) = i;
+  }
+  return res+1;
+}
+
+
 
 /*** R
 */

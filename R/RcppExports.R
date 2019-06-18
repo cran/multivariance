@@ -13,7 +13,7 @@ fastdist <- function(x) {
     .Call('_multivariance_fastdist', PACKAGE = 'multivariance', x)
 }
 
-#' doubly center a symmetric matrix
+#' double center a symmetric matrix
 #'
 #' @param x symmetric matrix
 #' @param normalize boolean. If \code{TRUE} the matrix will be normalized to mean 1.
@@ -29,5 +29,22 @@ doubleCenterSymMat <- function(x, normalize) {
 #' @export
 fastEuclideanCdm <- function(x, normalize) {
     .Call('_multivariance_fastEuclideanCdm', PACKAGE = 'multivariance', x, normalize)
+}
+
+#' for the fast detection of the full dependence structure
+#'
+#' Returns the row indicies of matrix A which match with B
+#'
+#' @param A matrix
+#' @param B matrix whose rows are subset of A
+#'
+#' @examples
+#' # A = t(utils::combn(10,3))
+#' # B = A[sort(sample.int(nrow(A),10)),]
+#' # match_rows(A,B)
+#'
+#' @keywords internal
+match_rows <- function(A, B) {
+    .Call('_multivariance_match_rows', PACKAGE = 'multivariance', A, B)
 }
 

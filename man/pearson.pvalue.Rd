@@ -4,14 +4,14 @@
 \alias{pearson.pvalue}
 \title{fast p-value approximation}
 \usage{
-pearson.pvalue(x, vec = 1:ncol(x), type = "multi", ...)
+pearson.pvalue(x, vec = NA, type = "multi", ...)
 }
 \arguments{
 \item{x}{matrix, the rows should be iid samples}
 
-\item{vec}{vector, which indicates which columns of \code{x} are treated together as one sample}
+\item{vec}{vector, which indicates which columns of \code{x} are treated together as one sample. The default case treats each column as a separate sample.}
 
-\item{type}{one of \code{"multi","total","m.multi.2","m.multi.3"}}
+\item{type}{one of \code{"multi","total","m.multi.2","m.multi.3","all"}}
 
 \item{...}{these are passed to \code{\link{cdms}}}
 }

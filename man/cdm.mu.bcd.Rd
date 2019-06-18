@@ -9,6 +9,7 @@ cdm.mu.bcd(x, normalize = FALSE, psi = NULL, p = NULL,
   isotropic = FALSE, unbiased.moments = TRUE, external.dm.fun = NULL)
 }
 \description{
-NOTE: speedup might be possible by incorporating mu3 and some matrix-norm-identities
+given the sample of a single variable the centered distance matrix, mu (the limit moments) and bcd (the terms for the finite sample moments) are computed
+The normalization should be postponed to the moment calculation.
 }
 \keyword{internal}

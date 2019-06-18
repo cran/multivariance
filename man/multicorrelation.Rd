@@ -37,7 +37,7 @@ A value of 0 of multicorrelation \code{"multi"} or 3-multicorrelation \code{"m.m
 }
 \examples{
 y = rnorm(100)
-x = cbind(y,y*2,(y-2)/3,y+1,y*5)
+x = cbind(y,y*2,(y-2)/3,y+1,y*5) # all variables are related by similarity transforms
 
 # compute all types of correlations for x:
 for (ty in c("(lower bound) total","m.multi.2","m.multi.3","multi"))
