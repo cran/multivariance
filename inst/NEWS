@@ -1,3 +1,23 @@
+Changes in version 2.3.0
+========================
+
+Changes
+ * 'multicorrelation' the default options and available arguments have changed.
+ * 'multivariance.test' uses now the fast and approximately sharp 'pearson_approx' as default for the p-value approximation, instead of the very fast and conservative 'distribution_free'.
+
+New Features
+ * bias corrected estimators are now implemented (and standard) in 'multicorrelation'
+ * functions using the "copula version of multivariance" are now included: 'emp.transf' Monte Carlo empirical transform, 'copula.multivariance' copula multivariance, 'copula.multicorrelation' copula multicorrelation, 'copula.multicorrelation.test' tests for independence based on copula multivariance. Formally these act just alias for the standard functions applied to 'emp.transf' of the data.
+ * 'coins' has now an option 'type' which allows to switch the type of events considered.
+
+Updates
+ * Some basic input checks
+ * documentation
+ * 'multicorrelation' provides for special cases now a more detailed error description
+
+Outdated
+ * the function 'independence.test' is marked as depreciated, instead use: 'multivariance.test' as a general interface
+
 Changes in Version 2.2.0
 ========================
 

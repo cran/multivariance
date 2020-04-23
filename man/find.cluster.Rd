@@ -4,32 +4,43 @@
 \alias{find.cluster}
 \title{cluster detection}
 \usage{
-find.cluster(x, vec = 1:ncol(x), list.cdm = cdms(x, vec = vec),
-  mem = as.numeric(1:max(vec)), cluster.to.vertex = 1:max(mem),
-  vertex.to.cdm = 1:max(mem), previous.n.o.cdms = rep(0, max(mem)),
+find.cluster(
+  x,
+  vec = 1:ncol(x),
+  list.cdm = cdms(x, vec = vec),
+  mem = as.numeric(1:max(vec)),
+  cluster.to.vertex = 1:max(mem),
+  vertex.to.cdm = 1:max(mem),
+  previous.n.o.cdms = rep(0, max(mem)),
   all.multivariances = numeric(0),
-  g = igraph::add.vertices(igraph::graph.empty(, directed = FALSE),
-  max(mem), label = sapply(1:max(mem), function(r) paste(colnames(x,
-  do.NULL = FALSE, prefix = "")[vec == r], collapse = ",")), shape =
-  "circle"), fixed.rejection.level = NA, alpha = 0.05,
-  p.adjust.method = "holm", verbose = TRUE, kvec = 2:max(mem),
-  parameter.range = NULL, type = "conservative",
-  stop.too.many = NULL, ...)
+  g = igraph::add.vertices(igraph::graph.empty(, directed = FALSE), max(mem), label =
+    sapply(1:max(mem), function(r) paste(colnames(x, do.NULL = FALSE, prefix = "")[vec ==
+    r], collapse = ",")), shape = "circle"),
+  fixed.rejection.level = NA,
+  alpha = 0.05,
+  p.adjust.method = "holm",
+  verbose = TRUE,
+  kvec = 2:max(mem),
+  parameter.range = NULL,
+  type = "conservative",
+  stop.too.many = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{matrix with the samples}
 
 \item{vec}{vector, it indicates which columns are initially treated together as one sample}
 
-\item{list.cdm}{list of centered distance matrices}
+\item{list.cdm}{list of doubly centered distance matrices}
 
 \item{mem}{numeric vector, its length is the number of vertices, its content is the number of the corresponding cluster for the current iteration, i.e., vertex \code{i} belongs to cluster \code{mem[i]}}
 
 \item{cluster.to.vertex}{vector, contains the cluster to vertex relations, i.e., \code{cluster.to.vertex[i]} is the index of the vertex which represents cluster \code{i}}
 
-\item{vertex.to.cdm}{vector, contains the vertex to centered distance matrix relations, i.e., \code{vertex.to.cdm[i]} is the index centered distance matrix in \code{list.cdm} which corresponds to vertex \code{i}}
+\item{vertex.to.cdm}{vector, contains the vertex to doubly centered distance matrix relations, i.e., \code{vertex.to.cdm[i]} is the index of the doubly centered distance matrix in \code{list.cdm} which corresponds to vertex \code{i}}
 
-\item{previous.n.o.cdms}{vector, number of centered distance matrices in the previous iteration (it is used to ensure that previously check tuples are not checked again)}
+\item{previous.n.o.cdms}{vector, number of the doubly centered distance matrices in the previous iteration (it is used to ensure that previously check tuples are not checked again)}
 
 \item{all.multivariances}{vector, which contains all distance multivariances which have been calculated so far. Only used to finally return all distance multivariances which have been calculated.}
 

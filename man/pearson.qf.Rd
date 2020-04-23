@@ -2,7 +2,7 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{pearson.qf}
 \alias{pearson.qf}
-\title{approximate distribution of Gaussian quadratic form}
+\title{approximate distribution function of a Gaussian quadratic form}
 \usage{
 pearson.qf(x, moment, lower.tail = TRUE, verbose = FALSE)
 }

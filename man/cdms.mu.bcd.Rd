@@ -2,9 +2,9 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{cdms.mu.bcd}
 \alias{cdms.mu.bcd}
-\title{computes the centered distance matrices, mus and bcds}
+\title{computes the doubly centered distance matrices, mus and bcds}
 \usage{
-cdms.mu.bcd(x, vec = 1:ncol(x), membership = NULL, ...)
+cdms.mu.bcd(x, vec = 1:ncol(x), membership = NULL, cdm.normalize = TRUE, ...)
 }
 \arguments{
 \item{x}{matrix, each row is a sample}
@@ -18,13 +18,13 @@ cdms.mu.bcd(x, vec = 1:ncol(x), membership = NULL, ...)
 \value{
 A list containing the following components:
 \describe{
-  \item{\code{list.cdm}}{list of the centered distance matrices,}
+  \item{\code{list.cdm}}{list of the doubly centered distance matrices - these are always normalized if 'cdm.normalize = TRUE'!!!,}
   \item{\code{mu}}{matrix with the limit moments in a column for each variable,}
   \item{\code{bcd}}{matrix with b, c, d (which are required for the computation of the finite sample moments) in columns for each variable,}
   \item{\code{mean}}{vector with the mean of each distance matrix.}
 }
 }
 \description{
-computes the centered distance matrices, mus and bcds
+computes the doubly centered distance matrices, mus and bcds
 }
 \keyword{internal}

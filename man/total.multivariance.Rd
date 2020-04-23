@@ -4,11 +4,18 @@
 \alias{total.multivariance}
 \title{total distance multivariance}
 \usage{
-total.multivariance(x, vec = NA, lambda = 1, Nscale = TRUE,
-  Escale = TRUE, squared = TRUE, ...)
+total.multivariance(
+  x,
+  vec = NA,
+  lambda = 1,
+  Nscale = TRUE,
+  Escale = TRUE,
+  squared = TRUE,
+  ...
+)
 }
 \arguments{
-\item{x}{either a data matrix or a list of centered distance matrices}
+\item{x}{either a data matrix or a list of doubly centered distance matrices}
 
 \item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is a list, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
 

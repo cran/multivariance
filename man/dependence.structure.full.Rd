@@ -4,9 +4,18 @@
 \alias{dependence.structure.full}
 \title{functions to detect the full (without clustering) dependence structure}
 \usage{
-dependence.structure.full(x, vec = 1:ncol(x), verbose = TRUE,
-  type = "conservative", alpha = 0.05, list.cdm = NULL,
-  maxk = max(vec), stop.too.many = NULL, c.factor = 2, ...)
+dependence.structure.full(
+  x,
+  vec = 1:ncol(x),
+  verbose = TRUE,
+  type = "conservative",
+  alpha = 0.05,
+  list.cdm = NULL,
+  maxk = max(vec),
+  stop.too.many = NULL,
+  c.factor = 2,
+  ...
+)
 }
 \description{
 functions to detect the full (without clustering) dependence structure

@@ -2,7 +2,7 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{cdms}
 \alias{cdms}
-\title{computes the centered distance matrices}
+\title{computes the doubly centered distance matrices}
 \usage{
 cdms(x, vec = 1:ncol(x), membership = NULL, ...)
 }
@@ -19,5 +19,5 @@ cdms(x, vec = 1:ncol(x), membership = NULL, ...)
 It returns a list of distance matrices.
 }
 \description{
-computes the centered distance matrices
+computes the doubly centered distance matrices
 }

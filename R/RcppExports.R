@@ -48,3 +48,26 @@ match_rows <- function(A, B) {
     .Call('_multivariance_match_rows', PACKAGE = 'multivariance', A, B)
 }
 
+#' bias corrected double centering
+#' # included for speed comparison
+#'
+#' @keywords internal
+doubleCenterBiasCorrected <- function(x) {
+    .Call('_multivariance_doubleCenterBiasCorrected', PACKAGE = 'multivariance', x)
+}
+
+#' bias corrected double centering with normalizing
+#' # included for speed comparison
+#'
+#' @keywords internal
+doubleCenterBiasCorrectedUpper <- function(x) {
+    .Call('_multivariance_doubleCenterBiasCorrectedUpper', PACKAGE = 'multivariance', x)
+}
+
+#' bias corrected double centering with normalizing constants for upper and lower bound
+#'
+#' @keywords internal
+doubleCenterBiasCorrectedUpperLower <- function(x, n) {
+    .Call('_multivariance_doubleCenterBiasCorrectedUpperLower', PACKAGE = 'multivariance', x, n)
+}
+

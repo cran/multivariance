@@ -4,10 +4,20 @@
 \alias{dependence.structure}
 \title{determines the dependence structure}
 \usage{
-dependence.structure(x, vec = 1:ncol(x), verbose = TRUE,
-  detection.aim = NULL, type = "conservative",
-  structure.type = "clustered", c.factor = 2, list.cdm = NULL,
-  alpha = 0.05, p.adjust.method = "holm", stop.too.many = NULL, ...)
+dependence.structure(
+  x,
+  vec = 1:ncol(x),
+  verbose = TRUE,
+  detection.aim = NULL,
+  type = "conservative",
+  structure.type = "clustered",
+  c.factor = 2,
+  list.cdm = NULL,
+  alpha = 0.05,
+  p.adjust.method = "holm",
+  stop.too.many = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{matrix, each row of the matrix is treated as one sample}
@@ -24,7 +34,7 @@ dependence.structure(x, vec = 1:ncol(x), verbose = TRUE,
 
 \item{c.factor}{numeric, larger than 0, a constant factor used in the case of '\code{type = "consistent"}'}
 
-\item{list.cdm}{not required, the list of centered distance matrices corresponding to \code{x} speeds up the computation if given}
+\item{list.cdm}{not required, the list of doubly centered distance matrices corresponding to \code{x} speeds up the computation if given}
 
 \item{alpha}{numeric between 0 and 1, the significance level used for the tests}
 
@@ -38,7 +48,7 @@ dependence.structure(x, vec = 1:ncol(x), verbose = TRUE,
 returns a list with elements:
 \describe{
   \item{\code{multivariances}}{calculated multivariances,}
-  \item{\code{cdms}}{calculated centered distance matrices,}
+  \item{\code{cdms}}{calculated doubly centered distance matrices,}
   \item{\code{graph}}{graph representing the dependence structure,}
   \item{\code{detected}}{boolean, this is only included if a \code{detection.aim} is given,}
   \item{\code{number.of.dep.tuples}}{vector, with the number of dependent tuples for each tested order. For the full dependence structure a value of -1 indicates that all tuples of this order are already lower order dependent, a value of -2 indicates that there were more than \code{stop.too.many} tuples,}
@@ -80,9 +90,17 @@ dependence.structure(dep_struct_ring_15_100)
 
 # basic examples:
 
-dependence.structure(coins(100)) # 3-dependent
+x = coins(100) # 3-dependent
+dependence.structure(x)
+
+colnames(x) = c("A","B","C")
+dependence.structure(x) # names of variables are used as labels
+
 dependence.structure(coins(100),vec = c(1,1,2))
 # 3-dependent rv of which the first two rv are used together as one rv, thus 2-dependence.
+
+dependence.structure(x,vec = c(1,1,2)) # names of variables are used as labels
+
 
 dependence.structure(cbind(coins(200),coins(200,k=5)),verbose = TRUE)
 #1,2,3 are 3-dependent, 4,..,9 are 6-dependent
@@ -138,7 +156,7 @@ for (i in 2:100) {
         8, 1, 2, 4, 5, 6, 7, 3)))$detected
   print(paste("First", i,"samples. Detected?", re[i]==1))
 }
-cat(paste("Given the 1 to k'th row the structure is not detected for k =",which(re == FALSE),"\\n"))
+cat(paste("Given the 1 to k'th row the structure is not detected for k =",which(re == FALSE),"\n"))
 }
 }
 \references{

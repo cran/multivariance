@@ -4,47 +4,89 @@
 \alias{multicorrelation}
 \title{distance multicorrelation}
 \usage{
-multicorrelation(x, vec = 1:ncol(x), type = "m.multi.2",
-  multicorrelation.type = "unnormalized", squared = TRUE, ...)
+multicorrelation(
+  x,
+  vec = 1:ncol(x),
+  type = "total.upper.lower",
+  multicorrelation.type = "normalized",
+  estimator.type = "bias.corrected",
+  squared = TRUE,
+  ...
+)
 }
 \arguments{
-\item{x}{either a data matrix or a list of centered distance matrices}
+\item{x}{either a data matrix or a list of doubly centered distance matrices}
 
 \item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is a list, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
 
-\item{type}{one of \code{"m.multi.2","multi","m.multi.3","(lower bound) total"}}
+\item{type}{default: "total.lower.upper", for details and other options see below}
 
 \item{multicorrelation.type}{one of \code{"normalized","unnormalized"}}
+
+\item{estimator.type}{one of \code{"biased","bias.corrected"}}
 
 \item{squared}{if \code{FALSE} it returns the actual multivariance, otherwise the squared multivariance (less computation)}
 
 \item{...}{these are passed to \code{\link{cdms}} (which is only invoked if \code{x} is a matrix)}
 }
 \value{
-Value of the multicorrelation.
+Value of the multicorrelation(s).
 }
 \description{
-Computes various types of sample distance multicorrelation as defined in [3].
+Computes various types of sample distance multicorrelation as defined and discussed in [3,4,6].
 }
 \details{
-The unnormalized and normalized versions coincide if an even number of variables is considered (in particular always for 2-multivariance). They usually differ if an odd number of variables is considered (always for 3-multivariance). If all variables are related by similarity transforms the unnormalized \code{"unnormalized"} multicorrelations are 1.
+There exist many variants of distance multicorrelation as discussed in [6] -- and only in specific cases a direct comparison of the values is meaningful.
 
-For \code{"m.multi.2"} the empirical 2-multicorrelation is computed. Which is a dependence measure for pairwise dependence, i.e. the 3-multicorrelation is 0 if and only if all variables are pairwise independent.
+The implemented options are:
+\itemize{
+\item \code{total.upper.lower normalized bias.corrected}: default; bounded by 1; fast; population limit characterizes independence by 0
+\item \code{pairwise normalized bias.corrected}: bounded by 1; fast; population limit characterizes pairwise independence by 0
+\item \code{total.upper normalized biased}: biased versions of the above
+\item \code{total.lower normalized biased}
+\item \code{pairwise normalized biased}
+\item \code{multi normalized biased}: population limit characterizes only in case of lower independence the independence of all variables by 0
+\item \code{m.multi.3 normalized biased}: population limit characterizes only in case of pairwise independence the 3-independence of all variables by 0
+\item \code{pairwise unnormalized biased} population limit characterizes pairwise independence by 0 and relation by similarity transforms by 1
+\item \code{multi unnormalized biased}: population limit characterizes only in case of lower independence the independence of all variables by 0 and relation by similarity transforms by 1
+\item \code{m.multi.3 unnormalized biased}: population limit characterizes only in case of pairwise independence the 3-independence of all variables by 0 and relation by similarity transforms by 1
+}
 
-For total multicorrelation there is currently only a feasible empirical estimator for a lower bound (\code{"(lower bound) total"}). But it still characterizes dependence in the sense that the population version of this bound is 0 if and only if the variables are independent.
 
-A value of 0 of multicorrelation \code{"multi"} or 3-multicorrelation \code{"m.multi.3"} does not characterize independence.
+Further details:
+
+The \code{"bias.corrected"} versions require a data matrix, since they compute bias corrected centered distance matricies.
+
+For \code{"multi"} the unnormalized and normalized version coincide if an even number of variables is considered. They usually differ if an odd number of variables is considered. If all variables are related by similarity transforms the unnormalized \code{"unnormalized"} multicorrelations are 1.
+
+For \code{"pairwise"} an alias is \code{"m.multi.2"}.
+
+For total multicorrelation there is currently only a feasible empirical estimator for a lower or upper bound. These are upper and lower bounds for in the population setting. When using bias corrected estimators these are in general no proper bounds, but their range can be used as values for comparisons.
 }
 \examples{
 y = rnorm(100)
 x = cbind(y,y*2,(y-2)/3,y+1,y*5) # all variables are related by similarity transforms
 
 # compute all types of correlations for x:
-for (ty in c("(lower bound) total","m.multi.2","m.multi.3","multi"))
- for (mty in c("normalized","unnormalized"))
-  print(paste(format(multicorrelation(x,type=ty,multicorrelation.type = mty)
-                     ,digits=3,nsmall = 3,width = 7),mty,ty,"correlation"))
+for (ty in c("total.lower","total.upper","pairwise","m.multi.3","multi"))
+ for (mty in c("normalized"))
+  print(paste(format(multicorrelation(
+  x,type=ty,multicorrelation.type = mty,estimator.type = "biased")
+  ,digits=3,nsmall = 3,width = 7),mty,ty,"correlation - biased estimate"))
+
+for (ty in c("total.upper.lower","pairwise"))
+ for (mty in c("normalized"))
+  print(paste(format(multicorrelation(
+  x,type=ty,multicorrelation.type = mty,estimator.type = "bias.corrected")
+  ,digits=3,nsmall = 3,width = 7),mty,ty,"correlation - bias corrected estimate"))
+
+for (ty in c("m.multi.2","m.multi.3","multi"))
+ for (mty in c("unnormalized"))
+  print(paste(format(multicorrelation(
+  x,type=ty,multicorrelation.type = mty,estimator.type = "biased")
+  ,digits=3,nsmall = 3,width = 7),mty,ty,"correlation - biased estimate"))
+
 }
 \references{
-For the theoretic background see the references given on the main help page of this package: \link{multivariance-package}.
+For the theoretic background see the references [2,3,6] given on the main help page of this package: \link{multivariance-package}.
 }

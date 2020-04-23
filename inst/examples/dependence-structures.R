@@ -7,9 +7,17 @@ dependence.structure(dep_struct_ring_15_100)
 
 # basic examples:
 
-dependence.structure(coins(100)) # 3-dependent
+x = coins(100) # 3-dependent
+dependence.structure(x)
+
+colnames(x) = c("A","B","C")
+dependence.structure(x) # names of variables are used as labels
+
 dependence.structure(coins(100),vec = c(1,1,2))
 # 3-dependent rv of which the first two rv are used together as one rv, thus 2-dependence.
+
+dependence.structure(x,vec = c(1,1,2)) # names of variables are used as labels
+
 
 dependence.structure(cbind(coins(200),coins(200,k=5)),verbose = TRUE)
 #1,2,3 are 3-dependent, 4,..,9 are 6-dependent

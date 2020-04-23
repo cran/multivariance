@@ -4,8 +4,14 @@
 \alias{resample.multivariance}
 \title{resampling (total /m-) multivariance}
 \usage{
-resample.multivariance(x, vec = 1:ncol(x), times = 300,
-  type = "multi", resample.type = "permutation", ...)
+resample.multivariance(
+  x,
+  vec = 1:ncol(x),
+  times = 300,
+  type = "multi",
+  resample.type = "permutation",
+  ...
+)
 }
 \arguments{
 \item{x}{matrix, the rows should be iid samples}

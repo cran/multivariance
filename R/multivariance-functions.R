@@ -7,17 +7,15 @@
 #'
 # It also includes a function to perform a dependence analysis.
 #'
-#' Distance multivariance is a multivariate dependence measure, which can be used to detect dependencies between an arbitrary number of random vectors each of which can have a distinct dimension. The necessary functions are implemented in this package, and examples are given. For the theoretic background we refer to the papers [1,2,3,4]. Paper [3] includes a summary of the first two. It is the recommended starting point for users with an applied interest. Paper [4] is concerned with new (faster) p-value estimates for the independence tests.
+#' Distance multivariance is a multivariate dependence measure, which can be used to detect dependencies between an arbitrary number of random vectors each of which can have a distinct dimension. The necessary functions are implemented in this package, and examples are given. For the theoretic background we refer to the papers [1,2,3,4,5,6]. Paper [3] includes a summary of the first two. It is the recommended starting point for users with an applied interest. Paper [4] is concerned with new (faster) p-value estimates for the independence tests, [5] introduces the copula versions of distance multivariance, [6] discusses the quantification of dependence using distance multicorrelations.
 #'
-#' The (current) code is tested and speed improved in comparison to the former releases. Certainly there is still room for improvement and development. Questions, comments and remarks are welcome: \email{bjoern.boettcher@@tu-dresden.de}
+#' The (current) code is speed improved in comparison to the former releases. Certainly there is still room for improvement and development. Questions, comments and remarks are welcome: \email{bjoern.boettcher@@tu-dresden.de}
 #'
 # Users on Windows machines might get a considerable speed up using MRO instead of the standard R release - since this is particularly faster for large matrix operations.
 #'
 #' For infos on the latest changes and/or updates to the package use \code{news(package="multivariance")}.
 #'
 #' To cite this package use the standard citation for R packages, i.e., the output of \code{citation("multivariance")}.
-#'
-#'
 #'
 #' @section Multivariance:
 #'
@@ -29,6 +27,11 @@
 #'
 #'  It might be convenient to compute these simultaneously using \code{\link{multivariances.all}}.
 #'
+#'  \code{\link{copula.multivariance}} computes the copula versions of the above (introduced in [5])
+#'
+#'  \code{\link{multicorrelation}} computes the multicorrelations (discussed specifically in [6])
+#'
+#'
 #' @section Functions to use and interpret multivariance:
 #'
 #'  \code{\link{rejection.level}} computes a (conservative) rejection level for a given significance level. This can be used for a conservative interpretation of distance multivariance. The counterpart is \code{\link{multivariance.pvalue}}, which computes a conservative p-value for a given distance multivariance. Both methods are distribution-free.
@@ -37,11 +40,13 @@
 #'
 #'  Using the methods developed in [4] approximate p-value estimates are provided by \code{\link{pearson.pvalue}}. This method is much faster than the resampling method.
 #'
-#'  \code{\link{multivariance.test}} and \code{\link{independence.test}} provide the corresponding tests of independence. The former provides output as common for tests in R, the latter is a simple significance test returning for a given significance level just \code{TRUE} or \code{FALSE}
+#'  \code{\link{multivariance.test}} provides the corresponding tests of independence. The former provides output as common for tests in R.
 #'
-#' \code{\link{cdm}} and \code{\link{cdms}} compute the (doubly) centered distance matrix and matrices, respectively. These can be used to speed up repeated computations of distance multivariance.
+#' \code{\link{cdm}} and \code{\link{cdms}} compute the doubly centered distance matrix and matrices, respectively. These can be used to speed up repeated computations of distance multivariance.
 #'
 #' In [4] various methods to estimate the moments of the test statistic under H0 were developed, these are (implicitly) implemented in this package only for the moments used in \code{\link{pearson.pvalue}}. Further and explicit functions can be added upon request. Please feel free to contact the author.
+#'
+#' \code{\link{emp.transf}} computes the Monte Carlo empirical transform of the data. This data yields the copula version of distance multivariance. Hereto note, that values become randomized due to the "Monte Carlo empirical transform", i.e., the copula versions yield in a finite sample setting not identical values for repeated runs.
 #'
 #' For planing of large projects or studies it might be convenient to estimate the computation time of multivariance via \code{\link{multivariance.timing}}.
 #'
@@ -57,14 +62,20 @@
 #'
 #' \code{\link{dep_struct_iterated_13_100}}, \code{\link{dep_struct_ring_15_100}}, \code{\link{dep_struct_several_26_100}} and \code{\link{dep_struct_star_9_100}} are example data sets for the dependence structure detection. These might also serve as benchmark examples.
 #'
+#' \code{\link{anscombe.extended}} provides an extension of Anscombe's Quartett. It illustrates that a large value of Pearson's correlation can occur for very different dependencies and that this is not a small-sample problem. These dependencies are at least partly differentiated by values of distance multicorrelation.
+#'
 #' @references
-#' [1] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors: generalized distance covariance and Gaussian covariance. Modern Stochastics: Theory and Applications 2018, Vol. 5, No. 3, 353-383. \url{https://www.vmsta.org/journal/VMSTA/article/127/info}
+#' [1] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors: generalized distance covariance and Gaussian covariance. Modern Stochastics: Theory and Applications, Vol. 5, No. 3(2018) 353-383. \url{https://www.vmsta.org/journal/VMSTA/article/127/info}
 #'
-#' [2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures for random vectors. Accepted for publication in Annals of Statistics. \url{https://arxiv.org/abs/1711.07775}
+#' [2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures for random vectors. The Annals of Statistics, Vol. 47, No. 5 (2019) 2757-2789. \url{https://projecteuclid.org/euclid.aos/1564797863}
 #'
-#' [3] B. Böttcher, Dependence and Dependence Structures: Estimation and Visualization Using Distance Multivariance. Preprint. \url{https://arxiv.org/abs/1712.06532}
+#' [3] B. Böttcher, Dependence and Dependence Structures: Estimation and Visualization using the Unifying Concept of Distance Multivariance. Open Statistics, Vol. 1, No. 1 (2020) 1-46. \url{https://doi.org/10.1515/stat-2020-0001}
 #'
 #' [4] G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint. \url{https://arxiv.org/abs/1808.07280}
+#'
+#' [5] B. Böttcher, Copula versions of distance multivariance and dHSIC via the distributional transform -- a general approach to construct invariant dependence measures, Statistics, (2020) 1-18. \url{https://doi.org/10.1080/02331888.2020.1748029}
+#'
+#' [6] B. Böttcher, Notes on the interpretation of dependence measures -- Pearson's correlation, distance correlation, distance multicorrelations and their copula versions, Preprint. \url{https://arxiv.org/abs/2004.07649}
 #'
 #' @docType package
 #' @name multivariance-package
@@ -73,6 +84,21 @@ NULL
 NULL
 #' @importFrom Rcpp sourceCpp
 NULL
+
+.onAttach <- function(libname, pkgname) {
+  packageStartupMessage(paste0("Welcome to 'multivariance' version ",utils::packageVersion("multivariance"),".
+
+For usage hints and details on the theoretic backgound see
+help(\"multivariance-package\")
+and the references given therein, starting with:
+https://doi.org/10.1515/stat-2020-0001
+
+Note: For independence testing use 'multivariance.test(...)'. In version 2.3.0 (April 2020) the default p-value estimation procedure was changed to the fast and approximately sharp Pearson's approximation 'pearson_approx'.
+
+			To suppress this message use:
+			suppressPackageStartupMessages(library(multivariance))"))
+}
+
 
 ################# Multivariance ###########
 
@@ -129,9 +155,9 @@ multivariance.pvalue = function(x) {
 }
 
 
-#' centered distance matrix
+#' computes a doubly centered distance matrix
 #'
-#' computes the centered distance matrix
+#' computes the doubly centered distance matrix
 #'
 #' @param x matrix, each row of the matrix is treated as one sample
 #' @param normalize logical, indicates if the matrix should be normalized
@@ -141,7 +167,7 @@ multivariance.pvalue = function(x) {
 #' @param external.dm.fun here one can supply an external function, which computes the distance matrix given \code{x}.
 #'
 #' @details
-#' The centered distance matrices are required for the computation of (total / m-) multivariance.
+#' The doubly centered distance matrices are required for the computation of (total / m-) multivariance.
 #'
 #'If \code{normalize = TRUE} then the value of multivariance is comparable and meaningful. It can be compared to the \code{\link{rejection.level}} or its p-value \code{\link{multivariance.pvalue}} can be computed.
 #'
@@ -217,7 +243,7 @@ cdm = function(x, normalize = TRUE, psi = NULL, p = NULL, isotropic = FALSE, ext
 
 }
 
-#' computes the centered distance matrices
+#' computes the doubly centered distance matrices
 #' @param x matrix, each row is a sample
 #' @param vec vector which indicates which columns are treated as one sample
 #' @param membership depreciated. Now use \code{vec}.
@@ -267,9 +293,9 @@ double.center = function(dm,normalize = TRUE) {
 
 #' distance multivariance
 #'
-#' Computes the distance multivariance, either for given data or a given list of centered distance matrices.
+#' Computes the distance multivariance, either for given data or a given list of doubly centered distance matrices.
 #'
-#' @param x either a data matrix or a list of centered distance matrices
+#' @param x either a data matrix or a list of doubly centered distance matrices
 #' @param vec if x is a matrix, then this indicates which columns are treated together as one sample; if x is a list, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.
 #' @param Nscale if \code{TRUE} the multivariance is scaled up by the sample size (and thus it is exactly as required for the test of independence)
 #' @param squared if \code{FALSE} it returns the actual multivariance, otherwise the squared multivariance (less computation)
@@ -278,7 +304,7 @@ double.center = function(dm,normalize = TRUE) {
 #'
 #' @details
 #'
-#' If \code{x} is an matrix and \code{vec} is not given, then each column is treated as a separate sample. Otherwise \code{vec} has to have as many elements as \code{x} has columns and values starting from 1 up to the number of 'variables', e.g. if \code{x} is an \code{N} by 5 matrix and \code{vec = c(1,2,1,3,1)} then the multivariance of the 1-dimensional variables represented by column 2 and 4 and the 3-dimensional variable represented by the columns 1,3,5 is computed.
+#' If \code{x} is a matrix and \code{vec} is not given, then each column is treated as a separate sample. Otherwise \code{vec} has to have as many elements as \code{x} has columns and values starting from 1 up to the number of 'variables', e.g. if \code{x} is an \code{N} by 5 matrix and \code{vec = c(1,2,1,3,1)} then the multivariance of the 1-dimensional variables represented by column 2 and 4 and the 3-dimensional variable represented by the columns 1,3,5 is computed.
 #'
 #' As default it computes the normalized Nscaled squared multivariance, for a multivariance without normalization the argument \code{normalize = FALSE} has to be passed to \code{cdms}.
 #'
@@ -313,13 +339,16 @@ double.center = function(dm,normalize = TRUE) {
 multivariance = function(x,vec = NA,Nscale = TRUE,correlation = FALSE, squared = TRUE, ...) {
 
   if (correlation) warning("The option 'correlation' is depreciated. Please use the function 'multicorrelation' instead. \n")
-  if (!is.list(x)) { # if the input is a matrix, the distance matrices are computed
+  if (is.list(x)) {
+    if (is.data.frame(x)) stop("Input is a data.frame. Please provide a matrix or a list of doubly centered distance matrices.")
+  } else { # if the input is a matrix, the distance matrices are computed
     if (is.array(x) & (length(dim(x))>2)) stop("Please provide a list instead of an array. Changed since version 2.0.0.\n")
 
     if (anyNA(vec)) vec = 1:ncol(x)
     x = cdms(x,vec,...)
     vec = 1:max(vec)
   }
+
   if (anyNA(vec)) vec = 1:length(x)
 
   if (anyNA(x)) stop("Provided x contains NA. \n")
@@ -352,6 +381,7 @@ multivariance = function(x,vec = NA,Nscale = TRUE,correlation = FALSE, squared =
   #  test = test * x[vec[i],,][ut]
   #}
   #erg = sum(diat,2*test)/ncol(x)^2
+
   if (result < 0) {
     if (!isTRUE(all.equal(result,0))) warning(paste("Value of multivariance was negative (",result,"). This is usually due to numerical (in)precision. It was set to 0. \n"))
     result = 0
@@ -400,7 +430,9 @@ multivariance = function(x,vec = NA,Nscale = TRUE,correlation = FALSE, squared =
 #'
 #' @export
 total.multivariance = function(x,vec = NA,lambda = 1, Nscale = TRUE,Escale = TRUE,squared = TRUE,...) {
-  if (!is.list(x)) { # if the input is a matrix, the distance matrices are computed
+  if (is.list(x)) {
+    if (is.data.frame(x)) stop("Input is a data.frame. Please provide a matrix or a list of doubly centered distance matrices.")
+  } else { # if the input is a matrix, the distance matrices are computed
     if (is.array(x) & (length(dim(x))>2)) stop("Please provide a list instead of an array. Changed since version 2.0.0.")
 
     if (anyNA(vec)) vec = 1:ncol(x)
@@ -481,7 +513,9 @@ total.multivariance = function(x,vec = NA,lambda = 1, Nscale = TRUE,Escale = TRU
 #'
 #' @export
 m.multivariance = function(x, vec= NA, m = 2, Nscale = TRUE, Escale = TRUE, squared = TRUE,...) {
-  if (!is.list(x)) { # if the input is a matrix, the distance matrices are computed
+  if (is.list(x)) {
+    if (is.data.frame(x)) stop("Input is a data.frame. Please provide a matrix or a list of doubly centered distance matrices.")
+  } else { # if the input is a matrix, the distance matrices are computed
     if (is.array(x) & (length(dim(x))>2)) stop("Please provide a list instead of an array. Changed since version 2.0.0.")
 
     if (anyNA(vec)) vec = 1:ncol(x)
@@ -586,7 +620,9 @@ m.multivariance = function(x, vec= NA, m = 2, Nscale = TRUE, Escale = TRUE, squa
 #' @export
 #'
 multivariances.all = function(x, vec= NA, Nscale = TRUE, squared = TRUE,...) {
-  if (!is.list(x)) { # if the input is a matrix, the distance matrices are computed
+  if (is.list(x)) {
+    if (is.data.frame(x)) stop("Input is a data.frame. Please provide a matrix or a list of doubly centered distance matrices.")
+  } else { # if the input is a matrix, the distance matrices are computed
     if (is.array(x) & (length(dim(x))>2)) stop("Please provide a list instead of an array. Changed since version 2.0.0.")
 
     if (anyNA(vec)) vec = 1:ncol(x)
@@ -665,39 +701,93 @@ multivariances.all = function(x, vec= NA, Nscale = TRUE, squared = TRUE,...) {
 
 #' distance multicorrelation
 #'
-#' Computes various types of sample distance multicorrelation as defined in [3].
+#' Computes various types of sample distance multicorrelation as defined and discussed in [3,4,6].
 #'
 #' @inheritParams multivariance
-#' @param type one of \code{"m.multi.2","multi","m.multi.3","(lower bound) total"}
+#' @param type default: "total.lower.upper", for details and other options see below
 #' @param multicorrelation.type one of \code{"normalized","unnormalized"}
+#' @param estimator.type one of \code{"biased","bias.corrected"}
 #'
-#' @details The unnormalized and normalized versions coincide if an even number of variables is considered (in particular always for 2-multivariance). They usually differ if an odd number of variables is considered (always for 3-multivariance). If all variables are related by similarity transforms the unnormalized \code{"unnormalized"} multicorrelations are 1.
+#' @details
 #'
-#' For \code{"m.multi.2"} the empirical 2-multicorrelation is computed. Which is a dependence measure for pairwise dependence, i.e. the 3-multicorrelation is 0 if and only if all variables are pairwise independent.
+#' There exist many variants of distance multicorrelation as discussed in [6] -- and only in specific cases a direct comparison of the values is meaningful.
 #'
-#' For total multicorrelation there is currently only a feasible empirical estimator for a lower bound (\code{"(lower bound) total"}). But it still characterizes dependence in the sense that the population version of this bound is 0 if and only if the variables are independent.
+#' The implemented options are:
+#' \itemize{
+#' \item \code{total.upper.lower normalized bias.corrected}: default; bounded by 1; fast; population limit characterizes independence by 0
+#' \item \code{pairwise normalized bias.corrected}: bounded by 1; fast; population limit characterizes pairwise independence by 0
+#' \item \code{total.upper normalized biased}: biased versions of the above
+#' \item \code{total.lower normalized biased}
+#' \item \code{pairwise normalized biased}
+#' \item \code{multi normalized biased}: population limit characterizes only in case of lower independence the independence of all variables by 0
+#' \item \code{m.multi.3 normalized biased}: population limit characterizes only in case of pairwise independence the 3-independence of all variables by 0
+#' \item \code{pairwise unnormalized biased} population limit characterizes pairwise independence by 0 and relation by similarity transforms by 1
+#' \item \code{multi unnormalized biased}: population limit characterizes only in case of lower independence the independence of all variables by 0 and relation by similarity transforms by 1
+#' \item \code{m.multi.3 unnormalized biased}: population limit characterizes only in case of pairwise independence the 3-independence of all variables by 0 and relation by similarity transforms by 1
+#' }
 #'
-#' A value of 0 of multicorrelation \code{"multi"} or 3-multicorrelation \code{"m.multi.3"} does not characterize independence.
+#'
+#' Further details:
+#'
+#' The \code{"bias.corrected"} versions require a data matrix, since they compute bias corrected centered distance matricies.
+#'
+#' For \code{"multi"} the unnormalized and normalized version coincide if an even number of variables is considered. They usually differ if an odd number of variables is considered. If all variables are related by similarity transforms the unnormalized \code{"unnormalized"} multicorrelations are 1.
+#'
+#' For \code{"pairwise"} an alias is \code{"m.multi.2"}.
+#'
+#' For total multicorrelation there is currently only a feasible empirical estimator for a lower or upper bound. These are upper and lower bounds for in the population setting. When using bias corrected estimators these are in general no proper bounds, but their range can be used as values for comparisons.
+#'
 #' @return
 #'
-#' Value of the multicorrelation.
+#' Value of the multicorrelation(s).
 #'
 #' @references
-#' For the theoretic background see the references given on the main help page of this package: \link{multivariance-package}.
+#' For the theoretic background see the references [2,3,6] given on the main help page of this package: \link{multivariance-package}.
 
 #' @examples
 #' y = rnorm(100)
 #' x = cbind(y,y*2,(y-2)/3,y+1,y*5) # all variables are related by similarity transforms
 #'
 #' # compute all types of correlations for x:
-#' for (ty in c("(lower bound) total","m.multi.2","m.multi.3","multi"))
-#'  for (mty in c("normalized","unnormalized"))
-#'   print(paste(format(multicorrelation(x,type=ty,multicorrelation.type = mty)
-#'                      ,digits=3,nsmall = 3,width = 7),mty,ty,"correlation"))
+#' for (ty in c("total.lower","total.upper","pairwise","m.multi.3","multi"))
+#'  for (mty in c("normalized"))
+#'   print(paste(format(multicorrelation(
+#'   x,type=ty,multicorrelation.type = mty,estimator.type = "biased")
+#'   ,digits=3,nsmall = 3,width = 7),mty,ty,"correlation - biased estimate"))
+#'
+#' for (ty in c("total.upper.lower","pairwise"))
+#'  for (mty in c("normalized"))
+#'   print(paste(format(multicorrelation(
+#'   x,type=ty,multicorrelation.type = mty,estimator.type = "bias.corrected")
+#'   ,digits=3,nsmall = 3,width = 7),mty,ty,"correlation - bias corrected estimate"))
+#'
+#' for (ty in c("m.multi.2","m.multi.3","multi"))
+#'  for (mty in c("unnormalized"))
+#'   print(paste(format(multicorrelation(
+#'   x,type=ty,multicorrelation.type = mty,estimator.type = "biased")
+#'   ,digits=3,nsmall = 3,width = 7),mty,ty,"correlation - biased estimate"))
+#'
 #' @export
-multicorrelation = function(x, vec = 1:ncol(x), type = "m.multi.2", multicorrelation.type = "unnormalized", squared = TRUE, ...) {
+multicorrelation = function(x, vec = 1:ncol(x), type = "total.upper.lower", multicorrelation.type = "normalized", estimator.type = "bias.corrected",squared = TRUE, ...) {
 
-  if (!is.list(x)) { # if the input is a matrix, the distance matrices are computed
+  if (estimator.type == "bias.corrected") {
+    # implemented options:
+    # normalized: total.upper.lower, total.upper pairwise
+    # all
+    if (!(multicorrelation.type == "normalized")) {
+      stop("For the bias corrected estimator currently only 'normalized' with type 'total.upper.lower' and 'pairwise' are implemented.")
+    }
+    if (!is.matrix(x)) stop("'x' must be a matrix (for the current options).")
+    return(multicorrelation.bias.corrected(x = x,vec = vec,type = type,squared = squared,...))
+  }
+
+  if (!(estimator.type == "biased")) {
+    stop(paste0("Unknown 'estimator.type': ",estimator.type))
+  }
+
+  if (is.list(x)) {
+    if (is.data.frame(x)) stop("Input is a data.frame. Please provide a matrix or a list of doubly centered distance matrices.")
+  } else { # if the input is a matrix, the distance matrices are computed
     if (is.array(x) & (length(dim(x))>2)) stop("Please provide a list instead of an array. Changed since version 2.0.0.")
 
     if (anyNA(vec)) vec = 1:ncol(x)
@@ -709,17 +799,37 @@ multicorrelation = function(x, vec = 1:ncol(x), type = "m.multi.2", multicorrela
   if (anyNA(x)) stop("provided x contains NA")
 
   n = max(vec)
-  if (type == "(lower bound) total") type = "total"
+
+  if (type == "total.lower") {
+    type = "total"
+  }
+  if (type == "total.upper") {
+    n = 2
+    type = "total"
+  }
+
+  if (type == "pairwise") type = "m.multi.2"
   if (type == "m.multi.2") n = 2
   if (type == "m.multi.3") n = 3
 
   #list.cdms = cdms(x,normalize = FALSE)
   switch(multicorrelation.type,
     normalized = {
-      list.norms = lapply(x, function(x) (mean(abs(x)^n))^(1/n))
+      list.norms = lapply(x, function(x) (mean(abs(x)^n))^(1/n)) # for lower bound
+      list.norms[list.norms == 0] = 1 # for constant random variables no scaling is required, since the matrix is 0 anyway
     },
     unnormalized = {
       list.norms = lapply(x, function(x) (mean(x^n))^(1/n))
+      if (any(list.norms == 0)) {
+        check.val = lapply(x[list.norms == 0], function(x) (mean(x^2)))
+        if (any(check.val != 0))  {# non constant with normalizing constant 0
+          warning("Division by 0 due to a normalizing constants of 0. This can happen e.g. for an even number of samples of bernoulli distributed random variables.")
+          return(NaN)
+        } else {
+          list.norms[list.norms == 0] = 1 # for constant random variables no scaling is required, since the matrix is 0 anyway
+        }
+      }
+      if (type == "total") stop("The bound is only valid for 'normalized' total multivariance.")
     },
     {stop(paste("unkown multicorrelation.type:",type))}
   )
@@ -730,7 +840,11 @@ multicorrelation = function(x, vec = 1:ncol(x), type = "m.multi.2", multicorrela
       return(c( multicorrelation = multivariance(list.cdms,Nscale = FALSE,squared = squared)))
     },
     total = {
+      if (n == 2) {
+        return( c(total.multicorrelation.upper.bound = total.multivariance(list.cdms,Nscale = FALSE,squared = squared)))
+      } else {
       return( c(total.multicorrelation.lower.bound = total.multivariance(list.cdms,Nscale = FALSE,squared = squared)))
+      }
     },
     m.multi.2 = {
       return(c(multicorrelation.2 = m.multivariance(list.cdms,Nscale = FALSE,squared = squared)))
@@ -738,6 +852,11 @@ multicorrelation = function(x, vec = 1:ncol(x), type = "m.multi.2", multicorrela
     m.multi.3 = {
       return(c(multicorrelation.3 = m.multivariance(list.cdms,m = 3,Nscale = FALSE,squared = squared)))
     },
+    #all = { # this does not work, since the norms are different for the cases
+    #  val = c(multivariances.all(list.cdms,m = 3,Nscale = FALSE,squared = squared))
+    #  names(val) = paste0(c("Mcor","tMcorlb","M2cor","M3cor"),ifelse(multicorrelation.type == "unnormalized","-unnormalized","-normalized"))
+#      return(val)
+#    },
     {stop(paste("unkown type:",type))}
   )
 }
@@ -745,9 +864,9 @@ multicorrelation = function(x, vec = 1:ncol(x), type = "m.multi.2", multicorrela
 
 #' test for independence
 #'
-#' This computes a test of independence for the columns of a sample matrix (required for the resampling test) or for given centered distance matrices (only possible for the distribution-free test).
+#' Depreciated. Use \code{\link{multivariance.test}} instead. It provides all options and returns test result in a standard R format.
 #'
-#' For a test with p-value output (as standard for tests in R) see \code{\link{multivariance.test}}.
+#' This computes a test of independence for the columns of a sample matrix (required for the resampling test) or for given doubly centered distance matrices (only possible for the distribution-free test).
 #'
 #' @inheritParams multivariance
 #' @param alpha significance level
@@ -756,7 +875,7 @@ multicorrelation = function(x, vec = 1:ncol(x), type = "m.multi.2", multicorrela
 #'
 #' @return Returns \code{TRUE} if the hypothesis of independence is NOT rejected, otherwise \code{FALSE}.
 #' @details The \code{"pearson_approx"} and \code{"resample"} are approximately sharp. The latter is based on a resampling approach and thus much slower. The \code{"distribution_free"} test might be very conservative.
-#' The centered distance matrices can be prepared by \code{\link{cdms}}. But note that for the test based on Pearson's approximation and for the resampling test, the data matrix has to be given.
+#' The doubly centered distance matrices can be prepared by \code{\link{cdms}}. But note that for the test based on Pearson's approximation and for the resampling test, the data matrix has to be given.
 #'
 #' @references
 #' For the theoretic background see the references given on the main help page of this package: \link{multivariance-package}.
@@ -774,6 +893,8 @@ multicorrelation = function(x, vec = 1:ncol(x), type = "m.multi.2", multicorrela
 #' @export
 independence.test = function(x,vec = 1:ncol(x),alpha = 0.05,type = "distribution_free",verbose = TRUE,...) {
   tm = total.multivariance(x,vec,...)
+
+  warning("The function 'independence.test' is depreciated, use 'multivariance.test(...)$p.value < alpha' instead to compute the test result.")
 
   switch(type,
          distribution_free = {
@@ -837,7 +958,7 @@ independence.test = function(x,vec = 1:ncol(x),alpha = 0.05,type = "distribution
 #'
 #' @examples
 #' # an independence test
-#' multivariance.test(dep_struct_several_26_100) # conservative
+#' multivariance.test(dep_struct_several_26_100,p.value.type = "distribution_free") # conservative
 #' multivariance.test(dep_struct_several_26_100,p.value.type = "resample") #sharp but slow
 #' multivariance.test(dep_struct_several_26_100,p.value.type = "pearson_approx") #
 #'
@@ -850,24 +971,26 @@ independence.test = function(x,vec = 1:ncol(x),alpha = 0.05,type = "distribution
 #' # using the vec argument:
 #' x = matrix(rnorm(50*6),ncol = 10) # a 50x6 data matrix
 #' vec = c(1,2,3,4,5,6) # each column is treated as one variable
-#' multivariance.test(x,vec) # is the same as the default
+#' multivariance.test(x,vec,p.value.type = "distribution_free") # is the same as the default
 #'
 #' vec = c(1,2,2,1,3,1)
 #' # column 1,4,6 are treated as one variable
 #' # column 2,3 are treated as one variable
 #' # column 5 is treated as one variable
-#' multivariance.test(x,vec)
+#' multivariance.test(x,vec,p.value.type = "distribution_free")
 #'
 #' @export
-multivariance.test = function(x,vec = 1:ncol(x),type = "total",p.value.type = "distribution_free",verbose = TRUE,...) {
+multivariance.test = function(x,vec = 1:ncol(x),type = "total",p.value.type = "pearson_approx",verbose = TRUE,...) {
+
+  if (is.data.frame(x)) stop("Input is a data.frame. Please provide a matrix or a list of doubly centered distance matrices.")
 
   if (p.value.type == "conservative") p.value.type = "distribution_free" #undocumented
 
   data.name = deparse(substitute(x))
 
-  if ((p.value.type == "pearson_approx") & (is.list(x))) {
+  if ((p.value.type %in% c("pearson_approx","pearson_unif")) & (is.list(x))) {
     if (is.null(x$list.cdm)) {
-      stop("'pearson_approx' requires the data. A list of centered distance matrices is not sufficient.")
+      stop("'pearson_approx' requires the data. A list of doubly centered distance matrices is not sufficient.")
     } else {
       x.cdms.mu.bcd = x
       x = x$list.cdm
@@ -933,6 +1056,22 @@ multivariance.test = function(x,vec = 1:ncol(x),type = "total",p.value.type = "d
         p.value = pearson.pvalue(x=x.cdms.mu.bcd,vec=vec,type=type,...)
       }
     },
+    pearson_unif = {
+      method = paste0(method, "; p-value via Pearson's approximation (approx. sharp) using theoretic values based on the Euclidean distance. Only valid for 1-dim uniform marginals.")
+      statistic[1] = fun()
+      if (is.matrix(x)) {
+        p.value = pearson.pvalue.unif(x=x,vec=vec,type=type,...)
+      } else {
+        n = length(x) # x is now list.cdm
+
+        unif.cmb = list(list.cdm = x,
+          mu = matrix(rep(c(1/3,2/45,8/945),n),ncol=n),
+          bcd = matrix(rep(c(1/6,7/60,1/9),n),ncol=n),
+          mean =rep(1/3,n))
+
+        p.value = pearson.pvalue(x=unif.cmb,vec=vec,type=type,...)
+      }
+    },
     {stop(paste("unkown p.value.type:",p.value.type))}
   )
 
@@ -941,6 +1080,259 @@ multivariance.test = function(x,vec = 1:ncol(x),type = "total",p.value.type = "d
 
   return(result)
 }
+
+################ Bias corrected #########
+
+#' distance matrix
+#'
+#' # currently only used for the bias corrected multicorrelations
+#' # it might be used globally to remove redundancies
+#'
+#' @keywords internal
+dm = function(x, psi = NULL, p = NULL, isotropic = FALSE, external.dm.fun = NULL) {
+  if (is.null(psi) & is.null(p) & is.null(external.dm.fun)) {
+    #dm = dist.to.matrix(stats::dist(x,method="euclidean"))
+    #DEVELOPING NOTE: here as.matrix was slow, dist.to.matrix is faster. Instead one could just use the vector....
+    # even faster for the euclidean case is fastdist defined via Rcpp
+
+    return(fastdist(as.matrix(x)))
+
+  } else {
+    if (!is.null(p)) {
+      if ((p<1) || (p>2)) warning("p is not in [1,2]. \n")
+      dm = dist.to.matrix(stats::dist(x,method="minkowski", p = p))
+    } else { # case: psi is given
+      if (!is.null(external.dm.fun)) {
+        dm = external.dm.fun(as.matrix(x))
+      } else {
+        if (isotropic) {
+          #dm = psi(dist.to.matrix(stats::dist(x,method="euclidean")))
+          dm = psi(fastdist(as.matrix(x)))
+        } else {
+          x = as.matrix(x)
+          n = nrow(x)
+          d = ncol(x)
+          dm = matrix(apply(cbind(x[rep(1:n,n),],x[rep(1:n,each = n),]), #create all combinations
+            1, # apply to each row
+            function(y) psi(y[1:d], y[(d+1):(2*d)])),nrow = n)
+          # DEVELOPING NOTE: could double the speed if only the upper triangular matrix is computed, using the idea of dist.to.matrix
+        }
+      }
+    }
+  }
+}
+
+
+#' list of distance matrices
+#'
+#' # currently only used for the bias corrected multicorrelations
+#' # it might be used globally, to remove redundancies
+#'
+#' @keywords internal
+dms = function(x,vec = 1:ncol(x),...) {
+  return(lapply(1:max(vec),function(i) dm(x[,vec == i,drop = FALSE],...)))
+}
+
+#' bias corrected total multicorrelations
+#'
+#' @keywords internal
+multicorrelation.bias.corrected = function(x,
+  vec = 1:ncol(x), squared = FALSE, type = "all",...)
+{
+  # convention: 0/0 = 0
+
+  if (type == "total.upper.lower")
+    return(total.multicorrelation.bias.corrected.upper.lower(x,vec,squared,...))
+
+  if ((type == "m.multi.2") | (type == "pairwise"))
+    return(pairwise.multicorrelation.bias.corrected(x,vec,squared,...))
+
+  if (type == "total.upper")
+    return(total.multicorrelation.bias.corrected.upper(x,vec,squared,...))
+
+
+  ## below slow for 'all'
+  ## undocumented
+
+  if (!(type == "all")) stop(paste0("unknown type: ",type))
+
+
+  N = nrow(x)
+  n = max(vec)
+  const.lambda = 1 # for lambda total multicorrelation
+
+  #dms.list = lapply(1:n,function(i) fastdist(as.matrix(x[,vec == i])))
+
+  dms.list = dms(x,vec,...)
+
+  cdms.list = lapply(dms.list,doubleCenterBiasCorrected)
+  #    double.centerUB(dms.list,normalize = FALSE)
+
+  values = c(unnormalized = NA,upper = NA, normalized = NA, lower = NA, pairwise = NA)
+
+  for (typ in c("lower","upper"))  {
+    switch(typ,
+      lower = {
+        fun = function(x) abs(x)^n # for lower
+        fun.inv = function(x) x^(1/n) # for lower
+      },
+      upper = {
+        fun = function(x) x^2 # for upper and pairwise
+        fun.inv = function(x) sqrt(x)
+      })
+
+    # by the following roots a lot of precision is lost
+    norms.list = lapply(cdms.list, function(x) (N/((N-3))*mean(fun(x))))
+
+    too.small = norms.list < .Machine$double.eps
+    if (isTRUE(any(c(too.small)))) {
+      warning("some norming constant is approximately 0")
+      norms.list[too.small] = 0
+    }
+
+    #if ((n==2) & isTRUE(any(list.norms.upper == 0)))
+    #  return(c(0,0,0))
+
+    cdms.normed.list = lapply(1:length(cdms.list), function(i) cdms.list[[i]]/fun.inv(norms.list[[i]]))
+
+
+    global.factor = ((1+const.lambda)^n - n*const.lambda^(n-1) - const.lambda^n)
+
+    values[typ] = N/((N-3))*(mean(Reduce("*", lapply(cdms.normed.list,function(y) const.lambda + y))) - const.lambda^n)/global.factor
+
+    if (typ == "upper") {
+      # pairwise multicorrelation / 2-multicorrelation (needs cdms.normed.list used for upper)
+      Asum = Reduce("+", cdms.normed.list)
+      A2sum = Reduce("+", lapply(cdms.normed.list,function(y) y^2))
+
+      values["pairwise"] = N/((N-3))*mean(Asum^2 - A2sum)/(2*(choose(n,2)))
+    }
+  }
+
+  ### full normalized and unnormalized
+
+  if (n > 15) warning(paste0("Normalized and unnormalize multicorreltions become very slow for large number of variables. For the current dataset in these need to compute ",2^n-n-1," terms. In contrast 'upper.lower' requires only 1 of such terms."))
+
+  for (typ in c("normalized","unnormalized")) {
+
+    switch(typ,
+      normalized = {
+        fun = function(x) abs(x) # for normalizied
+      },
+      unnormalized = {
+        fun = function(x) x # for unnormalized
+      })
+
+    vals = NULL
+    for (k in 2:n) { # for each k-tuple
+      norms.list = lapply(cdms.list, function(x) (N/((N-3))*mean(fun(x)^k))^(1/k))
+
+      if (typ == "normalized") {
+        norms.list = lapply(norms.list,function(x) ifelse(x < .Machine$double.eps^(1/k),0,x))
+      }
+
+      cdms.normed.list = lapply(1:length(cdms.list), function(i) cdms.list[[i]]/(norms.list[[i]]))
+
+      S = utils::combn(n,k) # all possible k-tuples
+
+      vals = c(vals,apply(S,2,function(s) (N/((N-3))*(mean(Reduce("*", cdms.normed.list[s]))))))
+    }
+
+    values[typ] = mean(vals)
+  }
+
+  if (!squared) values = signed.sqrt(values)
+
+  # names(values) = paste0("Mcor.",names(values))
+  return(values)
+}
+
+#' # included for speed. it is faster than upper.lower
+#'
+#' @keywords internal
+total.multicorrelation.bias.corrected.upper = function(x,vec = 1:ncol(x),squared = FALSE,...){
+  n = max(vec)
+  global.factor = 2^n-n-1
+  N = nrow(x)
+
+  dms.list = dms(x,vec,...)
+
+  cdms.list = lapply(dms.list,function(mat) doubleCenterBiasCorrectedUpper(mat))
+
+  ret = c(total.upper = ((N-1)/(N-3)*(mean(Reduce("*", lapply(cdms.list
+    ,function(y) 1 + y))) - 1)/global.factor))
+
+  if (abs(ret) < .Machine$double.eps) ret[1] = 0
+  if (!squared) ret = signed.sqrt(ret)
+
+  return(ret)
+}
+
+#'
+#'
+#' @keywords internal
+total.multicorrelation.bias.corrected.upper.lower = function(x,vec = 1:ncol(x),squared = FALSE,...){
+  n = max(vec)
+  const.lambda = 1
+
+  # global.factor = ((1+const.lambda)^n - n*const.lambda^(n-1) - const.lambda^n) # for lambda total mutlicorrelation
+  global.factor = 2^n - n - 1
+
+  N = nrow(x)
+  #dms.list = lapply(1:n,function(i) fastdist(as.matrix(x[,vec == i])))
+  dms.list = dms(x,vec,...)
+
+  cdms.ul.list = lapply(dms.list
+    ,function(mat) doubleCenterBiasCorrectedUpperLower(mat,n))
+
+  ret = c(total.upper = ((N-1)/(N-3)*(mean(Reduce("*", lapply(
+    cdms.ul.list,function(y) 1 + y$out/y$upper))) - 1)/global.factor),
+    total.lower = ((N-1)/(N-3)*(mean(Reduce("*", lapply(
+      cdms.ul.list,function(y) 1 + y$out/y$lower))) - 1)/global.factor)
+  )
+
+  if (isTRUE(abs(ret[1]) < .Machine$double.eps)) ret[1] = 0
+  if (isTRUE(abs(ret[2]) < .Machine$double.eps)) ret[2] = 0
+  if (!squared) ret = signed.sqrt(ret)
+
+  return(ret)
+
+
+  #  For lambda total multicorrelation:
+  #  return(
+  #   c(upper = signed.sqrt((N-1)/(N-3)*(mean(Reduce("*", lapply(  cdms.ul.list,function(y) const.lambda + y$out/y$upper))) - const.lambda^n)/global.factor),
+  #   lower = signed.sqrt((N-1)/(N-3)*(mean(Reduce("*", lapply(
+  #   cdms.ul.list,function(y) const.lambda + y$out/y$lower))) - const.lambda^n)/global.factor)
+  # ))
+}
+
+#' pairwise multicorrelation
+#'
+#' @keywords internal
+pairwise.multicorrelation.bias.corrected = function(x,vec = 1:ncol(x),squared = FALSE,...){
+  n = max(vec)
+  N = nrow(x)
+  #dms.list = lapply(1:n,function(i) fastdist(as.matrix(x[,vec == i])))
+  dms.list = dms(x,vec,...)
+
+  cdms.list = lapply(dms.list
+    ,function(mat) doubleCenterBiasCorrectedUpper(mat))
+
+  Asum = Reduce("+", cdms.list)
+  A2sum = Reduce("+", lapply(cdms.list,function(y) y^2))
+
+  ret = c(pairwise = (N-1)/((N-3))*mean(Asum^2 - A2sum)/(2*(choose(n,2))))
+
+  if (abs(ret) < .Machine$double.eps) {
+    #warning(paste0(ret," rounded to 0."))
+    ret[1] = 0
+  }
+  if (!squared) ret = signed.sqrt(ret)
+
+  return(ret)
+
+}
+
 
 
 
@@ -961,6 +1353,8 @@ multivariance.test = function(x,vec = 1:ncol(x),type = "total",p.value.type = "d
 #' @export
 tetrahedron = function(N = 1000) {
   # rolls the tetrahedron with sides r,g,b,rgb
+  # this is an explicit implementation, the distribution is the same
+  # as for 'coins(N,3,type = "even")'
   side = sample.int(4,N,replace=TRUE)
   x = (side == 1)|(side == 4)
   y = (side == 2)|(side == 4)
@@ -973,7 +1367,13 @@ tetrahedron = function(N = 1000) {
 #' This function creates samples which are dependent but k-independent.
 #' @param N number of samples
 #' @param k each k-tuple will be independent
+#' @param type one of \code{"even"} or \code{"odd"}
 #' @return It returns the samples as rows of an \code{N} by \code{k+1} matrix. The columns are dependent but k-independent.
+#'
+#' @details Throw \code{k} independent fair coins. Now consider
+#' the k+1 events: The first shows head, the second shows head,... the \code{k}-th shows head,
+#' there is an \code{even} (or \code{odd} as selected via \code{type}) number of heads. Each row
+#' contains the state of these k+1 events.
 #'
 #' @references
 #' For the theoretic background see the reference [3] given on the main help page of this package: \link{multivariance-package}.
@@ -982,15 +1382,17 @@ tetrahedron = function(N = 1000) {
 #' coins(200,4)
 #'
 #' @export
-coins = function(N = 1000, k = 2) {
-  c = matrix(sample.int(2,k*N,replace = TRUE)-1,ncol = k)
-  d = (rowSums(as.matrix(c[,1:(k-1)])) %% 2) == c[,k]
-  return(unname(cbind(c,d)))
+coins = function(N = 1000, k = 2, type = "even") {
+  k.coins = matrix(sample.int(2,k*N,replace = TRUE)-1,ncol = k)
+  switch(type,
+         even = { d = ((rowSums(as.matrix(k.coins)) %% 2) == 0) },
+         odd =  { d = ((rowSums(as.matrix(k.coins)) %% 2) == 1) }
+  )
+  return(unname(cbind(k.coins,d)))
 }
 
 
-# resample ######
-
+# Resampling ######
 
 #' resample the columns of a matrix
 #' @param x matrix
@@ -1016,11 +1418,11 @@ sample.cols = function(x,vec = 1:ncol(x),replace = TRUE,incl.first = TRUE) {
   return(xnew)
 }
 
-#' resamples centered distance matrices
-#' @param list.cdm a list of centered distance matrices
+#' resamples doubly centered distance matrices
+#' @param list.cdm a list of doubly centered distance matrices
 #' @inheritParams sample.cols
 #'
-#' @return Returns a list of centered distance matrices, each matrix corresponds to the resampled columns of the corresponding sample, using resampling with replacement (bootstrap) or without replacement (permutations).
+#' @return Returns a list of doubly centered distance matrices, each matrix corresponds to the resampled columns of the corresponding sample, using resampling with replacement (bootstrap) or without replacement (permutations).
 #'
 #' @export
 sample.cdms = function(list.cdm,replace = FALSE, incl.first = FALSE) {
@@ -1081,7 +1483,7 @@ sample.cdms = function(list.cdm,replace = FALSE, incl.first = FALSE) {
 #' @export
 resample.multivariance = function(x,vec = 1:ncol(x),times = 300,type = "multi",resample.type = "permutation",...) {
 
-  res.vec = vec # the vec argument used for the resampling methods; some methods use the centered distance matrices, and there vec has to be 1:max(vec)
+  res.vec = vec # the vec argument used for the resampling methods; some methods use the doubly centered distance matrices, and there vec has to be 1:max(vec)
   switch(resample.type,
          #distinct.permutation = {resample = function() matrix(x[derangements.without.fixpoint(N,n, distinctcols,vec)],ncol = n)},
        permutation = {
@@ -1097,7 +1499,7 @@ resample.multivariance = function(x,vec = 1:ncol(x),times = 300,type = "multi",r
            # list.cdm = cdms(x,vec,...) #!! TODO: note there is the argument lambda for total.multivariance this should be excluded here!
            res.vec = 1:max(vec) # all distance matrices shall be used.
          }
-         resample = function() sample.cdms(list.cdm, replace = FALSE)}, # resampling of the centered distance matrices - this is faster than permutation.orig
+         resample = function() sample.cdms(list.cdm, replace = FALSE)}, # resampling of the doubly centered distance matrices - this is faster than permutation.orig
     bootstrap = {
          warning("Note that bootstrap resampling is (for multivariance) much slower than permutation resampling. Because certain simplifying identities fail to hold. \n")
          res.vec = 1:max(vec) # all distance matrices shall be used.
@@ -1221,7 +1623,7 @@ mu3.unbiased = function(B,b2ob = sum(tcrossprod(B)*B)) {
 }
 
 
-#' given the sample of a single variable the centered distance matrix, mu (the limit moments) and bcd (the terms for the finite sample moments) are computed
+#' given the sample of a single variable the doubly centered distance matrix, mu (the limit moments) and bcd (the terms for the finite sample moments) are computed
 #' The normalization should be postponed to the moment calculation.
 #'
 # NOTE: speedup might be possible by incorporating mu3 and some matrix-norm-identities
@@ -1311,7 +1713,7 @@ cdm.mu.bcd = function(x, normalize = FALSE, psi = NULL, p = NULL, isotropic = FA
   return(list(cdm = cdm, mu = mu, bcd = bcd, mean = m))
 }
 
-#' computes the centered distance matrices, mus and bcds
+#' computes the doubly centered distance matrices, mus and bcds
 #' @param x matrix, each row is a sample
 #' @param vec vector which indicates which columns are treated as one sample
 #' @param membership depreciated. Now use \code{vec}.
@@ -1319,14 +1721,14 @@ cdm.mu.bcd = function(x, normalize = FALSE, psi = NULL, p = NULL, isotropic = FA
 #'
 #' @return  A list containing the following components:
 #' \describe{
-#'   \item{\code{list.cdm}}{list of the centered distance matrices,}
+#'   \item{\code{list.cdm}}{list of the doubly centered distance matrices - these are always normalized if 'cdm.normalize = TRUE'!!!,}
 #'   \item{\code{mu}}{matrix with the limit moments in a column for each variable,}
 #'   \item{\code{bcd}}{matrix with b, c, d (which are required for the computation of the finite sample moments) in columns for each variable,}
 #'   \item{\code{mean}}{vector with the mean of each distance matrix.}
 #' }
 #'
 #' @keywords internal
-cdms.mu.bcd = function(x,vec = 1:ncol(x),membership = NULL,...) {
+cdms.mu.bcd = function(x,vec = 1:ncol(x),membership = NULL,cdm.normalize = TRUE,...) {
   if (!is.null(membership)) {
     vec = membership
     warning("Use 'vec' instead of 'membership' as argument to 'cdms'. 'membership' is depreciated. \n")
@@ -1342,7 +1744,7 @@ cdms.mu.bcd = function(x,vec = 1:ncol(x),membership = NULL,...) {
   for (i in 1:n) {
     res = cdm.mu.bcd(x[,(vec == i)],...)
     #array.cdm[,,i] = res$cdm
-    if(res$mean ==0) {
+    if((res$mean ==0)|(!cdm.normalize)) {
       list.cdm[[i]] = res$cdm
     } else {
       list.cdm[[i]] = res$cdm/res$mean # returns always the normalized matrices!
@@ -1500,7 +1902,7 @@ moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
   return(c(E.no,Var.no,limit.skewness))
 }
 
-#' approximate distribution of Gaussian quadratic form
+#' approximate distribution function of a Gaussian quadratic form
 #'
 #' Approximation of the of the value of the distribution function of a Gaussian quadratic form based on its first three moments.
 #'
@@ -1516,7 +1918,7 @@ moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
 #'
 #' @export
 pearson.qf = function(x,moment,lower.tail = TRUE,verbose = FALSE) {
-  if (any(is.na(moment))) return(NA) # e.g. in the case where 3-multivariance is tested but only two variables are available
+  if (any(is.na(moment[1:3]))) return(NA) # e.g. in the case where 3-multivariance is tested but only two variables are available
 
   if (any(moment[1:2] <= 0)) {
     if (verbose) warning("The mean or variance was negative, using 0 instead.")
@@ -1612,6 +2014,151 @@ pearson.pvalue = function(x,vec = NA, type = "multi",...) {
   }
 }
 
+##### Copula Multivariance ####
+
+#' Transform a vector of samples into a vector of samples of the uniform distribution
+#' such that, if applied to multiple (dependent) sample vectors, the dependence is preserved.
+#'
+#' @examples
+#' # x = rnorm(100)
+#' # plot(emp.transf.vec(x))
+#'
+#' @keywords internal
+emp.transf.vec = function(x,unif.samples = stats::runif(length(x))) {
+  N = length(x)
+  emp.p.x = rank(x,ties.method = "max")/N # value of the empirical distribution function at x
+  emp.d.x = stats::ave(x, x, FUN = length)/N # empirical probability of x
+
+  emp.t = emp.p.x - unif.samples*emp.d.x # here additional uniform samples are introduced to "smooth" jumps in the original distribution function - this is the key concept of the monte carlo distributional transform.
+
+  return(emp.t)
+}
+
+#' Monte Carlo empirical transform
+#'
+#' Transforms a matrix (rows: samples, columns: variables) into a matrix of uniform samples with the same dependence structure via the Monte Carlo empirical transform.
+#'
+#' @param x data matrix (rows: samples, columns: variables)
+# ru = runif(nrow(x)) # this would introduce dependence
+# apply(x,2,function(y) emp.transf.vec(y,ru))
+#'
+#' @references
+#' For the theoretic background see the reference [5] given on the main help page of this package: \link{multivariance-package}.
+#'
+#' @export
+emp.transf = function(x) {
+  apply(x,2,function(y) emp.transf.vec(y))
+}
+
+#' A dependent Monte Carlo emprical transform
+#'
+#' @keywords internal
+emp.transf.dep = function(x) {
+  u = stats::runif(nrow(x))
+  apply(x,2,function(y) emp.transf.vec(y,u))
+}
+
+
+#' copula version of distance multivariance
+#'
+#' Formally it is nothing but distance multivariance applied to the Monte Carlo emprical transform of the data. Hence its values vary for repeated runs.
+#'
+#' @inheritParams multicorrelation
+#'
+#' @references
+#' For the theoretic background see the reference [5] given on the main help page of this package: \link{multivariance-package}.
+#'
+#' @export
+copula.multivariance = function(x,vec = 1:ncol(x), type = "total",...) {
+  if (!is.matrix(x)) stop("The copula multivariance requires x to be a data matrix.")
+
+  switch(type,
+    multi = {fun = function (x,v) multivariance(x,vec = v,...)},
+    total = {fun = function (x,v) total.multivariance(x,vec = v,...)},
+    m.multi.2 = {fun = function (x,v) m.multivariance(x,vec = v,...)},
+    m.multi.3 = {fun = function (x,v) m.multivariance(x,vec = v,m = 3,...)},
+    all = {fun = function (x,v) multivariances.all(x,vec = v,...)},
+    {stop(paste("unkown type:",type))}
+  )
+
+  return(fun(emp.transf(x),vec))
+}
+
+#' coupla versions of distance multicorrelation
+#'
+#' Formally it is nothing but distance multicorrelation applied to the Monte Carlo emprical transform of the data. Hence its values vary for repeated runs.
+#'
+#' @inheritParams multicorrelation
+#'
+#' @references
+#' For the theoretic background see the reference [5] given on the main help page of this package: \link{multivariance-package}.
+#' @export
+copula.multicorrelation = function(x,vec = 1:ncol(x),...)  {
+  if (!is.matrix(x)) stop("The copula multivariance requires x to be a data matrix.")
+  multicorrelation(emp.transf(x),vec = vec,...)
+}
+
+#' independence tests using the copula versions of distance multivariance
+#'
+#' Formally it is nothing but tests for distance multivariance applied to the Monte Carlo emprical transform of the data. Hence its values vary for repeated runs.
+#'
+#' @inheritParams multivariance.test
+#'
+#' @references
+#' For the theoretic background see the reference [5] given on the main help page of this package: \link{multivariance-package}.
+#'
+#' @export
+copula.multicorrelation.test = function(x,vec = 1:ncol(x),...) {
+  if (!is.matrix(x)) stop("The copula multivariance requires x to be a data matrix.")
+
+  if (all(table(vec) == 1)) {
+    multivariance.test(emp.transf(x),vec = vec,p.value.type = "pearson_unif",...)
+  } else {
+    multivariance.test(emp.transf(x),vec = vec,p.value.type = "pearson_approx",...)
+  }
+}
+
+
+#' compute the p-value by Pearson's approximation assuming uniform marginals and euclidean distance
+#' @examples
+#' multivariance:::pearson.pvalue.unif(matrix(runif(300),ncol = 3))
+#'
+#' \dontrun{
+#' library(microbenchmark)
+#' x = matrix(runif(300*3),ncol = 3)
+#' microbenchmark(
+#'   multivariance.test(x,p.value.type = "pearson_approx")$p.value,
+#'   multivariance:::pearson.pvalue.unif(emp.transf(x))
+#'   )
+#' }
+#'
+#' @keywords internal
+pearson.pvalue.unif = function(x,vec = NA,type = "total",psi = NULL, isotropic = TRUE, ...) {
+
+  if (any(is.na(vec))) {
+    vec = 1:ncol(x)
+  }
+
+  if (!(all(table(vec) == 1)))
+    stop("'pearson_unif' makes only sense for one dimensional marginals, use 'pearson_approx' instead.")
+
+  if ((!is.null(psi)) | (!isotropic) | (max(vec)<ncol(x))) {
+    stop("The supplied arguments are not supported when using 'pearson_unif', use 'pearson_approx' instead.")
+    #return(pearson.pvalue(x,vec = vec, type = type, psi = psi, isotropic = isotropic, ...))
+  } else {
+    n = max(vec)
+    list.cdm = cdms(x,vec = vec,normalize = TRUE)
+
+    unif.cmb = list(list.cdm= list.cdm,
+      mu = matrix(rep(c(1/3,2/45,8/945),n),ncol=n),
+      bcd = matrix(rep(c(1/6,7/60,1/9),n),ncol=n),
+      mean =rep(1/3,n))
+
+    return(pearson.pvalue(unif.cmb,type = type))
+  }
+}
+
+
 ##### Dependence structure ####
 
 
@@ -1689,10 +2236,56 @@ pearson.pvalue = function(x,vec = NA, type = "multi",...) {
 #'
 "dep_struct_ring_15_100"
 
+#' Extended Anscombe's Quartett
+#'
+#' The dataset extends 'anscombe' provided in the
+#' standard R-package 'datasets'. All examples feature the same
+#' correlation of 0.82, but different types of dependencies. The main aim was to extend the classical examples, which have
+#' sample size 11, to larger sample sizes. This illustrates that the
+#' implied problems of Pearson's correlation are not small sample
+#' problems! Distance multicorrelation (which coincides in
+#' this case with distance correlation) yields different values
+#' for the datasets.
+#'
+#' Note: Anscombe's quartett features further identical parameters
+#' besides Pearson's correlation. The extended set is only
+#' concerned with correlation.
+#'
+#' @format \code{list} with elements:
+#' \itemize{
+#' \item\code{anscombe.extended$N11}
+#'  matrix with 11 samples for 5 examples the first 4 are the
+#'         classical Anscombe Quartett, the fifth is a monoton relation
+#'         which also features the same correlation.
+#' \item \code{anscombe.extended$N100} same as above but 100 samples
+#' \item \code{anscombe.extended$N1000} same as above but 1000 samples
+#' }
+#'
+#' @references
+#' This example was introduced in the reference [6] given on the main help page of this package: \link{multivariance-package}.
+#'
+#' @examples
+#'
+#' # Code which generates plots of all included data:
+#'
+#' op = par(mfrow = c(3,5),mar = c(0.5,0.5,3,0.5))
+#' for (name in c("N11","N100","N1000")) {
+#'   for (i in 1:5) {
+#'     x = anscombe.extended[[name]][,2*i-1]
+#'     y = anscombe.extended[[name]][,2*i]
+#'   plot(x,y,main = paste0("cor = ",round(cor(x,y),2),
+#'      "\n Mcor = ",round(multicorrelation(cbind(x,y),type = "pairwise",squared = FALSE),2)),
+#'      axes = FALSE,xlab ="",ylab = "")
+#'   # for two variables 'pairwise' coincides with
+#'   # both values of 'total.upper.lower'.
+#'   box()
+#'   }
+#' }
+#' par(op)
+#'
+"anscombe.extended"
 
 # * detection ####
-
-
 
 #' determines the dependence structure
 #'
@@ -1708,7 +2301,7 @@ pearson.pvalue = function(x,vec = NA, type = "multi",...) {
 #' @param p.adjust.method a string indicating the p-value adjustment for multiple testing, see \code{\link{p.adjust.methods}}
 #' @param c.factor numeric, larger than 0, a constant factor used in the case of '\code{type = "consistent"}'
 #' @param stop.too.many numeric, upper limit for the number of tested tuples. A warning is issued if it is used. Use \code{stop.too.many = NULL} for no limit.
-#' @param list.cdm not required, the list of centered distance matrices corresponding to \code{x} speeds up the computation if given
+#' @param list.cdm not required, the list of doubly centered distance matrices corresponding to \code{x} speeds up the computation if given
 #' @param ... these are passed to \code{\link{find.cluster}}
 #'
 #' @details
@@ -1730,7 +2323,7 @@ pearson.pvalue = function(x,vec = NA, type = "multi",...) {
 #' @return returns a list with elements:
 #' \describe{
 #'   \item{\code{multivariances}}{calculated multivariances,}
-#'   \item{\code{cdms}}{calculated centered distance matrices,}
+#'   \item{\code{cdms}}{calculated doubly centered distance matrices,}
 #'   \item{\code{graph}}{graph representing the dependence structure,}
 #'   \item{\code{detected}}{boolean, this is only included if a \code{detection.aim} is given,}
 #'   \item{\code{number.of.dep.tuples}}{vector, with the number of dependent tuples for each tested order. For the full dependence structure a value of -1 indicates that all tuples of this order are already lower order dependent, a value of -2 indicates that there were more than \code{stop.too.many} tuples,}
@@ -1810,7 +2403,7 @@ dependence.structure = function(x, vec = 1:ncol(x), verbose = TRUE, detection.ai
 
   cluster.to.vertex = 1:max(mem) # cluster to vertex relation - gets renewed each iteration (since the names of the clusters change)
 
-  vertex.to.cdm = 1:max(mem) # vertex to A (the centered distance matrices) relation - gets appended each iteration
+  vertex.to.cdm = 1:max(mem) # vertex to A (the doubly centered distance matrices) relation - gets appended each iteration
 
 
   previous.n.o.cdms = rep(0,max(mem)) # number of As in the previous iteration
@@ -1830,6 +2423,8 @@ dependence.structure = function(x, vec = 1:ncol(x), verbose = TRUE, detection.ai
   while (detected) {
     if (!is.null(detection.aim)) {
       #    run = find.cluster(x,vec,list.cdm,mem,cluster.to.vertex,vertex.to.cdm,previous.n.o.cdms,all.multivariances,g,kvec = 2:detection.aim[[k]][1], verbose = verbose, sig.limits = limits, type = type, ...)
+      if (length(detection.aim)<k) stop("Not enough detection aims to complete detection. This is expected if this run was used to output a detection aim.\n")
+
       run = do.call('find.cluster', c(list(
         x = x, vec = vec,list.cdm = list.cdm,
         mem = mem, cluster.to.vertex = cluster.to.vertex,
@@ -1952,11 +2547,11 @@ dependence.structure = function(x, vec = 1:ncol(x), verbose = TRUE, detection.ai
 #' @param x matrix with the samples
 #'
 #' @param vec vector, it indicates which columns are initially treated together as one sample
-#' @param list.cdm list of centered distance matrices
+#' @param list.cdm list of doubly centered distance matrices
 #' @param mem numeric vector, its length is the number of vertices, its content is the number of the corresponding cluster for the current iteration, i.e., vertex \code{i} belongs to cluster \code{mem[i]}
 #' @param cluster.to.vertex vector, contains the cluster to vertex relations, i.e., \code{cluster.to.vertex[i]} is the index of the vertex which represents cluster \code{i}
-#' @param vertex.to.cdm vector, contains the vertex to centered distance matrix relations, i.e., \code{vertex.to.cdm[i]} is the index centered distance matrix in \code{list.cdm} which corresponds to vertex \code{i}
-#' @param previous.n.o.cdms vector, number of centered distance matrices in the previous iteration (it is used to ensure that previously check tuples are not checked again)
+#' @param vertex.to.cdm vector, contains the vertex to doubly centered distance matrix relations, i.e., \code{vertex.to.cdm[i]} is the index of the doubly centered distance matrix in \code{list.cdm} which corresponds to vertex \code{i}
+#' @param previous.n.o.cdms vector, number of the doubly centered distance matrices in the previous iteration (it is used to ensure that previously check tuples are not checked again)
 #' @param all.multivariances vector, which contains all distance multivariances which have been calculated so far. Only used to finally return all distance multivariances which have been calculated.
 #' @param g dependence structure graph
 #' @param alpha numeric, significance level used for the (distribution-free) tests
@@ -1980,7 +2575,7 @@ find.cluster = function(x,
   # has to be numeric, since otherwise 'identical' fails to end the loop (in the case of
   # no detected clusters in the first run)
   cluster.to.vertex = 1:max(mem), # cluster to vertex relation - gets renewed each iteration (since the names of the clusters change)
-  vertex.to.cdm = 1:max(mem), # vertex to A (the centered distance matrices) relation - gets appended each iteration
+  vertex.to.cdm = 1:max(mem), # vertex to A (the doubly centered distance matrices) relation - gets appended each iteration
   previous.n.o.cdms = rep(0,max(mem)), # number of As in the iteration before. it is used to speed up the detection.
   all.multivariances = numeric(0), # vector which will contain all distance multivariances which are calculated
   g = igraph::add.vertices(igraph::graph.empty(,directed=FALSE),max(mem),label = sapply(1:max(mem),function(r) paste(colnames(x,do.NULL = FALSE,prefix = "")[vec == r],collapse = ",")),shape = "circle"), #the graph
@@ -2078,6 +2673,8 @@ find.cluster = function(x,
       # for each tuple, with adjusted p value less than the significance level (or multivariance less than a prescribed fixed.rejection.level, if given) we add a vertex and the edges
 
       new = length(igraph::V(g))+1
+      # next line adds the label to the dependency vertex
+      # g = igraph::add.vertices(g,1,label = pvalue.to.starlabel(adjusted.pvs[i]), shape = "none", level=k)
       g = igraph::add.vertices(g,1,label = signif(multivariances[i],4), shape = "none", level=k)
 
       g = igraph::add_edges(g, as.vector(t(cbind(new,cdm.to.vertex[tuples[i,]]))), weight= NA, color = k, lty = k) # weight = adjusted.pvs[i]
@@ -2197,7 +2794,6 @@ find.cluster = function(x,
 
 
 #' functions to detect the full (without clustering) dependence structure
-#' @keywords internal
 #' @examples
 #' # multivariance:::dependence.structure.full(dep_struct_ring_15_100)
 #' # dependence.structure(dep_struct_ring_15_100,structure.type = "full")
@@ -2409,8 +3005,8 @@ lower.order = function(tuple,m.values) {
   if( k >2) {
     tuples = t(utils::combn(tuple,k-1))
 
-    #matched.rows = match.rows(m.values[[k-1]][,1:(k-1)],tuples)
-    matched.rows = match_rows(m.values[[k-1]][,1:(k-1)],tuples)
+    #matched.rows = match.rows(m.values[[k-1]][,1:(k-1)],tuples) #R-implementation
+    matched.rows = match_rows(m.values[[k-1]][,1:(k-1)],tuples)  #cpp-implementation
 
     return(any(as.logical(m.values[[k-1]][matched.rows,c(k,k+1)]),na.rm = TRUE))
   } else {
@@ -2507,7 +3103,7 @@ circle.coordinates = function(n,r = 0.5,add.angle = 0) {
   }
 }
 
-#' A special igraph layout for the dependence structure visualization
+#' special igraph layout for the dependence structure visualization
 #'
 #' It places the variable nodes on an outer circle and the dependency nodes on an inner circle
 #' @param g graph
@@ -2548,6 +3144,38 @@ dist.to.matrix = function(ds) {
   m+t(m)
 }
 
+#' checks if a matrix is doubly centered
+#'
+#' !works only for the biased estimators
+#'
+#' @param mat matrix
+#'
+#' @examples
+#' multivariance:::is.doubly.centered(as.matrix(dist(rnorm(10))))
+#' multivariance:::is.doubly.centered(multivariance:::double.center(as.matrix(dist(rnorm(10)))))
+#'
+#' @keywords internal
+is.doubly.centered = function(mat) {
+  zero = rep(0,nrow(mat))
+  return(isTRUE(all.equal(rowMeans(mat),zero,check.attributes = FALSE)) &
+         isTRUE(all.equal(colMeans(mat),zero,check.attributes = FALSE)))
+}
+
+
+#' transforms a p-value into the corresponding label
+#'
+#' @param pv p-value
+#'
+#' @keywords internal
+p.value.to.star.label = function(pv) {
+ # inefficient code
+ lab = ifelse(pv  > 0.05  ,"ns"  ,pv)
+ lab = ifelse(pv <= 0.05  ,"*"   ,lab)
+ lab = ifelse(pv <= 0.01  ,"**"  ,lab)
+ lab = ifelse(pv <= 0.001 ,"***" ,lab)
+ lab = ifelse(pv <= 0.0001,"****",lab)
+ return(lab)
+}
 
 
 #' estimate of the computation time
@@ -2558,7 +3186,7 @@ dist.to.matrix = function(ds) {
 #' @param N number of samples. If \code{NULL} and \code{sectime} is given, then \code{N} is computed.
 #' @param n number of variables
 #' @param sectime desired computation time in seconds. If \code{NULL} then the required computation time is computed.
-#' @param coef.cdm computation time parameter for the centered distance matrices
+#' @param coef.cdm computation time parameter for the doubly centered distance matrices
 #' @param coef.prod computation time parameter for matrix products
 #' @param coef.sum computation time parameter for matrix sums
 #'
@@ -2659,6 +3287,11 @@ multivariance.timing = function(N=NULL,n,sectime = NULL,coef.cdm=15.2,coef.prod=
   }
 }
 
+#' sign preserving square root
+#' @keywords internal
+signed.sqrt = function(x) {
+  sign(x)*sqrt(abs(x))
+}
 
 
 

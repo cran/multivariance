@@ -4,7 +4,9 @@
 \name{dep_struct_several_26_100}
 \alias{dep_struct_several_26_100}
 \title{example dataset for \code{\link{dependence.structure}}}
-\format{\code{matrix} 26 variables (columns), 100 independent samples (rows)}
+\format{
+\code{matrix} 26 variables (columns), 100 independent samples (rows)
+}
 \usage{
 dep_struct_several_26_100
 }

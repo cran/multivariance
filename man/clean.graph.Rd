@@ -4,8 +4,12 @@
 \alias{clean.graph}
 \title{cleanup dependence structure graph}
 \usage{
-clean.graph(g, only.level = NULL, simplify.pairs = TRUE,
-  drop.label.pairs = FALSE)
+clean.graph(
+  g,
+  only.level = NULL,
+  simplify.pairs = TRUE,
+  drop.label.pairs = FALSE
+)
 }
 \arguments{
 \item{g}{graph, created by \code{\link{dependence.structure}}}

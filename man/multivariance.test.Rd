@@ -4,8 +4,14 @@
 \alias{multivariance.test}
 \title{independence tests based on (total-/2-/3-) multivariance}
 \usage{
-multivariance.test(x, vec = 1:ncol(x), type = "total",
-  p.value.type = "distribution_free", verbose = TRUE, ...)
+multivariance.test(
+  x,
+  vec = 1:ncol(x),
+  type = "total",
+  p.value.type = "pearson_approx",
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{matrix, each row is a sample}
@@ -47,7 +53,7 @@ All tests are performed using the standard euclidean distance. Other distances c
 }
 \examples{
 # an independence test
-multivariance.test(dep_struct_several_26_100) # conservative
+multivariance.test(dep_struct_several_26_100,p.value.type = "distribution_free") # conservative
 multivariance.test(dep_struct_several_26_100,p.value.type = "resample") #sharp but slow
 multivariance.test(dep_struct_several_26_100,p.value.type = "pearson_approx") #
 
@@ -60,13 +66,13 @@ for (ty in c("total","m.multi.2","m.multi.3","multi"))
 # using the vec argument:
 x = matrix(rnorm(50*6),ncol = 10) # a 50x6 data matrix
 vec = c(1,2,3,4,5,6) # each column is treated as one variable
-multivariance.test(x,vec) # is the same as the default
+multivariance.test(x,vec,p.value.type = "distribution_free") # is the same as the default
 
 vec = c(1,2,2,1,3,1)
 # column 1,4,6 are treated as one variable
 # column 2,3 are treated as one variable
 # column 5 is treated as one variable
-multivariance.test(x,vec)
+multivariance.test(x,vec,p.value.type = "distribution_free")
 
 }
 \references{

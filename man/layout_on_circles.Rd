@@ -2,7 +2,7 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{layout_on_circles}
 \alias{layout_on_circles}
-\title{A special igraph layout for the dependence structure visualization}
+\title{special igraph layout for the dependence structure visualization}
 \usage{
 layout_on_circles(g, n = sum(is.na(igraph::V(g)$level)))
 }

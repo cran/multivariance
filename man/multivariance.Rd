@@ -4,11 +4,17 @@
 \alias{multivariance}
 \title{distance multivariance}
 \usage{
-multivariance(x, vec = NA, Nscale = TRUE, correlation = FALSE,
-  squared = TRUE, ...)
+multivariance(
+  x,
+  vec = NA,
+  Nscale = TRUE,
+  correlation = FALSE,
+  squared = TRUE,
+  ...
+)
 }
 \arguments{
-\item{x}{either a data matrix or a list of centered distance matrices}
+\item{x}{either a data matrix or a list of doubly centered distance matrices}
 
 \item{vec}{if x is a matrix, then this indicates which columns are treated together as one sample; if x is a list, these are the indexes for which the multivariance is calculated. The default is all columns and all indexes, respectively.}
 
@@ -21,10 +27,10 @@ multivariance(x, vec = NA, Nscale = TRUE, correlation = FALSE,
 \item{...}{these are passed to \code{\link{cdms}} (which is only invoked if \code{x} is a matrix)}
 }
 \description{
-Computes the distance multivariance, either for given data or a given list of centered distance matrices.
+Computes the distance multivariance, either for given data or a given list of doubly centered distance matrices.
 }
 \details{
-If \code{x} is an matrix and \code{vec} is not given, then each column is treated as a separate sample. Otherwise \code{vec} has to have as many elements as \code{x} has columns and values starting from 1 up to the number of 'variables', e.g. if \code{x} is an \code{N} by 5 matrix and \code{vec = c(1,2,1,3,1)} then the multivariance of the 1-dimensional variables represented by column 2 and 4 and the 3-dimensional variable represented by the columns 1,3,5 is computed.
+If \code{x} is a matrix and \code{vec} is not given, then each column is treated as a separate sample. Otherwise \code{vec} has to have as many elements as \code{x} has columns and values starting from 1 up to the number of 'variables', e.g. if \code{x} is an \code{N} by 5 matrix and \code{vec = c(1,2,1,3,1)} then the multivariance of the 1-dimensional variables represented by column 2 and 4 and the 3-dimensional variable represented by the columns 1,3,5 is computed.
 
 As default it computes the normalized Nscaled squared multivariance, for a multivariance without normalization the argument \code{normalize = FALSE} has to be passed to \code{cdms}.
 

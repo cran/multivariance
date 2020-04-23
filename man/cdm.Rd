@@ -2,10 +2,16 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{cdm}
 \alias{cdm}
-\title{centered distance matrix}
+\title{computes a doubly centered distance matrix}
 \usage{
-cdm(x, normalize = TRUE, psi = NULL, p = NULL, isotropic = FALSE,
-  external.dm.fun = NULL)
+cdm(
+  x,
+  normalize = TRUE,
+  psi = NULL,
+  p = NULL,
+  isotropic = FALSE,
+  external.dm.fun = NULL
+)
 }
 \arguments{
 \item{x}{matrix, each row of the matrix is treated as one sample}
@@ -21,10 +27,10 @@ cdm(x, normalize = TRUE, psi = NULL, p = NULL, isotropic = FALSE,
 \item{external.dm.fun}{here one can supply an external function, which computes the distance matrix given \code{x}.}
 }
 \description{
-computes the centered distance matrix
+computes the doubly centered distance matrix
 }
 \details{
-The centered distance matrices are required for the computation of (total / m-) multivariance.
+The doubly centered distance matrices are required for the computation of (total / m-) multivariance.
 
 If \code{normalize = TRUE} then the value of multivariance is comparable and meaningful. It can be compared to the \code{\link{rejection.level}} or its p-value \code{\link{multivariance.pvalue}} can be computed.
 

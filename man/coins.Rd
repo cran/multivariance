@@ -4,18 +4,26 @@
 \alias{coins}
 \title{dependence example: k-independent coin sampling}
 \usage{
-coins(N = 1000, k = 2)
+coins(N = 1000, k = 2, type = "even")
 }
 \arguments{
 \item{N}{number of samples}
 
 \item{k}{each k-tuple will be independent}
+
+\item{type}{one of \code{"even"} or \code{"odd"}}
 }
 \value{
 It returns the samples as rows of an \code{N} by \code{k+1} matrix. The columns are dependent but k-independent.
 }
 \description{
 This function creates samples which are dependent but k-independent.
+}
+\details{
+Throw \code{k} independent fair coins. Now consider
+the k+1 events: The first shows head, the second shows head,... the \code{k}-th shows head,
+there is an \code{even} (or \code{odd} as selected via \code{type}) number of heads. Each row
+contains the state of these k+1 events.
 }
 \examples{
 coins(200,4)

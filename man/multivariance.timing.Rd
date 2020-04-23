@@ -4,8 +4,15 @@
 \alias{multivariance.timing}
 \title{estimate of the computation time}
 \usage{
-multivariance.timing(N = NULL, n, sectime = NULL, coef.cdm = 15.2,
-  coef.prod = 2.1, coef.sum = 1.05, determine.parameters = FALSE)
+multivariance.timing(
+  N = NULL,
+  n,
+  sectime = NULL,
+  coef.cdm = 15.2,
+  coef.prod = 2.1,
+  coef.sum = 1.05,
+  determine.parameters = FALSE
+)
 }
 \arguments{
 \item{N}{number of samples. If \code{NULL} and \code{sectime} is given, then \code{N} is computed.}
@@ -14,7 +21,7 @@ multivariance.timing(N = NULL, n, sectime = NULL, coef.cdm = 15.2,
 
 \item{sectime}{desired computation time in seconds. If \code{NULL} then the required computation time is computed.}
 
-\item{coef.cdm}{computation time parameter for the centered distance matrices}
+\item{coef.cdm}{computation time parameter for the doubly centered distance matrices}
 
 \item{coef.prod}{computation time parameter for matrix products}
 
