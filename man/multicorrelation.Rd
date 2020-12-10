@@ -2,9 +2,20 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{multicorrelation}
 \alias{multicorrelation}
+\alias{Mcor}
 \title{distance multicorrelation}
 \usage{
 multicorrelation(
+  x,
+  vec = 1:ncol(x),
+  type = "total.upper.lower",
+  multicorrelation.type = "normalized",
+  estimator.type = "bias.corrected",
+  squared = TRUE,
+  ...
+)
+
+Mcor(
   x,
   vec = 1:ncol(x),
   type = "total.upper.lower",

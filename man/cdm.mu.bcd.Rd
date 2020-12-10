@@ -2,8 +2,7 @@
 % Please edit documentation in R/multivariance-functions.R
 \name{cdm.mu.bcd}
 \alias{cdm.mu.bcd}
-\title{given the sample of a single variable the doubly centered distance matrix, mu (the limit moments) and bcd (the terms for the finite sample moments) are computed
-The normalization should be postponed to the moment calculation.}
+\title{given the sample of a single variable the doubly centered distance matrix, mu (the limit moments) and bcd (the terms for the finite sample moments) are computed}
 \usage{
 cdm.mu.bcd(
   x,
@@ -16,7 +15,6 @@ cdm.mu.bcd(
 )
 }
 \description{
-given the sample of a single variable the doubly centered distance matrix, mu (the limit moments) and bcd (the terms for the finite sample moments) are computed
 The normalization should be postponed to the moment calculation.
 }
 \keyword{internal}

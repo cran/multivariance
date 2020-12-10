@@ -18,4 +18,7 @@ moments.for.pearson(N, bcd, mu, mmean, type = "multi")
 \description{
 computes the moments as required for Pearson's approximation
 }
+\details{
+Note: It is currently only implemented for the case of normalized multivariance, i.e., the OUTPUT values correspond to normalized multivariance!
+}
 \keyword{internal}

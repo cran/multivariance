@@ -80,7 +80,7 @@ For planing of large projects or studies it might be convenient to estimate the 
 
 [4] G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint. \url{https://arxiv.org/abs/1808.07280}
 
-[5] B. Böttcher, Copula versions of distance multivariance and dHSIC via the distributional transform -- a general approach to construct invariant dependence measures, Statistics, (2020) 1-18. \url{https://doi.org/10.1080/02331888.2020.1748029}
+[5] B. Böttcher, Copula versions of distance multivariance and dHSIC via the distributional transform -- a general approach to construct invariant dependence measures. Statistics, (2020) 1-18. \url{https://doi.org/10.1080/02331888.2020.1748029}
 
-[6] B. Böttcher, Notes on the interpretation of dependence measures -- Pearson's correlation, distance correlation, distance multicorrelations and their copula versions, Preprint. \url{https://arxiv.org/abs/2004.07649}
+[6] B. Böttcher, Notes on the interpretation of dependence measures -- Pearson's correlation, distance correlation, distance multicorrelations and their copula versions. Preprint. \url{https://arxiv.org/abs/2004.07649}
 }

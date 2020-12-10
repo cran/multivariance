@@ -73,9 +73,9 @@
 #'
 #' [4] G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint. \url{https://arxiv.org/abs/1808.07280}
 #'
-#' [5] B. Böttcher, Copula versions of distance multivariance and dHSIC via the distributional transform -- a general approach to construct invariant dependence measures, Statistics, (2020) 1-18. \url{https://doi.org/10.1080/02331888.2020.1748029}
+#' [5] B. Böttcher, Copula versions of distance multivariance and dHSIC via the distributional transform -- a general approach to construct invariant dependence measures. Statistics, (2020) 1-18. \url{https://doi.org/10.1080/02331888.2020.1748029}
 #'
-#' [6] B. Böttcher, Notes on the interpretation of dependence measures -- Pearson's correlation, distance correlation, distance multicorrelations and their copula versions, Preprint. \url{https://arxiv.org/abs/2004.07649}
+#' [6] B. Böttcher, Notes on the interpretation of dependence measures -- Pearson's correlation, distance correlation, distance multicorrelations and their copula versions. Preprint. \url{https://arxiv.org/abs/2004.07649}
 #'
 #' @docType package
 #' @name multivariance-package
@@ -92,8 +92,6 @@ For usage hints and details on the theoretic backgound see
 help(\"multivariance-package\")
 and the references given therein, starting with:
 https://doi.org/10.1515/stat-2020-0001
-
-Note: For independence testing use 'multivariance.test(...)'. In version 2.3.0 (April 2020) the default p-value estimation procedure was changed to the fast and approximately sharp Pearson's approximation 'pearson_approx'.
 
 			To suppress this message use:
 			suppressPackageStartupMessages(library(multivariance))"))
@@ -191,13 +189,14 @@ multivariance.pvalue = function(x) {
 #'
 #' @export
 cdm = function(x, normalize = TRUE, psi = NULL, p = NULL, isotropic = FALSE, external.dm.fun = NULL) {
+  if (!is.matrix(x)) x = as.matrix(x)
   if (is.null(psi) & is.null(p) & is.null(external.dm.fun)) {
     #dm = dist.to.matrix(stats::dist(x,method="euclidean"))
     #DEVELOPING NOTE: here as.matrix was slow, dist.to.matrix is faster. Instead one could just use the vector....
     # even faster for the euclidean case is fastdist defined via Rcpp
     #dm = fastdist(as.matrix(x))
 
-    return(fastEuclideanCdm(as.matrix(x),normalize))
+    return(fastEuclideanCdm(x,normalize))
 
   } else {
     if (!is.null(p)) {
@@ -264,7 +263,7 @@ cdms = function(x,vec = 1:ncol(x),membership = NULL,...) {
   # for (i in 1:n) array.cdm[,,i] = cdm(x[,(vec == i)],...)
   # return(array.cdm)
 
-  return(lapply(1:n, function(i) cdm(x[,(vec == i)],...)))
+  return(lapply(1:n, function(i) cdm(x[,(vec == i),drop = FALSE],...)))
 }
 
 #' double centering of a matrix
@@ -861,6 +860,10 @@ multicorrelation = function(x, vec = 1:ncol(x), type = "total.upper.lower", mult
   )
 }
 
+#' @rdname multicorrelation
+#' @export
+Mcor <- multicorrelation
+
 
 #' test for independence
 #'
@@ -930,7 +933,7 @@ independence.test = function(x,vec = 1:ncol(x),alpha = 0.05,type = "distribution
 #'
 #' @inheritParams cdms
 #' @param type one of \code{"independence"}, \code{"pairwise independence"}, \code{"multi"}, \code{"total"}, \code{"m.multi.2"}, \code{"m.multi.3"}
-#' @param p.value.type one of \code{"pearson_approx"}, \code{"distribution_free"}, \code{"resample"}
+#' @param p.value.type one of \code{"pearson_approx"}, \code{"distribution_free"}, \code{"resample"}, \code{"pearson_unif"}
 #' @param verbose logical, if TRUE meaningful text output is generated.
 #'
 #' @return  A list with class "\code{htest}" containing the following components:
@@ -949,7 +952,7 @@ independence.test = function(x,vec = 1:ncol(x),alpha = 0.05,type = "distribution
 #'
 #' The type \code{"m.multi.3"}, performs a test for 3-independence, assuming pairwise independence. The type  \code{"multi"} performs a test for n-independence, assuming (n-1)-independence.
 #'
-#' There are several ways (determined by \code{p.value.type}) to estimate the p-value: The \code{"pearson_approx"} and \code{"resample"} are approximately sharp. The latter is based on a resampling approach and thus much slower. The \code{"distribution_free"} test might be very conservative, its p-value estimates are only valid for p-values lower than 0.215 - values above should be interpreted as "values larger than 0.215".
+#' There are several ways (determined by \code{p.value.type}) to estimate the p-value: The \code{"pearson_approx"} and \code{"resample"} are approximately sharp. The latter is based on a resampling approach and thus much slower. The \code{"distribution_free"} test might be very conservative, its p-value estimates are only valid for p-values lower than 0.215 - values above should be interpreted as "values larger than 0.215". Finally, \code{"pearson_unif"} uses fixed parameters in Pearson's estimate, it is only applicable for univariate uniformly distributed marginals
 #'
 #' All tests are performed using the standard euclidean distance. Other distances can be supplied via the \code{...}, see \code{\link{cdm}} for the accepted arguments.
 #'
@@ -1003,22 +1006,22 @@ multivariance.test = function(x,vec = 1:ncol(x),type = "total",p.value.type = "p
   switch(type,
     multi = {
       method = "multivariance: test of n-independence (assuming (n-1)-independence)"
-      fun = function() multivariance(x,vec = vec,...)
+      fun = function(dat = x) multivariance(dat,vec = vec,...)
       statistic = c(multivariance = NA)
     },
     total = {
       method = "total multivariance: test of independence"
-      fun = function() total.multivariance(x,vec = vec,...)
+      fun = function(dat = x) total.multivariance(dat,vec = vec,...)
       statistic = c(total.multivariance = NA)
     },
     m.multi.2 = {
       method = "2-multivariance: test of pairwise independence"
-      fun = function() m.multivariance(x,vec = vec,...)
+      fun = function(dat = x) m.multivariance(dat,vec = vec,...)
       statistic = c(m.multivariance = NA)
     },
     m.multi.3 = {
       method = "3-multivariance: test of 3-independence (assuming pairwise independence)"
-      fun = function() m.multivariance(x,vec = vec,m = 3,...)
+      fun = function(dat = x) m.multivariance(dat,vec = vec,m = 3,...)
       statistic = c(m.multivariance = NA)
     },
     {stop(paste("unkown type:",type))}
@@ -1049,10 +1052,16 @@ multivariance.test = function(x,vec = 1:ncol(x),type = "total",p.value.type = "p
     },
     pearson_approx = {
       method = paste0(method, "; p-value via Pearson's approximation (approx. sharp)")
-      statistic[1] = fun()
+      # statistic[1] = fun()
       if (is.matrix(x)) {
-      p.value = pearson.pvalue(x=x,vec=vec,type=type,...)
+        dots <- list(...) # we filter the argument lambda which might be used for total.multivariance, we keep everything else to preserve other error messages.
+        x.cdms.mu.bcd = do.call('cdms.mu.bcd', c(list(x = x, vec = vec), dots[!(names(dots) %in% "lambda")]))
+        # = cdms.mu.bcd(x,vec,...) # problem by extra argments in ... e.g. "lambda"
+      p.value = pearson.pvalue(x=x.cdms.mu.bcd,vec=vec,type=type,...)
+      statistic[1] = fun(x.cdms.mu.bcd$list.cdm)
+
       } else {
+        statistic[1] = fun()
         p.value = pearson.pvalue(x=x.cdms.mu.bcd,vec=vec,type=type,...)
       }
     },
@@ -1090,12 +1099,13 @@ multivariance.test = function(x,vec = 1:ncol(x),type = "total",p.value.type = "p
 #'
 #' @keywords internal
 dm = function(x, psi = NULL, p = NULL, isotropic = FALSE, external.dm.fun = NULL) {
+  if (!is.matrix(x)) x = as.matrix(x)
   if (is.null(psi) & is.null(p) & is.null(external.dm.fun)) {
     #dm = dist.to.matrix(stats::dist(x,method="euclidean"))
     #DEVELOPING NOTE: here as.matrix was slow, dist.to.matrix is faster. Instead one could just use the vector....
     # even faster for the euclidean case is fastdist defined via Rcpp
 
-    return(fastdist(as.matrix(x)))
+    return(fastdist(x))
 
   } else {
     if (!is.null(p)) {
@@ -1103,13 +1113,12 @@ dm = function(x, psi = NULL, p = NULL, isotropic = FALSE, external.dm.fun = NULL
       dm = dist.to.matrix(stats::dist(x,method="minkowski", p = p))
     } else { # case: psi is given
       if (!is.null(external.dm.fun)) {
-        dm = external.dm.fun(as.matrix(x))
+        dm = external.dm.fun(x)
       } else {
         if (isotropic) {
           #dm = psi(dist.to.matrix(stats::dist(x,method="euclidean")))
-          dm = psi(fastdist(as.matrix(x)))
+          dm = psi(fastdist(x))
         } else {
-          x = as.matrix(x)
           n = nrow(x)
           d = ncol(x)
           dm = matrix(apply(cbind(x[rep(1:n,n),],x[rep(1:n,each = n),]), #create all combinations
@@ -1624,6 +1633,7 @@ mu3.unbiased = function(B,b2ob = sum(tcrossprod(B)*B)) {
 
 
 #' given the sample of a single variable the doubly centered distance matrix, mu (the limit moments) and bcd (the terms for the finite sample moments) are computed
+#'
 #' The normalization should be postponed to the moment calculation.
 #'
 # NOTE: speedup might be possible by incorporating mu3 and some matrix-norm-identities
@@ -1632,11 +1642,13 @@ cdm.mu.bcd = function(x, normalize = FALSE, psi = NULL, p = NULL, isotropic = FA
   if (normalize) stop("normalized not implemented")
 
   ##### lines copied from cmd
+  if (!is.matrix(x)) x = as.matrix(x)
   if (is.null(psi) & is.null(p) & is.null(external.dm.fun)) {
     #dm = dist.to.matrix(stats::dist(x,method="euclidean"))
     #DEVELOPING NOTE: here as.matrix was slow, dist.to.matrix is faster. Instead one could just use the vector....
     # even faster for the euclidean case is fastdist defined via Rcpp
-    dm = fastdist(as.matrix(x))
+
+    dm = fastdist(x)
   } else {
     if (!is.null(p)) {
       if ((p<1) || (p>2)) warning("p is not in [1,2]. \n")
@@ -1675,6 +1687,8 @@ cdm.mu.bcd = function(x, normalize = FALSE, psi = NULL, p = NULL, isotropic = FA
 
   ###### for mu (biased)
   B = dm
+  #if (normalize) B = B/mean(B) # normalize
+
   B2 = tcrossprod(B) #mymm(B,B) # B%*%B note that the matrices are symmetric; this seems to be a faster implementation.
   #B3 = tcrossprod(B,B2) #mymm(B,B2) #B2%*%B
 
@@ -1683,31 +1697,36 @@ cdm.mu.bcd = function(x, normalize = FALSE, psi = NULL, p = NULL, isotropic = FA
   cb = colSums(B)
   mB = 1/N^2 * sum(cb) #mean(B)
   mB2 = 1/N^2 * sum(cb^2) #mean(B2)
-  mB3 = 1/N^2 * cb%*%B%*%cb #mean(B3)
-
   mBsq = mean(B^2)
 
   mB2oB = mean(B2*B)
-
-  m2 = mBsq-2/N*mB2+mB^2
-  m3 = -1/N*mB2oB + 3/N^2*mB3-3/N*mB2*mB + mB^2*mB
-
-  mu = c(mB,m2,m3)
 
   ###### for bcd (and mu unbiased)
   if (unbiased.moments) {
     #    bcd = c(N^2/(N*(N-1))*mBsq,N^2/(N*(N-1)*(N-2)) * (mB2-mBsq),N^2/(N*(N-1)*(N-2)*(N-3))*(N^2*mB^2+2*mBsq-4*mB2)) #b,c,d
     bcd = c(N/((N-1))*mBsq, N/((N-1)*(N-2)) * (mB2-mBsq), N/((N-1)*(N-2)*(N-3))*(N^2*mB^2+2*mBsq-4*mB2)) #b,c,d
 
-    # unbiased mB, m2
-    mB = N/(N-1)*mB #!! since we are in the case without normalization
+  #  if (normalize) {
+  #
+  #  } else {
+      mB = N/(N-1)*mB #!! since we are in the case without normalization
+   # }
     m2 = sum(bcd * c(1,-2,1))
     m3 = mu3.unbiased(B,b2ob = mB2oB*N^2)
 
-    mu = c(mB,m2,m3)
+    mu = c(mB,m2,m3) # unbiased estimators for limit moments
 
   } else {
-    bcd = c(mBsq,1/N*mB2,mB^2) #b,c,d
+
+    bcd = c(mBsq,1/N*mB2,mB^2) # biased estimators for b,c,d
+
+    mB3 = 1/N^2 * cb%*%B%*%cb #mean(B3)
+
+    m2 = mBsq-2/N*mB2+mB^2
+    m3 = -1/N*mB2oB + 3/N^2*mB3-3/N*mB2*mB + mB^2*mB
+
+    mu = c(mB,m2,m3) # biased estimators for the limit moments
+
   }
 
   return(list(cdm = cdm, mu = mu, bcd = bcd, mean = m))
@@ -1742,7 +1761,7 @@ cdms.mu.bcd = function(x,vec = 1:ncol(x),membership = NULL,cdm.normalize = TRUE,
   bcd = matrix(ncol = n,nrow = 3)
   m = numeric(n)
   for (i in 1:n) {
-    res = cdm.mu.bcd(x[,(vec == i)],...)
+    res = cdm.mu.bcd(x[,(vec == i),drop = FALSE],...)
     #array.cdm[,,i] = res$cdm
     if((res$mean ==0)|(!cdm.normalize)) {
       list.cdm[[i]] = res$cdm
@@ -1824,9 +1843,12 @@ sums.of.products = function(a,b,c, type = "multi") {
 #' @param bcd an array with b c d
 #' @param mu the limit moments
 #' @param mmean the means of the distance matrices
+#' @details
+#' Note: It is currently only implemented for the case of normalized multivariance, i.e., the OUTPUT values correspond to normalized multivariance!
+# COMMENT  But also note that the skewness is (appart from the scaling with respect to the number of summands) invariant with respect to normalization.
 #'
 #' @keywords internal
-moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
+moments.for.pearson = function(N, bcd, mu, mmean, type = "multi") {
 
   switch(type,
          multi = {fun = function (x) prod(x)},
@@ -1853,10 +1875,11 @@ moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
 
   switch(type,
          multi = {scalevec = 1},
-         total = {scalevec = (2^n-n-1)^2},
-         m.multi.2 = {scalevec = (choose(n,2))^2},
-         m.multi.3 = {scalevec = (choose(n,3))^2},
+         total = {scalevec = (2^n-n-1)},
+         m.multi.2 = {scalevec = (choose(n,2))},
+         m.multi.3 = {scalevec = (choose(n,3))},
   )
+  scalevec2 = scalevec^2
 
   res = N.coefficients(N)
 
@@ -1881,21 +1904,23 @@ moments.for.pearson = function(N,bcd, mu, mmean, type = "multi") {
 
   one[mmean == 0] = 0 # fixing 0/0
 
-  E.no = (fun(one) + (N-1)*fun((-1/(N-1))*one))/sqrt(scalevec) # finite sample expectation
+  E.no = (fun(one) + (N-1)*fun((-1/(N-1))*one))/scalevec # theoretic finite sample expectation for normalized multivariances - otherwise 'one' has to be replaced by 'muvec'
 
+  # E2.no is the second moment (unbiased estimated)
   s.no = numeric(7)
   for (i in 1:3) s.no[i] = res$freq.o.c[i]/N^2*sums.of.products((-1/(N-1))*one,(-1/(N-1))*one,bcdsums.normalized[i,],type = type)
   for (i in c(4,7)) s.no[i] = res$freq.o.c[i]/N^2*sums.of.products(one,one,bcdsums.normalized[i,],type = type)
   for (i in c(5,6)) s.no[i] = res$freq.o.c[i]/N^2*sums.of.products(one,(-1/(N-1))*one,bcdsums.normalized[i,],type = type)
-  E2.no = sum(s.no/scalevec)
+  E2.no = sum(s.no/scalevec2)
 
-  Esq.no.biased = (E.no)^2 # is this the same as the following?.... guess not.
+  Esq.no = (E.no)^2 # this is the same as the following (modulo numeric tolerance), since for normalized multivariance the expectation does not depend on the estimated marginals...
 
-  r.no = numeric(7)
-  for (i in 1:3) r.no[i]  = res$freq.o.c[i]/N^2*sums.of.products((-1/(N-1))*one,(-1/(N-1))*one,(-1/(N-1))^2*one,type = type)
-  for (i in c(4,7)) r.no[i] = res$freq.o.c[i]/N^2*sums.of.products(one,one,one,type = type)
-  for (i in c(5,6)) r.no[i] = res$freq.o.c[i]/N^2*sums.of.products(one,(-1/(N-1))*one,(-1/(N-1))*one,type = type)
-  Esq.no = sum(r.no/scalevec)
+  # Esq.no is an unbiased estimate for the first moment squared.
+#  r.no = numeric(7)
+#  for (i in 1:3) r.no[i]  = res$freq.o.c[i]/N^2*sums.of.products((-1/(N-1))*one,(-1/(N-1))*one,(-1/(N-1))^2*one,type = type)
+#  for (i in c(4,7)) r.no[i] = res$freq.o.c[i]/N^2*sums.of.products(one,one,one,type = type)
+#  for (i in c(5,6)) r.no[i] = res$freq.o.c[i]/N^2*sums.of.products(one,(-1/(N-1))*one,(-1/(N-1))*one,type = type)
+#  Esq.no = sum(r.no/scalevec2)
 
   Var.no = E2.no-Esq.no # finite sample variance
 
@@ -2089,14 +2114,26 @@ copula.multivariance = function(x,vec = 1:ncol(x), type = "total",...) {
 #' Formally it is nothing but distance multicorrelation applied to the Monte Carlo emprical transform of the data. Hence its values vary for repeated runs.
 #'
 #' @inheritParams multicorrelation
+#' @param ... are passed to \code{\link{multicorrelation}}
 #'
 #' @references
 #' For the theoretic background see the reference [5] given on the main help page of this package: \link{multivariance-package}.
+#'
+#' @seealso
+#' \code{\link{multicorrelation}}
+#'
+#' @aliases CMcor
 #' @export
 copula.multicorrelation = function(x,vec = 1:ncol(x),...)  {
   if (!is.matrix(x)) stop("The copula multivariance requires x to be a data matrix.")
   multicorrelation(emp.transf(x),vec = vec,...)
 }
+
+
+#' @rdname copula.multicorrelation
+#' @export
+CMcor <- copula.multicorrelation
+
 
 #' independence tests using the copula versions of distance multivariance
 #'
@@ -2165,6 +2202,7 @@ pearson.pvalue.unif = function(x,vec = NA,type = "total",psi = NULL, isotropic =
 
 # * Data ####
 
+# ** dep_struct_several ####
 #' example dataset for \code{\link{dependence.structure}}
 #'
 #' It was generated by \preformatted{
@@ -2181,6 +2219,7 @@ pearson.pvalue.unif = function(x,vec = NA,type = "total",psi = NULL, isotropic =
 #'
 "dep_struct_several_26_100"
 
+# ** dep_struct_star ####
 #' example dataset for \code{\link{dependence.structure}}
 #'
 #' It was generated by \preformatted{
@@ -2197,6 +2236,7 @@ pearson.pvalue.unif = function(x,vec = NA,type = "total",psi = NULL, isotropic =
 #'
 "dep_struct_star_9_100"
 
+# ** dep_struct_iterated ####
 #' example dataset for \code{\link{dependence.structure}}
 #'
 #' It was generated by \preformatted{
@@ -2214,6 +2254,7 @@ pearson.pvalue.unif = function(x,vec = NA,type = "total",psi = NULL, isotropic =
 #'
 "dep_struct_iterated_13_100"
 
+# ** dep_struct_ring ####
 #' example dataset for \code{\link{dependence.structure}}
 #'
 #' It was generated by \preformatted{
@@ -2236,6 +2277,7 @@ pearson.pvalue.unif = function(x,vec = NA,type = "total",psi = NULL, isotropic =
 #'
 "dep_struct_ring_15_100"
 
+# ** Anscombe ####
 #' Extended Anscombe's Quartett
 #'
 #' The dataset extends 'anscombe' provided in the
@@ -2266,20 +2308,20 @@ pearson.pvalue.unif = function(x,vec = NA,type = "total",psi = NULL, isotropic =
 #'
 #' @examples
 #'
-#' # Code which generates plots of all included data:
-#'
+#'# Code which generates plots of all included data:
 #' op = par(mfrow = c(3,5),mar = c(0.5,0.5,3,0.5))
-#' for (name in c("N11","N100","N1000")) {
-#'   for (i in 1:5) {
-#'     x = anscombe.extended[[name]][,2*i-1]
-#'     y = anscombe.extended[[name]][,2*i]
-#'   plot(x,y,main = paste0("cor = ",round(cor(x,y),2),
-#'      "\n Mcor = ",round(multicorrelation(cbind(x,y),type = "pairwise",squared = FALSE),2)),
-#'      axes = FALSE,xlab ="",ylab = "")
-#'   # for two variables 'pairwise' coincides with
-#'   # both values of 'total.upper.lower'.
-#'   box()
-#'   }
+#'for (name in c("N11","N100","N1000")) {
+#'  for (i in 1:5) {
+#'    x = anscombe.extended[[name]][,2*i-1]
+#'    y = anscombe.extended[[name]][,2*i]
+#'    plot(x,y,main = paste0("cor = ",round(cor(x,y),2),
+#' "\n Mcor = ",round(multicorrelation(cbind(x,y),type = "pairwise",squared = FALSE),2),
+#' "\n CMcor = ",round(copula.multicorrelation(cbind(x,y),type = "pairwise",squared = FALSE),2)),
+#'         axes = FALSE,xlab ="",ylab = "", cex.main=1)
+#'    # for two variables 'pairwise' coincides with
+#'    # both values of 'total.upper.lower'.
+#'    box()
+#'  }
 #' }
 #' par(op)
 #'
@@ -2305,7 +2347,7 @@ pearson.pvalue.unif = function(x,vec = NA,type = "total",psi = NULL, isotropic =
 #' @param ... these are passed to \code{\link{find.cluster}}
 #'
 #' @details
-#' Performs the detection of the dependence structure as described in [3] (the options '\code{structure.type = "full"}' and '\code{type = "consistent"}' are part of a revised version of the paper). In the \code{clustered} structure variables are clustered and treated as one variable as soon as a dependence is detected, the \code{full} structure treats always each variable separately. The detection is either based on tests with significance level \code{alpha} or a \code{consistent} estimator is used. The latter yields (in the limit for increasing sample size) under very mild conditions always the correct dependence structure (but the convergence might be very slow).
+#' Performs the detection of the dependence structure as described in [3]. In the \code{clustered} structure variables are clustered and treated as one variable as soon as a dependence is detected, the \code{full} structure treats always each variable separately. The detection is either based on tests with significance level \code{alpha} or a \code{consistent} estimator is used. The latter yields (in the limit for increasing sample size) under very mild conditions always the correct dependence structure (but the convergence might be very slow).
 #'
 #' If \code{fixed.rejection.level} is not provided, the significance level \code{alpha} is used to determine which multivariances are significant using the distribution-free rejection level. As default the Holm method is used for p-value correction corresponding to multiple testing.
 #'
@@ -2423,7 +2465,10 @@ dependence.structure = function(x, vec = 1:ncol(x), verbose = TRUE, detection.ai
   while (detected) {
     if (!is.null(detection.aim)) {
       #    run = find.cluster(x,vec,list.cdm,mem,cluster.to.vertex,vertex.to.cdm,previous.n.o.cdms,all.multivariances,g,kvec = 2:detection.aim[[k]][1], verbose = verbose, sig.limits = limits, type = type, ...)
-      if (length(detection.aim)<k) stop("Not enough detection aims to complete detection. This is expected if this run was used to output a detection aim.\n")
+      if (length(detection.aim)<k) {
+        warning("Not enough detection aims to complete detection. This is expected if this run was used to output a detection aim.\n")
+        return()
+      }
 
       run = do.call('find.cluster', c(list(
         x = x, vec = vec,list.cdm = list.cdm,
@@ -3206,7 +3251,10 @@ p.value.to.star.label = function(pv) {
 #'
 #' @export
 multivariance.timing = function(N=NULL,n,sectime = NULL,coef.cdm=15.2,coef.prod=2.1,coef.sum = 1.05,determine.parameters = FALSE) {
-  if (!determine.parameters) {
+# coef.cdm.Nssq coef.prod.Nssq  coef.sum.Nssq  machine
+#   8.808793       1.455658       0.932342     i5-1035G4 CPU @ 1.10GHz, 1498 MHz, 4 cores, 8 (logical) processors
+
+    if (!determine.parameters) {
     const = coef.cdm*n+coef.prod*(n-1)+coef.sum
     if (!is.null(N) & is.null(sectime)) {
       nanotime = const * N^2
@@ -3294,4 +3342,16 @@ signed.sqrt = function(x) {
 }
 
 
+#' Simple integer hash from text
+#'
+#' Used to compute a random seed for \code{set.seed} based on the example name,
+#' in order to aviod arbitrary seeds like '1234'.
+#'
+#' @examples
+#' multivariance:::simple.int.hash("dep_struct_several_26_100")
+#' @keywords internal
+simple.int.hash = function(x) {
+  ra = charToRaw(x)
+  return(as.integer(sum(strtoi(ra,16L)*2^(1:length(ra))) %% 2^31))
+}
 

@@ -20,7 +20,7 @@ multivariance.test(
 
 \item{type}{one of \code{"independence"}, \code{"pairwise independence"}, \code{"multi"}, \code{"total"}, \code{"m.multi.2"}, \code{"m.multi.3"}}
 
-\item{p.value.type}{one of \code{"pearson_approx"}, \code{"distribution_free"}, \code{"resample"}}
+\item{p.value.type}{one of \code{"pearson_approx"}, \code{"distribution_free"}, \code{"resample"}, \code{"pearson_unif"}}
 
 \item{verbose}{logical, if TRUE meaningful text output is generated.}
 
@@ -47,7 +47,7 @@ Also the types \code{"pairwise independence"} and \code{"m.multi.2"} are identic
 
 The type \code{"m.multi.3"}, performs a test for 3-independence, assuming pairwise independence. The type  \code{"multi"} performs a test for n-independence, assuming (n-1)-independence.
 
-There are several ways (determined by \code{p.value.type}) to estimate the p-value: The \code{"pearson_approx"} and \code{"resample"} are approximately sharp. The latter is based on a resampling approach and thus much slower. The \code{"distribution_free"} test might be very conservative, its p-value estimates are only valid for p-values lower than 0.215 - values above should be interpreted as "values larger than 0.215".
+There are several ways (determined by \code{p.value.type}) to estimate the p-value: The \code{"pearson_approx"} and \code{"resample"} are approximately sharp. The latter is based on a resampling approach and thus much slower. The \code{"distribution_free"} test might be very conservative, its p-value estimates are only valid for p-values lower than 0.215 - values above should be interpreted as "values larger than 0.215". Finally, \code{"pearson_unif"} uses fixed parameters in Pearson's estimate, it is only applicable for univariate uniformly distributed marginals
 
 All tests are performed using the standard euclidean distance. Other distances can be supplied via the \code{...}, see \code{\link{cdm}} for the accepted arguments.
 }

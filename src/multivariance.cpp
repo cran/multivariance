@@ -185,7 +185,7 @@ NumericMatrix doubleCenterBiasCorrected(const NumericMatrix & x) {
       out(i, j) = tmp;
     }
 
-    return out;
+  return out;
 }
 
 //' bias corrected double centering with normalizing
@@ -218,10 +218,10 @@ NumericVector doubleCenterBiasCorrectedUpper(const NumericMatrix & x) {
       k += 1;
     }
 
-    centeredmean = 2*centeredmean/(N*(N-3));
+  centeredmean = 2*centeredmean/(N*(N-3));
 
   if (centeredmean < DBL_EPSILON) {
-    warning("A doubly centered distance matrix seems to have only zero entries. Maybe one variable is constant. Constants are always independent. \n");
+//    warning("A doubly centered distance matrix seems to have only zero entries. Maybe one variable is constant. Constants are always independent. \n");
     return zero;
   } else {
     return out/pow(centeredmean, 0.5);
@@ -261,10 +261,10 @@ List doubleCenterBiasCorrectedUpperLower(const NumericMatrix & x, const int & n)
 
 
 
-    upper = 2*upper/(N*(N-3));
+  upper = 2*upper/(N*(N-3));
 
   if (upper < DBL_EPSILON) {
-    warning("A doubly centered distance matrix seems to have only zero entries. Maybe one variable is constant. Constants are always independent. \n");
+//    warning("A doubly centered distance matrix seems to have only zero entries. Maybe one variable is constant. Constants are always independent. \n");
     out = zero;
     upper = 1;  // to prevent division by 0
     lower = 1;  // to prevent division by 0

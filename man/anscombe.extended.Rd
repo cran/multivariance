@@ -36,19 +36,19 @@ concerned with correlation.
 \examples{
 
 # Code which generates plots of all included data:
-
 op = par(mfrow = c(3,5),mar = c(0.5,0.5,3,0.5))
 for (name in c("N11","N100","N1000")) {
-  for (i in 1:5) {
-    x = anscombe.extended[[name]][,2*i-1]
-    y = anscombe.extended[[name]][,2*i]
-  plot(x,y,main = paste0("cor = ",round(cor(x,y),2),
-     "\n Mcor = ",round(multicorrelation(cbind(x,y),type = "pairwise",squared = FALSE),2)),
-     axes = FALSE,xlab ="",ylab = "")
-  # for two variables 'pairwise' coincides with
-  # both values of 'total.upper.lower'.
-  box()
-  }
+ for (i in 1:5) {
+   x = anscombe.extended[[name]][,2*i-1]
+   y = anscombe.extended[[name]][,2*i]
+   plot(x,y,main = paste0("cor = ",round(cor(x,y),2),
+"\n Mcor = ",round(multicorrelation(cbind(x,y),type = "pairwise",squared = FALSE),2),
+"\n CMcor = ",round(copula.multicorrelation(cbind(x,y),type = "pairwise",squared = FALSE),2)),
+        axes = FALSE,xlab ="",ylab = "", cex.main=1)
+   # for two variables 'pairwise' coincides with
+   # both values of 'total.upper.lower'.
+   box()
+ }
 }
 par(op)
 

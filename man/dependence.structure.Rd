@@ -65,7 +65,7 @@ returns a list with elements:
 Determines the dependence structure as described in [3].
 }
 \details{
-Performs the detection of the dependence structure as described in [3] (the options '\code{structure.type = "full"}' and '\code{type = "consistent"}' are part of a revised version of the paper). In the \code{clustered} structure variables are clustered and treated as one variable as soon as a dependence is detected, the \code{full} structure treats always each variable separately. The detection is either based on tests with significance level \code{alpha} or a \code{consistent} estimator is used. The latter yields (in the limit for increasing sample size) under very mild conditions always the correct dependence structure (but the convergence might be very slow).
+Performs the detection of the dependence structure as described in [3]. In the \code{clustered} structure variables are clustered and treated as one variable as soon as a dependence is detected, the \code{full} structure treats always each variable separately. The detection is either based on tests with significance level \code{alpha} or a \code{consistent} estimator is used. The latter yields (in the limit for increasing sample size) under very mild conditions always the correct dependence structure (but the convergence might be very slow).
 
 If \code{fixed.rejection.level} is not provided, the significance level \code{alpha} is used to determine which multivariances are significant using the distribution-free rejection level. As default the Holm method is used for p-value correction corresponding to multiple testing.
 

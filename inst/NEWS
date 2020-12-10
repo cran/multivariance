@@ -1,3 +1,18 @@
+
+
+Changes in version 2.4.0
+========================
+
+Updates
+ * extended/updated documentation
+ * adaptation to stricter checks of R submissions
+ * speedup of 'pearson_approx', 'multivariance.test' and some more
+
+New Features
+ * 'multivariance.test' has now the p-value option "pearson_unif" for fast tests with precalculated paramters in the case of univariate unifomly distributed marginals, e.g. given by copulas
+ * 'Mcor' is an alias for 'multicorrelation'
+ * 'CMcor' is an alias for 'copula.multicorrelation'
+
 Changes in version 2.3.0
 ========================
 

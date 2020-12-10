@@ -111,7 +111,7 @@ N = 5
 x = matrix(rnorm(N*n),nrow = N)
 
 for (ty in c("total","m.multi.2","m.multi.3","multi"))
-  for (pvt in c("distribution_free","resample","pearson_approx"))
+  for (pvt in c("distribution_free","resample","pearson_approx","pearson_unif"))
     multivariance.test(x,type=ty,p.value.type = pvt)
 
 if (n == 5) { # testing argument 'vec'
@@ -135,7 +135,8 @@ for (ty in c("total","m.multi.2","m.multi.3","multi"))
 
 for (ty in c("total","m.multi.2","m.multi.3","multi"))
   for (pvt in c("distribution_free","resample","pearson_approx"))
-    expect_warning(multivariance.test(x,type=ty,p.value.type = pvt, p = 0.5))
+    expect_warning(multivariance.test(x,type=ty,p.value.type = pvt, p = 0.5),"p is not in")
+# note: for "pearson_approx" there is more than one warning
 
 for (ty in c("total","m.multi.2","m.multi.3","multi"))
   for (pvt in c("distribution_free","resample","pearson_approx"))
@@ -151,7 +152,7 @@ for (ty in c("total","m.multi.2","m.multi.3","multi"))
 
 for (ty in c("total","m.multi.2","m.multi.3","multi"))
   for (pvt in c("resample"))
-    multivariance.test(x,type=ty,p.value.type = pvt, resample.type = "bootstrap")
+    expect_warning(multivariance.test(x,type=ty,p.value.type = pvt, resample.type = "bootstrap"),"bootstrap")
 
 
 
@@ -239,22 +240,30 @@ expect_equivalent(multicorrelation(x,type = "m.multi.2",multicorrelation.type = 
 # expected to be not equal
 # expect_equivalent(multicorrelation(x,type = "m.multi.3",multicorrelation.type = "unnormalized"), multicorrelation(x,type = "m.multi.3",multicorrelation.type = "normalized"))
 
+suppressWarnings(
 expect_equivalent(
   multicorrelation(matrix(rep(1,10*3),ncol = 3),type = "total.lower",estimator.type = "biased"),
   0)
+)
+
+expect_warning(
+  multicorrelation(matrix(rep(1,10*3),ncol = 3),type = "total.lower",estimator.type = "biased"),"Constant")
+
 
 #TODO check that lower bound is a lower bound!
 
 # * unbiased ####
 
-expect_equivalent(
+suppressWarnings( expect_equivalent(
   multicorrelation(matrix(rep(1,10*3),ncol = 3)),
-  c(0,0))
+  c(0,0)))
+
+# expect_warning( multicorrelation(matrix(rep(1,10*3),ncol = 3)),"zero entries")
+# warning removed in 2.3.1
 
 expect_equivalent(multicorrelation(cbind(y,2*y,1-y,y*5-pi,y+1),type="pairwise",multicorrelation.type = "normalized",estimator.type = "bias.corrected"),1)
 
 expect_equivalent(multicorrelation(cbind(y,2*y,1-y,y*5-pi,y+1),type="all",multicorrelation.type = "normalized",estimator.type = "bias.corrected")["unnormalized"],1)
-
 
 
 # identity with other measures ####
@@ -324,21 +333,23 @@ context("dependence structures")
 # just some code, to see if some errors are produced...
 
 set.seed(1023)
-x = coins(30,5)
+x = coins(10,5)
 vec = 1:ncol(x)
+
+verbose.output = FALSE
 
 for (sty in c("clustered","full"))
   for (ty in c("conservative","resample","pearson_approx","consistent"))
-    dependence.structure(x,vec,type = ty, structure.type = sty,list.cdm = NULL, alpha = 0.05,stop.too.many = 100000)
+    dependence.structure(x,vec,type = ty, structure.type = sty,list.cdm = NULL, alpha = 0.05,stop.too.many = 100000,verbose = verbose.output)
 
 for (sty in c("clustered"))
   for (ty in c("conservative","resample","pearson_approx","consistent"))
-    dependence.structure(x,vec,type = ty, structure.type = sty,list.cdm = NULL, alpha = 0.05,stop.too.many = 100000)
+    dependence.structure(x,vec,type = ty, structure.type = sty,list.cdm = NULL, alpha = 0.05,stop.too.many = 100000,verbose = verbose.output)
 
 vec = c(1:3,1)
 for (sty in c("clustered","full"))
   for (ty in c("conservative","resample","pearson_approx","consistent"))
-    dependence.structure(x,vec,type = ty, structure.type = sty,list.cdm = NULL, alpha = 0.05,stop.too.many = 100000)
+    dependence.structure(x,vec,type = ty, structure.type = sty,list.cdm = NULL, alpha = 0.05,stop.too.many = 100000,verbose = verbose.output)
 
 # input problems ####
 
@@ -351,3 +362,4 @@ if (FALSE) {
   multivariance(cbind(x,y))
   multivariance(data.frame(x,y))
 }
+
