@@ -4,10 +4,12 @@
 \alias{emp.transf}
 \title{Monte Carlo empirical transform}
 \usage{
-emp.transf(x)
+emp.transf(x, continuous = FALSE)
 }
 \arguments{
 \item{x}{data matrix (rows: samples, columns: variables)}
+
+\item{continuous}{boolean, if TRUE it provides the classical (non-Monte-Carlo) transformation by the empirical distribution function, which is a reasonable choice for data of continuous distributions.}
 }
 \description{
 Transforms a matrix (rows: samples, columns: variables) into a matrix of uniform samples with the same dependence structure via the Monte Carlo empirical transform.

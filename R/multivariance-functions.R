@@ -67,13 +67,13 @@
 #' @references
 #' [1] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors: generalized distance covariance and Gaussian covariance. Modern Stochastics: Theory and Applications, Vol. 5, No. 3(2018) 353-383. \url{https://www.vmsta.org/journal/VMSTA/article/127/info}
 #'
-#' [2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures for random vectors. The Annals of Statistics, Vol. 47, No. 5 (2019) 2757-2789. \url{https://projecteuclid.org/euclid.aos/1564797863}
+#' [2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures for random vectors. The Annals of Statistics, Vol. 47, No. 5 (2019) 2757-2789. \doi{10.1214/18-AOS1764}
 #'
-#' [3] B. Böttcher, Dependence and Dependence Structures: Estimation and Visualization using the Unifying Concept of Distance Multivariance. Open Statistics, Vol. 1, No. 1 (2020) 1-46. \url{https://doi.org/10.1515/stat-2020-0001}
+#' [3] B. Böttcher, Dependence and Dependence Structures: Estimation and Visualization using the Unifying Concept of Distance Multivariance. Open Statistics, Vol. 1, No. 1 (2020) 1-46. \doi{10.1515/stat-2020-0001}
 #'
 #' [4] G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint. \url{https://arxiv.org/abs/1808.07280}
 #'
-#' [5] B. Böttcher, Copula versions of distance multivariance and dHSIC via the distributional transform -- a general approach to construct invariant dependence measures. Statistics, (2020) 1-18. \url{https://doi.org/10.1080/02331888.2020.1748029}
+#' [5] B. Böttcher, Copula versions of distance multivariance and dHSIC via the distributional transform -- a general approach to construct invariant dependence measures. Statistics, (2020) 1-18. \doi{10.1080/02331888.2020.1748029}
 #'
 #' [6] B. Böttcher, Notes on the interpretation of dependence measures -- Pearson's correlation, distance correlation, distance multicorrelations and their copula versions. Preprint. \url{https://arxiv.org/abs/2004.07649}
 #'
@@ -2064,6 +2064,7 @@ emp.transf.vec = function(x,unif.samples = stats::runif(length(x))) {
 #' Transforms a matrix (rows: samples, columns: variables) into a matrix of uniform samples with the same dependence structure via the Monte Carlo empirical transform.
 #'
 #' @param x data matrix (rows: samples, columns: variables)
+#' @param continuous boolean, if TRUE it provides the classical (non-Monte-Carlo) transformation by the empirical distribution function, which is a reasonable choice for data of continuous distributions.
 # ru = runif(nrow(x)) # this would introduce dependence
 # apply(x,2,function(y) emp.transf.vec(y,ru))
 #'
@@ -2071,12 +2072,18 @@ emp.transf.vec = function(x,unif.samples = stats::runif(length(x))) {
 #' For the theoretic background see the reference [5] given on the main help page of this package: \link{multivariance-package}.
 #'
 #' @export
-emp.transf = function(x) {
-  apply(x,2,function(y) emp.transf.vec(y))
+emp.transf = function(x,continuous = FALSE) {
+  if (continuous) {
+    apply(x,2,function(y) emp.transf.vec(y,0))
+  } else {
+    apply(x,2,function(y) emp.transf.vec(y))
+  }
 }
 
 #' A dependent Monte Carlo emprical transform
-#'
+#' 
+#' It is dependendent, since each component uses the same uniformly distributed sample.
+#' 
 #' @keywords internal
 emp.transf.dep = function(x) {
   u = stats::runif(nrow(x))

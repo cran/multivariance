@@ -1,5 +1,15 @@
 
 
+Changes in version 2.4.1
+========================
+
+Updates
+ * accommodate changes of the required package 'Rcpp'
+
+New Features
+ * 'emp.transf' has now the option "continuous". If TRUE it provides the classical (non-Monte-Carlo) transformation by the empirical distribution function, which is a reasonable choice for data of continuous distributions.
+
+
 Changes in version 2.4.0
 ========================
 
@@ -12,6 +22,10 @@ New Features
  * 'multivariance.test' has now the p-value option "pearson_unif" for fast tests with precalculated paramters in the case of univariate unifomly distributed marginals, e.g. given by copulas
  * 'Mcor' is an alias for 'multicorrelation'
  * 'CMcor' is an alias for 'copula.multicorrelation'
+
+Changes in version 2.X.X
+========================
+
 
 Changes in version 2.3.0
 ========================

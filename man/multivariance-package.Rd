@@ -74,13 +74,13 @@ For planing of large projects or studies it might be convenient to estimate the 
 \references{
 [1] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors: generalized distance covariance and Gaussian covariance. Modern Stochastics: Theory and Applications, Vol. 5, No. 3(2018) 353-383. \url{https://www.vmsta.org/journal/VMSTA/article/127/info}
 
-[2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures for random vectors. The Annals of Statistics, Vol. 47, No. 5 (2019) 2757-2789. \url{https://projecteuclid.org/euclid.aos/1564797863}
+[2] B. Böttcher, M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures for random vectors. The Annals of Statistics, Vol. 47, No. 5 (2019) 2757-2789. \doi{10.1214/18-AOS1764}
 
-[3] B. Böttcher, Dependence and Dependence Structures: Estimation and Visualization using the Unifying Concept of Distance Multivariance. Open Statistics, Vol. 1, No. 1 (2020) 1-46. \url{https://doi.org/10.1515/stat-2020-0001}
+[3] B. Böttcher, Dependence and Dependence Structures: Estimation and Visualization using the Unifying Concept of Distance Multivariance. Open Statistics, Vol. 1, No. 1 (2020) 1-46. \doi{10.1515/stat-2020-0001}
 
 [4] G. Berschneider, B. Böttcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. Preprint. \url{https://arxiv.org/abs/1808.07280}
 
-[5] B. Böttcher, Copula versions of distance multivariance and dHSIC via the distributional transform -- a general approach to construct invariant dependence measures. Statistics, (2020) 1-18. \url{https://doi.org/10.1080/02331888.2020.1748029}
+[5] B. Böttcher, Copula versions of distance multivariance and dHSIC via the distributional transform -- a general approach to construct invariant dependence measures. Statistics, (2020) 1-18. \doi{10.1080/02331888.2020.1748029}
 
 [6] B. Böttcher, Notes on the interpretation of dependence measures -- Pearson's correlation, distance correlation, distance multicorrelations and their copula versions. Preprint. \url{https://arxiv.org/abs/2004.07649}
 }

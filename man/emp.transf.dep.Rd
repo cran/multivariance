@@ -7,6 +7,6 @@
 emp.transf.dep(x)
 }
 \description{
-A dependent Monte Carlo emprical transform
+It is dependendent, since each component uses the same uniformly distributed sample.
 }
 \keyword{internal}

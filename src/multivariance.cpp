@@ -1,4 +1,6 @@
 #include <Rcpp.h>
+#include <float.h>
+#define STRICT_R_HEADERS
 using namespace Rcpp;
 
 //' fast Euclidean distance matrix
